@@ -1,0 +1,61 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: vue-dashboard-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: vue-dashboard
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - vue-dashboard-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vue-dashboard-backend
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/vue-dashboard?authSource=admin
+      JWT_SECRET: your_super_secret_jwt_key_change_in_production
+      NODE_ENV: production
+      PORT: 5000
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - "5000:5000"
+    networks:
+      - vue-dashboard-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: vue-dashboard-frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    ports:
+      - "5173:5173"
+    networks:
+      - vue-dashboard-network
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:
+
+networks:
+  vue-dashboard-network:
+    driver: bridge
