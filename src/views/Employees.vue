@@ -1221,7 +1221,7 @@
                     <div class="form-group">
                       <label class="checkbox-label">
                         <input type="checkbox" v-model="currentChild.hasSupport" />
-                        <span>គណនា</span>
+                        <span>សំដៅបានស្នើសុំប្រាក់ឧបត្ថម្ភប្រចាំខែ</span>
                       </label>
                     </div>
                     <div class="form-group full-width-2col">
@@ -2509,8 +2509,8 @@ onMounted(() => {
 .child-form-modal {
   background: white;
   border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
+  width: 95%;
+  max-width: 900px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   animation: slideUp 0.3s ease-out;
 }
@@ -2619,6 +2619,10 @@ onMounted(() => {
   border: 1px solid #cbd5e1;
   border-radius: 4px;
   font-size: 0.8rem;
+}
+
+.date-inputs-compact input:nth-child(3) {
+  flex: 1.3;
 }
 
 .date-inputs-compact input::placeholder {
