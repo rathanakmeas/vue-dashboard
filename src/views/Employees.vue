@@ -1066,7 +1066,7 @@
           </div>
 
           <!-- Tab 4: Children Information -->
-          <div v-show="activeIconTab === 4" class="tab-content">
+          <div v-show="activeIconTab === 3" class="tab-content">
             <div class="form-block">
               <div class="form-section-header">
                 <i class="pi pi-users"></i>
@@ -1230,6 +1230,19 @@
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Tab 5: Education/Culture Information -->
+          <div v-show="activeIconTab === 4" class="tab-content">
+            <div class="form-block">
+              <div class="form-section-header">
+                <i class="pi pi-book"></i>
+                <h4>ព័ត៌មានកម្រិតវប្បធម៌</h4>
+              </div>
+              <p style="color: #94a3b8; text-align: center; padding: 2rem;">
+                ផ្នែកនេះនឹងបង្ហាញព័ត៌មានលម្អិតអំពីកម្រិតវប្បធម៌ក្នុងឹងមាន។
+              </p>
             </div>
           </div>
 
