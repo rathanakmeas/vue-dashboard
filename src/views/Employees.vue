@@ -1138,8 +1138,8 @@
                 </div>
 
                 <div class="child-form-body">
-                  <!-- Row 1: Birth Certificate and Khmer Name -->
-                  <div class="form-row">
+                  <!-- Row 1: Birth Certificate, Khmer Name, Latin Name (3 columns) -->
+                  <div class="form-row-3col">
                     <div class="form-group">
                       <label>លេខសំបុត្រកំណើត</label>
                       <input v-model="currentChild.birthCertificateNo" type="text" placeholder="លេខសំបុត្រកំណើត" />
@@ -1148,14 +1148,14 @@
                       <label>គោត្តនាម និងនាម</label>
                       <input v-model="currentChild.khmerName" type="text" placeholder="គោត្តនាម និងនាម" />
                     </div>
-                  </div>
-
-                  <!-- Row 2: Latin Name and Gender -->
-                  <div class="form-row">
                     <div class="form-group">
                       <label>គោត្តនាម និងនាមឡាតាំង</label>
                       <input v-model="currentChild.latinName" type="text" placeholder="គោត្តនាម និងនាមឡាតាំង" />
                     </div>
+                  </div>
+
+                  <!-- Row 2: Gender, Birth Date, Occupation (3 columns) -->
+                  <div class="form-row-3col">
                     <div class="form-group">
                       <label>ភេទ</label>
                       <select v-model="currentChild.gender">
@@ -1164,13 +1164,9 @@
                         <option value="ស្រី">ស្រី</option>
                       </select>
                     </div>
-                  </div>
-
-                  <!-- Row 3: Date of Birth and Occupation -->
-                  <div class="form-row">
                     <div class="form-group">
                       <label>ថ្ងៃខែឆ្នាំកំណើត</label>
-                      <div class="date-inputs">
+                      <div class="date-inputs-compact">
                         <input v-model="currentChild.birthDay" type="number" placeholder="ថ្ងៃ" min="1" max="31" />
                         <input v-model="currentChild.birthMonth" type="number" placeholder="ខែ" min="1" max="12" />
                         <input v-model="currentChild.birthYear" type="number" placeholder="ឆ្នាំ" min="1900" />
@@ -1189,7 +1185,7 @@
                         <option value="associate-professor">សាស្ដ្រាចារ្យរង</option>
                         <option value="assistant-professor">សាស្ដ្រាចារ្យជំនួយ</option>
                         <option value="medical-specialist">វេជ្ជបណ្ខិតឯកទេស</option>
-                        <option value="medical-master">វេជ្ជបណ្ខិត(ជំនាញ/អនុបណ្ឌិត)</option>
+                        <option value="medical-master">វេជ្ជបណ្ខិត(ជំនាญ/អនុបណ្ឌិត)</option>
                         <option value="medical-doctor">វេជ្ជបណ្ឌិត</option>
                         <option value="dentist">ទន្ដបណ្ឌិត</option>
                         <option value="pharmacist">ឱសថការី</option>
@@ -1220,22 +1216,46 @@
                     </div>
                   </div>
 
-                  <!-- Row 4: Checkbox and Remarks -->
-                  <div class="form-row">
+                  <!-- Row 3: Checkbox and Remarks (3 columns) -->
+                  <div class="form-row-3col">
                     <div class="form-group">
                       <label class="checkbox-label">
                         <input type="checkbox" v-model="currentChild.hasSupport" />
                         <span>គណនា</span>
                       </label>
                     </div>
-                    <div class="form-group"></div>
+                    <div class="form-group full-width-2col">
+                      <label>ផ្សេងៗ</label>
+                      <textarea v-model="currentChild.remarks" placeholder="ផ្សេងៗ" rows="2"></textarea>
+                    </div>
                   </div>
 
-                  <!-- Row 5: Remarks (Full Width) -->
-                  <div class="form-row">
-                    <div class="form-group full-width">
-                      <label>ផ្សេងៗ</label>
-                      <textarea v-model="currentChild.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+                  <!-- File Upload Block -->
+                  <div class="attachment-block">
+                    <div class="block-header">
+                      <i class="pi pi-paperclip"></i>
+                      <h5>ឯកសារកូនដែលកើត</h5>
+                    </div>
+                    <div class="file-upload-area">
+                      <input 
+                        type="file" 
+                        @change="handleChildFileUpload" 
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        class="file-input"
+                        ref="childFileInput"
+                      />
+                      <label for="childFileInput" class="file-upload-label">
+                        <i class="pi pi-cloud-upload"></i>
+                        <span>ចុចដើម្បីយក​ឯកសារ ឬ Drag & Drop</span>
+                        <small>ឯកសារដែលទទួលយក: PDF, JPG, PNG, DOC, DOCX</small>
+                      </label>
+                    </div>
+                    <div v-if="currentChild.attachmentFile" class="file-info">
+                      <i class="pi pi-check-circle"></i>
+                      <span>{{ currentChild.attachmentFile.name }} ({{ formatFileSize(currentChild.attachmentFile.size) }})</span>
+                      <button type="button" class="btn-remove-file" @click="removeChildFile">
+                        <i class="pi pi-trash"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1335,7 +1355,8 @@ const currentChild = ref({
   birthYear: '',
   occupation: '',
   hasSupport: false,
-  remarks: ''
+  remarks: '',
+  attachmentFile: null
 });
 
 const formData = ref({
@@ -1595,7 +1616,8 @@ const addChild = () => {
     birthYear: '',
     occupation: '',
     hasSupport: false,
-    remarks: ''
+    remarks: '',
+    attachmentFile: null
   };
   editingChildIndex.value = null;
   childFormVisible.value = true;
@@ -1640,7 +1662,8 @@ const closeChildForm = () => {
     birthYear: '',
     occupation: '',
     hasSupport: false,
-    remarks: ''
+    remarks: '',
+    attachmentFile: null
   };
 };
 
@@ -1659,6 +1682,30 @@ const deleteEmployee = async () => {
     console.error('Error deleting employee:', error);
     alert('កំហុសក្នុងការលុប');
   }
+};
+
+const handleChildFileUpload = (event) => {
+  const file = event.target.files?.[0];
+  if (file) {
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('ឯកសារមានទំហំធំពេក។ ដែនកំណត់អតិបរមា: 5MB');
+      return;
+    }
+    currentChild.value.attachmentFile = file;
+  }
+};
+
+const removeChildFile = () => {
+  currentChild.value.attachmentFile = null;
+};
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 };
 
 onMounted(() => {
@@ -2558,6 +2605,171 @@ onMounted(() => {
 
 .date-inputs input::placeholder {
   color: #94a3b8;
+}
+
+/* Compact Date Inputs for 3-column layout */
+.date-inputs-compact {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.date-inputs-compact input {
+  flex: 1;
+  padding: 0.4rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.date-inputs-compact input::placeholder {
+  color: #94a3b8;
+}
+
+/* 3-Column Form Row */
+.form-row-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row-3col .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row-3col label {
+  margin-bottom: 0.4rem;
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.form-row-3col select,
+.form-row-3col input {
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.form-row-3col select:focus,
+.form-row-3col input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Full Width 2 Column */
+.form-group.full-width-2col {
+  grid-column: 2 / 4;
+}
+
+/* Attachment Block */
+.attachment-block {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.block-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.block-header i {
+  color: #0ea5e9;
+  font-size: 1.25rem;
+}
+
+.block-header h5 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.file-upload-area {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.file-upload-label:hover {
+  border-color: #0ea5e9;
+  background: #eff6ff;
+}
+
+.file-upload-label i {
+  font-size: 2rem;
+  color: #0ea5e9;
+}
+
+.file-upload-label span {
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.file-upload-label small {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
+  border-radius: 6px;
+  color: #065f46;
+}
+
+.file-info i {
+  font-size: 1.2rem;
+}
+
+.file-info span {
+  flex: 1;
+  font-size: 0.875rem;
+  word-break: break-all;
+}
+
+.btn-remove-file {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-remove-file:hover {
+  background: #dc2626;
 }
 
 /* Checkbox Label */
