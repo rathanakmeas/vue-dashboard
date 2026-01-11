@@ -1099,11 +1099,11 @@
                       <td>{{ child.birthDay }}/{{ child.birthMonth }}/{{ child.birthYear }}</td>
                       <td>{{ child.occupation }}</td>
                       <td>
-                        <span v-if="child.hasSupport" class="status-indicator active">
-                          <i class="pi pi-check-circle"></i> Yes
+                        <span v-if="child.supportStatus === 'applied'" class="status-indicator active">
+                          <i class="pi pi-check-circle"></i> មាន
                         </span>
                         <span v-else class="status-indicator inactive">
-                          <i class="pi pi-circle"></i> No
+                          <i class="pi pi-circle"></i> គ្មាន
                         </span>
                       </td>
                       <td>
@@ -1131,7 +1131,7 @@
             <div v-if="childFormVisible" class="child-form-overlay">
               <div class="child-form-modal">
                 <div class="child-form-header">
-                  <h4>{{ editingChildIndex !== null ? 'កែប្រែទិន្នន័យកូន' : 'បន្ថែមកូនថ្មី' }}</h4>
+                  <h4 class="siemreap-font-13">{{ editingChildIndex !== null ? 'កែប្រែទិន្នន័យកូន' : 'បន្ថែមកូនថ្មី' }}</h4>
                   <button type="button" class="btn-close" @click="closeChildForm">
                     <i class="pi pi-times"></i>
                   </button>
@@ -1216,13 +1216,20 @@
                     </div>
                   </div>
 
-                  <!-- Row 3: Checkbox and Remarks (3 columns) -->
+                  <!-- Row 3: Radio buttons and Remarks (3 columns) -->
                   <div class="form-row-3col">
                     <div class="form-group">
-                      <label class="checkbox-label">
-                        <input type="checkbox" v-model="currentChild.hasSupport" />
-                        <span>សំដៅបានស្នើសុំប្រាក់ឧបត្ថម្ភប្រចាំខែ</span>
-                      </label>
+                      <label>ការគាំទ្រ</label>
+                      <div class="radio-group">
+                        <label class="radio-label">
+                          <input type="radio" v-model="currentChild.supportStatus" value="applied" />
+                          <span>បានស្នើសុំប្រាក់ឧបត្ថម្ភ</span>
+                        </label>
+                        <label class="radio-label">
+                          <input type="radio" v-model="currentChild.supportStatus" value="not-applied" />
+                          <span>មិនទាន់បានស្នើប្រាក់ឧបត្ថម្ភ</span>
+                        </label>
+                      </div>
                     </div>
                     <div class="form-group full-width-2col">
                       <label>ផ្សេងៗ</label>
@@ -1234,7 +1241,7 @@
                   <div class="attachment-block">
                     <div class="block-header">
                       <i class="pi pi-paperclip"></i>
-                      <h5>ឯកសារកូនដែលកើត</h5>
+                      <h5 class="siemreap-font-12">ឯកសារកូនដែលកើត</h5>
                     </div>
                     <div class="file-upload-area">
                       <input 
@@ -1244,10 +1251,10 @@
                         class="file-input"
                         ref="childFileInput"
                       />
-                      <label for="childFileInput" class="file-upload-label">
+                      <label for="childFileInput" class="file-upload-label siemreap-font-12">
                         <i class="pi pi-cloud-upload"></i>
                         <span>ចុចដើម្បីយក​ឯកសារ ឬ Drag & Drop</span>
-                        <small>ឯកសារដែលទទួលយក: PDF, JPG, PNG, DOC, DOCX</small>
+                        <small>ឯកសារដែលទទួលយក: PDF, JPG, PNG, DOC, DOCX (ម៉ាក្សម៌ 5 Megabyte)</small>
                       </label>
                     </div>
                     <div v-if="currentChild.attachmentFile" class="file-info">
@@ -1354,7 +1361,7 @@ const currentChild = ref({
   birthMonth: '',
   birthYear: '',
   occupation: '',
-  hasSupport: false,
+  supportStatus: 'not-applied',
   remarks: '',
   attachmentFile: null
 });
@@ -1615,7 +1622,7 @@ const addChild = () => {
     birthMonth: '',
     birthYear: '',
     occupation: '',
-    hasSupport: false,
+    supportStatus: 'not-applied',
     remarks: '',
     attachmentFile: null
   };
@@ -1661,7 +1668,7 @@ const closeChildForm = () => {
     birthMonth: '',
     birthYear: '',
     occupation: '',
-    hasSupport: false,
+    supportStatus: 'not-applied',
     remarks: '',
     attachmentFile: null
   };
@@ -2529,6 +2536,16 @@ onMounted(() => {
   color: #1e293b;
 }
 
+.siemreap-font-13 {
+  font-family: 'Siemreap', serif;
+  font-size: 13px;
+}
+
+.siemreap-font-12 {
+  font-family: 'Siemreap', serif;
+  font-size: 12px;
+}
+
 .btn-close {
   background: none;
   border: none;
@@ -2794,6 +2811,32 @@ onMounted(() => {
 
 .checkbox-label span {
   margin-top: 0.25rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  flex-direction: column;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-label input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.radio-label span {
+  font-size: 0.95rem;
+  color: #475569;
 }
 
 /* Full Width Form Group */
