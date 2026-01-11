@@ -1081,26 +1081,29 @@
                   <thead>
                     <tr>
                       <th>ល.រ</th>
-                      <th>ឈ្មោះខ្មែរ</th>
-                      <th>ឈ្មោះលាតីន</th>
+                      <th>លេខសំបុត្រកំណើត</th>
+                      <th>គោត្តនាម និងនាម</th>
                       <th>ភេទ</th>
-                      <th>ថ្ងៃកំណើត</th>
+                      <th>ថ្ងៃខែឆ្នាំកំណើត</th>
                       <th>មុខរបរ</th>
-                      <th>ស្ថានភាព</th>
+                      <th>គណនា</th>
                       <th>សម្ភាសន៍</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(child, index) in formData.children" :key="index">
                       <td>{{ index + 1 }}</td>
+                      <td>{{ child.birthCertificateNo }}</td>
                       <td>{{ child.khmerName }}</td>
-                      <td>{{ child.latinName }}</td>
                       <td>{{ child.gender }}</td>
-                      <td>{{ child.birthDate }}</td>
+                      <td>{{ child.birthDay }}/{{ child.birthMonth }}/{{ child.birthYear }}</td>
                       <td>{{ child.occupation }}</td>
                       <td>
-                        <span :class="['status-indicator', child.status === 'alive' ? 'alive' : 'deceased']">
-                          <i :class="child.status === 'alive' ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
+                        <span v-if="child.hasSupport" class="status-indicator active">
+                          <i class="pi pi-check-circle"></i> Yes
+                        </span>
+                        <span v-else class="status-indicator inactive">
+                          <i class="pi pi-circle"></i> No
                         </span>
                       </td>
                       <td>
@@ -1135,17 +1138,31 @@
                 </div>
 
                 <div class="child-form-body">
+                  <!-- Birth Certificate Number -->
                   <div class="form-row">
                     <div class="form-group">
-                      <label>ឈ្មោះខ្មែរ</label>
-                      <input v-model="currentChild.khmerName" type="text" placeholder="ឈ្មោះខ្មែរ" />
-                    </div>
-                    <div class="form-group">
-                      <label>ឈ្មោះលាតីន</label>
-                      <input v-model="currentChild.latinName" type="text" placeholder="ឈ្មោះលាតីន" />
+                      <label>លេខសំបុត្រកំណើត</label>
+                      <input v-model="currentChild.birthCertificateNo" type="text" placeholder="លេខសំបុត្រកំណើត" />
                     </div>
                   </div>
 
+                  <!-- Khmer Name and Surname -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>គោត្តនាម និងនាម</label>
+                      <input v-model="currentChild.khmerName" type="text" placeholder="គោត្តនាម និងនាម" />
+                    </div>
+                  </div>
+
+                  <!-- Latin Name and Surname -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>គោត្តនាម និងនាមឡាតាំង</label>
+                      <input v-model="currentChild.latinName" type="text" placeholder="គោត្តនាម និងនាមឡាតាំង" />
+                    </div>
+                  </div>
+
+                  <!-- Gender -->
                   <div class="form-row">
                     <div class="form-group">
                       <label>ភេទ</label>
@@ -1155,19 +1172,31 @@
                         <option value="ស្រី">ស្រី</option>
                       </select>
                     </div>
+                  </div>
+
+                  <!-- Birth Date (Day/Month/Year) -->
+                  <div class="form-row">
                     <div class="form-group">
-                      <label>ថ្ងៃកំណើត</label>
-                      <input v-model="currentChild.birthDate" type="date" />
+                      <label>ថ្ងៃខែឆ្នាំកំណើត</label>
+                      <div class="date-inputs">
+                        <input v-model="currentChild.birthDay" type="number" placeholder="ថ្ងៃ" min="1" max="31" />
+                        <input v-model="currentChild.birthMonth" type="number" placeholder="ខែ" min="1" max="12" />
+                        <input v-model="currentChild.birthYear" type="number" placeholder="ឆ្នាំ" min="1900" />
+                      </div>
                     </div>
                   </div>
 
+                  <!-- Occupation -->
                   <div class="form-row">
                     <div class="form-group">
                       <label>មុខរបរ</label>
                       <select v-model="currentChild.occupation">
                         <option value="">ជ្រើសរើស</option>
-                        <option value="civil-servant">មន្ត្រីរាជការ</option>
+                        <option value="government-employee">មន្ត្រីរាជការ</option>
                         <option value="teacher">គ្រូបង្រៀន</option>
+                        <option value="loading">ក្នុងបន្ទុក</option>
+                        <option value="high-school">សិស្ស</option>
+                        <option value="university">និស្សិត</option>
                         <option value="professor">សាស្ត្រាចារ្យមហាបរិញ្ញា</option>
                         <option value="associate-professor">សាស្ដ្រាចារ្យរង</option>
                         <option value="assistant-professor">សាស្ដ្រាចារ្យជំនួយ</option>
@@ -1195,7 +1224,6 @@
                         <option value="mid-doctor">គ្រូពេទ្យមធ្យម</option>
                         <option value="farmer">កសិករ</option>
                         <option value="worker">កម្មករ</option>
-                        <option value="student">និស្សិត</option>
                         <option value="retired">រាជការនិវត្ត</option>
                         <option value="unemployed">គ្មានការងារ</option>
                         <option value="housewife">មេផ្ទះ</option>
@@ -1204,19 +1232,21 @@
                     </div>
                   </div>
 
+                  <!-- Calculate Checkbox -->
                   <div class="form-row">
                     <div class="form-group">
-                      <label>ស្ថានភាព</label>
-                      <div class="radio-group">
-                        <label class="radio-label">
-                          <input type="radio" v-model="currentChild.status" value="alive" />
-                          <span>រស់</span>
-                        </label>
-                        <label class="radio-label">
-                          <input type="radio" v-model="currentChild.status" value="deceased" />
-                          <span>ស្លាប់</span>
-                        </label>
-                      </div>
+                      <label class="checkbox-label">
+                        <input type="checkbox" v-model="currentChild.hasSupport" />
+                        <span>គណនា</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Other/Remarks -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>ផ្សេងៗ</label>
+                      <textarea v-model="currentChild.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
                     </div>
                   </div>
                 </div>
@@ -1307,12 +1337,16 @@ const activeIconTab = ref(0);
 const childFormVisible = ref(false);
 const editingChildIndex = ref(null);
 const currentChild = ref({
+  birthCertificateNo: '',
   khmerName: '',
   latinName: '',
   gender: '',
-  birthDate: '',
+  birthDay: '',
+  birthMonth: '',
+  birthYear: '',
   occupation: '',
-  status: 'alive'
+  hasSupport: false,
+  remarks: ''
 });
 
 const formData = ref({
@@ -1563,12 +1597,16 @@ const prevTab = () => {
 
 const addChild = () => {
   currentChild.value = {
+    birthCertificateNo: '',
     khmerName: '',
     latinName: '',
     gender: '',
-    birthDate: '',
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
     occupation: '',
-    status: 'alive'
+    hasSupport: false,
+    remarks: ''
   };
   editingChildIndex.value = null;
   childFormVisible.value = true;
@@ -1604,12 +1642,16 @@ const closeChildForm = () => {
   childFormVisible.value = false;
   editingChildIndex.value = null;
   currentChild.value = {
+    birthCertificateNo: '',
     khmerName: '',
     latinName: '',
     gender: '',
-    birthDate: '',
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
     occupation: '',
-    status: 'alive'
+    hasSupport: false,
+    remarks: ''
   };
 };
 
@@ -2509,6 +2551,77 @@ onMounted(() => {
   margin: 0;
   color: #1e293b;
   flex: 1;
+}
+
+/* Date Inputs */
+.date-inputs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.date-inputs input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.date-inputs input::placeholder {
+  color: #94a3b8;
+}
+
+/* Checkbox Label */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #475569;
+  font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox-label span {
+  margin-top: 0.25rem;
+}
+
+/* Textarea */
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+  color: #475569;
+}
+
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Status Indicator for Checkbox */
+.status-indicator.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-indicator.inactive {
+  background: #f3f4f6;
+  color: #6b7280;
 }
 
 @keyframes fadeIn {
