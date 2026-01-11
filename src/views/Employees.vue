@@ -1286,9 +1286,145 @@
                 <i class="pi pi-book"></i>
                 <h4>ព័ត៌មានកម្រិតវប្បធម៌</h4>
               </div>
-              <p style="color: #94a3b8; text-align: center; padding: 2rem;">
-                ផ្នែកនេះនឹងបង្ហាញព័ត៌មានលម្អិតអំពីកម្រិតវប្បធម៌ក្នុងឹងមាន។
-              </p>
+
+              <!-- Education History Section -->
+              <div class="form-block-section">
+                <div class="section-header" style="background-color: #e3f2fd; border-left: 4px solid #2196f3;">
+                  <i class="pi pi-graduation-cap"></i>
+                  <h5>ប្រវត្តិសាស្រ្ត​ការ​ដោះស្រាយ​ថ្នាក់</h5>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>កម្រិត​ការ​ផ្តល់ ឬ ទម្រង់ការ​ដោះស្រាយ​ថ្នាក់</label>
+                    <select v-model="formData.educationLevel">
+                      <option value="">-- ជ្រើសរើស --</option>
+                      <option value="primary">ប្រាథមិក</option>
+                      <option value="secondary">មត្តិមសិក្សា</option>
+                      <option value="highschool">វិទ្យាល័យ</option>
+                      <option value="bachelor">បរិញ្ញាបត្រ</option>
+                      <option value="master">មេធាវី</option>
+                      <option value="phd">បណ្ឌិត</option>
+                      <option value="vocational">វិชាជីវៈ</option>
+                      <option value="other">ផ្សេងៗ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ឈ្មោះ​សាលា / ស្ថាប័ន</label>
+                    <input v-model="formData.schoolName" type="text" placeholder="ឈ្មោះ​សាលា / ស្ថាប័ន" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ឆ្នាំ​ចាប់ផ្តើម</label>
+                    <input v-model="formData.startYear" type="number" placeholder="ឆ្នាំ​ចាប់ផ្តើម" min="1900" />
+                  </div>
+                  <div class="form-group">
+                    <label>ឆ្នាំ​បញ្ចប់</label>
+                    <input v-model="formData.endYear" type="number" placeholder="ឆ្នាំ​បញ្ចប់" min="1900" />
+                  </div>
+                  <div class="form-group">
+                    <label>វិស័យ / ឯកទេស</label>
+                    <input v-model="formData.major" type="text" placeholder="វិស័យ / ឯកទេស" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group full-width">
+                    <label>វិច្ឆិកាសញ្ញាប័ត្រ</label>
+                    <textarea v-model="formData.certificate" placeholder="ព័ត៌មាននៃវិច្ឆិកាសញ្ញាប័ត្រ" rows="3"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Languages Section -->
+              <div class="form-block-section">
+                <div class="section-header" style="background-color: #f3e5f5; border-left: 4px solid #9c27b0;">
+                  <i class="pi pi-comments"></i>
+                  <h5>ភាសា</h5>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ភាសាខ្មែរ</label>
+                    <select v-model="formData.khmerLanguage">
+                      <option value="">-- ជ្រើសរើស --</option>
+                      <option value="native">ម៉ាតាំង</option>
+                      <option value="fluent">ស្ដេច</option>
+                      <option value="good">ល្អ</option>
+                      <option value="fair">មិនច្រើន</option>
+                      <option value="basic">ងាយ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ភាសាអង់គ្លេស</label>
+                    <select v-model="formData.englishLanguage">
+                      <option value="">-- ជ្រើសរើស --</option>
+                      <option value="native">ម៉ាតាំង</option>
+                      <option value="fluent">ស្ដេច</option>
+                      <option value="good">ល្អ</option>
+                      <option value="fair">មិនច្រើន</option>
+                      <option value="basic">ងាយ</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ភាសាបារាំង</label>
+                    <select v-model="formData.frenchLanguage">
+                      <option value="">-- ជ្រើសរើស --</option>
+                      <option value="native">ម៉ាតាំង</option>
+                      <option value="fluent">ស្ដេច</option>
+                      <option value="good">ល្អ</option>
+                      <option value="fair">មិនច្រើន</option>
+                      <option value="basic">ងាយ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ផ្សេងៗ</label>
+                    <input v-model="formData.otherLanguage" type="text" placeholder="ភាសាផ្សេងៗ" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Training & Certifications Section -->
+              <div class="form-block-section">
+                <div class="section-header" style="background-color: #e8f5e9; border-left: 4px solid #4caf50;">
+                  <i class="pi pi-certificate"></i>
+                  <h5>ការ​បណ្តុះបណ្តាល និង វិច្ឆិកា</h5>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group full-width">
+                    <label>ការបណ្តុះបណ្តាល</label>
+                    <textarea v-model="formData.training" placeholder="ព័ត៌មាននៃការបណ្តុះបណ្តាល / ដំណាលកម្មវិធី" rows="3"></textarea>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group full-width">
+                    <label>វិច្ឆិកា</label>
+                    <textarea v-model="formData.certifications" placeholder="ព័ត៌មាននៃវិច្ឆិកា / អនុលោមរង្វាន់" rows="3"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cultural Skills Section -->
+              <div class="form-block-section">
+                <div class="section-header" style="background-color: #fff3e0; border-left: 4px solid #ff9800;">
+                  <i class="pi pi-star"></i>
+                  <h5>ជំនាញ សិល្បៈ និង វប្បធម៌</h5>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group full-width">
+                    <label>សកម្មភាព / ជំនាញ សិល្បៈ និង វប្បធម៌</label>
+                    <textarea v-model="formData.culturalSkills" placeholder="សម្ពាធ ឬ ជំនាញ សិល្បៈ វប្បធម៌ (រាំ, ច្រៀង, ទិន្នន័យ, កីឡា)..." rows="4"></textarea>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1477,7 +1613,21 @@ const formData = ref({
   spousePhone: '',
   spouseEmail: '',
   // Children Information
-  children: []
+  children: [],
+  // Education/Culture Information
+  educationLevel: '',
+  schoolName: '',
+  startYear: '',
+  endYear: '',
+  major: '',
+  certificate: '',
+  khmerLanguage: '',
+  englishLanguage: '',
+  frenchLanguage: '',
+  otherLanguage: '',
+  training: '',
+  certifications: '',
+  culturalSkills: ''
 });
 
 const iconTabs = [
@@ -2164,6 +2314,37 @@ onMounted(() => {
 
 .form-section-header i {
   font-size: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+}
+
+.section-header i {
+  font-size: 1.25rem;
+}
+
+.section-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+  font-family: 'Noto Serif Khmer', serif;
+}
+
+.form-block-section {
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-block-section:last-child {
+  border-bottom: none;
 }
 
 .general-info-block .form-section-header {
