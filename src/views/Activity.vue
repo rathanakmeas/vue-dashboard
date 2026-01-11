@@ -3,15 +3,18 @@
         <!-- Header -->
         <div class="page-header">
             <h2 class="title">📋 Activity Log</h2>
-            <select v-model="filterAction" class="filter-select">
+            <select v-model="filterAction" @change="loadActivities" class="filter-select">
                 <option value="">All Activities</option>
                 <option value="LOGIN">Login</option>
                 <option value="LOGOUT">Logout</option>
                 <option value="FILE_UPLOAD">File Upload</option>
+                <option value="FILE_UPDATE">File Update</option>
                 <option value="FILE_DELETE">File Delete</option>
                 <option value="FOLDER_CREATE">Folder Create</option>
                 <option value="FOLDER_UPDATE">Folder Update</option>
                 <option value="FOLDER_DELETE">Folder Delete</option>
+                <option value="FOLDER_SHARE">Folder Share</option>
+                <option value="FOLDER_UNSHARE">Folder Unshare</option>
                 <option value="PROFILE_UPDATE">Profile Update</option>
             </select>
         </div>
@@ -75,7 +78,9 @@ const loadActivities = async () => {
     loading.value = true
     try {
         const skip = (currentPage.value - 1) * limit
-        const response = await activityAPI.getMyActivities(limit, skip)
+        const response = filterAction.value
+            ? await activityAPI.getAllActivities(limit, skip, filterAction.value)
+            : await activityAPI.getMyActivities(limit, skip)
         
         activities.value = response.activities || []
         totalActivities.value = response.pagination?.total || 0
@@ -90,12 +95,13 @@ const loadActivities = async () => {
 const formatAction = (action) => {
     const actionMap = {
         'LOGIN': 'Login',
-        'LOGOUT': 'Logout',
-        'FILE_UPLOAD': 'File Upload',
+        'LOGOUUPDATE': 'File Update',
         'FILE_DELETE': 'File Delete',
         'FOLDER_CREATE': 'Folder Create',
         'FOLDER_UPDATE': 'Folder Update',
         'FOLDER_DELETE': 'Folder Delete',
+        'FOLDER_SHARE': 'Folder Share',
+        'FOLDER_UNSHARE': 'Folder Unshare',
         'PROFILE_UPDATE': 'Profile Update'
     }
     return actionMap[action] || action
@@ -106,10 +112,13 @@ const getActionIcon = (action) => {
         'LOGIN': '🔓',
         'LOGOUT': '🔒',
         'FILE_UPLOAD': '📤',
+        'FILE_UPDATE': '✏️',
         'FILE_DELETE': '🗑️',
         'FOLDER_CREATE': '📁',
         'FOLDER_UPDATE': '✏️',
         'FOLDER_DELETE': '🗑️',
+        'FOLDER_SHARE': '🔗',
+        'FOLDER_UNSHARE': '🔓',
         'PROFILE_UPDATE': '👤'
     }
     return iconMap[action] || '📋'

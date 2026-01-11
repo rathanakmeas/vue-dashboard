@@ -19,6 +19,46 @@
                 <span v-if="!collapsed">Activity Log</span>
             </RouterLink>
 
+            <!-- Departments Section with submenu -->
+            <div class="nav-item parent-item" @click="toggleSubmenu('departments')">
+                <span class="icon">🏥</span>
+                <span v-if="!collapsed">Departments</span>
+                <span v-if="!collapsed" class="submenu-arrow">
+                    {{ openSubmenus['departments'] ? '▾' : '▸' }}
+                </span>
+            </div>
+
+            <div v-if="openSubmenus['departments'] && !collapsed" class="submenu">
+                <RouterLink to="/departments" class="nav-sub-item" exact-active-class="active">
+                    <span class="icon">🏥</span>
+                    Manage Departments
+                </RouterLink>
+                <RouterLink to="/departments/analytics" class="nav-sub-item" exact-active-class="active">
+                    <span class="icon">📊</span>
+                    Analytics Dashboard
+                </RouterLink>
+                <RouterLink to="/departments/orgchart" class="nav-sub-item" exact-active-class="active">
+                    <span class="icon">🌳</span>
+                    Org Chart
+                </RouterLink>
+            </div>
+
+            <!-- HR Management Section with submenu -->
+            <div class="nav-item parent-item" @click="toggleSubmenu('hr')">
+                <span class="icon">👥</span>
+                <span v-if="!collapsed">HR Management</span>
+                <span v-if="!collapsed" class="submenu-arrow">
+                    {{ openSubmenus['hr'] ? '▾' : '▸' }}
+                </span>
+            </div>
+
+            <div v-if="openSubmenus['hr'] && !collapsed" class="submenu">
+                <RouterLink to="/employees" class="nav-sub-item" exact-active-class="active">
+                    <span class="icon">👥</span>
+                    Employees
+                </RouterLink>
+            </div>
+
             <!-- Dynamic Sections with submenus -->
             <template v-for="(section, index) in menuSections" :key="index">
                 <div class="nav-item parent-item" @click="toggleSubmenu(index)">
@@ -72,12 +112,23 @@
         icon: '📁',
         label: 'Folders',
         children: [
+        { icon: '📁', label: 'My Folders', to: '/folders' },
         { icon: '🕒', label: 'Recent', to: '/folder/recent' },
         { icon: '📤', label: 'Shared', to: '/folder/shared' },
         ],
     },
     {
-        icon: '🔐',
+        icon: '�',
+        label: 'Documents',
+        children: [
+        { icon: '📄', label: 'All Documents', to: '/documents' },
+        { icon: '🗂️', label: 'Categories', to: '/documents/categories' },
+        { icon: '📋', label: 'Audit Trail', to: '/documents/audit' },
+        { icon: '📦', label: 'Archived', to: '/documents/archived' },
+        ],
+    },
+    {
+        icon: '�🔐',
         label: 'Authentication',
         children: [
         { icon: '🔓', label: 'Login', to: '/auth/login' },
@@ -93,6 +144,19 @@
 
     // Auto-open submenu if current route matches a submenu item
     onMounted(() => {
+        // Check departments submenu
+        if (route.path.startsWith('/departments')) {
+            openSubmenus.value['departments'] = true
+            collapsed.value = false
+        }
+
+        // Check HR submenu
+        if (route.path.startsWith('/employees')) {
+            openSubmenus.value['hr'] = true
+            collapsed.value = false
+        }
+
+        // Check other sections
         menuSections.forEach((section, index) => {
             if (section.children.some(child => route.path.startsWith(child.to))) {
                 openSubmenus.value[index] = true

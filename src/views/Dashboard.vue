@@ -2,70 +2,75 @@
     <div class="container">
         <!-- Header -->
         <div class="page-header">
-            <h2 class="title">📊 Welcome back, Admin!</h2>
+            <h2 class="title">📊 Dashboard</h2>
             <p class="subtitle">{{ today }}</p>
         </div>
 
         <!-- Stats Cards Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>👥 Users</h3>
-                <p>{{ stats.totalUsers }}</p>
+                <h3>📁 Total Folders</h3>
+                <p>{{ statistics.totalFolders }}</p>
             </div>
             <div class="stat-card">
-                <h3>📁 Folders</h3>
-                <p>{{ stats.totalFolders }}</p>
+                <h3>🔒 Owned</h3>
+                <p>{{ statistics.ownedFolders }}</p>
             </div>
             <div class="stat-card">
-                <h3>🛒 Sales</h3>
-                <p>328</p>
+                <h3>🔗 Shared</h3>
+                <p>{{ statistics.sharedFolders }}</p>
             </div>
             <div class="stat-card">
-                <h3>💰 Revenue</h3>
-                <p>$43,520</p>
-            </div>
-            <div class="stat-card">
-                <h3>📋 Tasks</h3>
-                <p>12</p>
-            </div>
-            <div class="stat-card">
-                <h3>👀 Visitors</h3>
-                <p>5,678</p>
+                <h3>📄 Total Files</h3>
+                <p>{{ statistics.totalFiles }}</p>
             </div>
         </div>
 
-        <!-- Chart Section -->
-        <section class="dashboard-section">
-            <h3>📈 Monthly Sales</h3>
-            <div class="chart-placeholder">[Chart Placeholder]</div>
-        </section>
-
-        <!-- Task Progress -->
-        <section class="dashboard-section">
-            <h3>✅ Task Progress</h3>
-            <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: '65%' }">65%</div>
+        <!-- Activity Stats -->
+        <section class="dashboard-section card">
+            <h3>📊 Activity Summary</h3>
+            <div class="activity-stats">
+                <div v-for="stat in activityStats" :key="stat._id" class="activity-stat">
+                    <span class="action-badge">{{ stat._id }}</span>
+                    <span class="count">{{ stat.count }}</span>
+                </div>
             </div>
         </section>
 
-        <!-- Recent Activity Table -->
+        <!-- Top Folders -->
         <section class="dashboard-section card">
-            <h3>📌 Recent Activity</h3>
+            <h3>📁 Top Folders by Files</h3>
             <div v-if="loading" class="loading">Loading...</div>
-            <div v-else-if="activityItems.length === 0" class="no-data">No recent activity yet</div>
-            <div v-else class="table-responsive">
-                <input type="text" v-model="search" placeholder="Search" class="search-input" />
-                <EasyDataTable :headers="headers" :items="activityItems" :sortable="true" rows-per-page="5" table-class="custom-activity-table" />
+            <div v-else-if="topFolders.length === 0" class="no-data">No folders yet</div>
+            <div v-else class="top-folders">
+                <div v-for="folder in topFolders" :key="folder._id" class="folder-stat">
+                    <div class="folder-info">
+                        <h4>{{ folder.name }}</h4>
+                        <p class="folder-meta">{{ folder.fileCount }} files • {{ formatSize(folder.totalSize) }}</p>
+                    </div>
+                    <span v-if="!folder.isShared" class="shared-badge">Owned</span>
+                    <span v-else class="shared-badge">Shared</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activities -->
+        <section class="dashboard-section card">
+            <h3>📌 Recent Activities</h3>
+            <div v-if="loading" class="loading">Loading...</div>
+            <div v-else-if="recentActivities.length === 0" class="no-data">No recent activity yet</div>
+            <div v-else class="recent-activities">
+                <div v-for="activity in recentActivities" :key="activity._id" class="activity-item">
+                    <div class="activity-action">{{ activity.action }}</div>
+                    <div class="activity-time">{{ formatTime(activity.createdAt) }}</div>
+                </div>
             </div>
         </section>
     </div>
 </template>
 
 <script setup>
-    import { ref, computed, onMounted } from 'vue'
-    import EasyDataTable from 'vue3-easy-data-table'
-    import 'vue3-easy-data-table/dist/style.css'
-    import { statsAPI } from '../api'
+    import { ref, onMounted } from 'vue'
 
     const today = new Date().toLocaleDateString(undefined, {
         weekday: 'long',
@@ -74,77 +79,58 @@
         day: 'numeric'
     })
 
-    const stats = ref({
-        totalUsers: 0,
+    const statistics = ref({
         totalFolders: 0,
-        recentActivity: []
+        ownedFolders: 0,
+        sharedFolders: 0,
+        totalFiles: 0
     })
+    const activityStats = ref([])
+    const topFolders = ref([])
+    const recentActivities = ref([])
     const loading = ref(false)
 
-    const headers = [
-        { text: 'Action', value: 'action', sortable: true },
-        { text: 'Item', value: 'name', sortable: true },
-        { text: 'Time', value: 'timeAgo', sortable: true }
-    ]
-
-    const items = ref([
-        { user: 'Alice', action: 'Created new order', time: '2 hours ago' },
-        { user: 'Bob', action: 'Updated profile', time: '5 hours ago' },
-        { user: 'Jane', action: 'Completed a task', time: '1 day ago' },
-        { user: 'Mark', action: 'Deleted a file', time: '3 days ago' },
-        { user: 'Lina', action: 'Uploaded document', time: '4 days ago' },
-        { user: 'Tom', action: 'Reset password', time: '5 days ago' }
-    ])
-
-    const search = ref('')
-
-    const filteredItems = computed(() => {
-    if (!search.value.trim()) {
-        return items.value
+    const formatSize = (bytes) => {
+        if (bytes === 0) return '0 B'
+        const k = 1024
+        const sizes = ['B', 'KB', 'MB', 'GB']
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
     }
-    const s = search.value.toLowerCase()
-    return items.value.filter(
-        (item) =>
-        item.user.toLowerCase().includes(s) ||
-        item.action.toLowerCase().includes(s) ||
-        item.time.toLowerCase().includes(s)
-    )
-    })
 
-    const getTimeAgo = (timestamp) => {
-        const date = new Date(timestamp)
+    const formatTime = (date) => {
         const now = new Date()
-        const seconds = Math.floor((now - date) / 1000)
-        
-        if (seconds < 60) return 'Just now'
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
-        
-        return date.toLocaleDateString()
+        const diff = now - new Date(date)
+        const minutes = Math.floor(diff / 60000)
+        const hours = Math.floor(diff / 3600000)
+        const days = Math.floor(diff / 86400000)
+
+        if (minutes < 1) return 'just now'
+        if (minutes < 60) return `${minutes} mins ago`
+        if (hours < 24) return `${hours} hours ago`
+        return `${days} days ago`
     }
 
-    const loadStats = async () => {
+    const loadDashboard = async () => {
         loading.value = true
         try {
-            const response = await statsAPI.getStats()
-            stats.value = response
+            const response = await fetch('/api/dashboard', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            })
+            const data = await response.json()
+            statistics.value = data.statistics
+            activityStats.value = data.activityStats
+            topFolders.value = data.topFolders
+            recentActivities.value = data.recentActivities
         } catch (error) {
-            console.error('Failed to load stats:', error)
+            console.error('Failed to load dashboard:', error)
         } finally {
             loading.value = false
         }
     }
 
-    const activityItems = computed(() => {
-        return stats.value.recentActivity?.map(activity => ({
-            ...activity,
-            timeAgo: getTimeAgo(activity.time)
-        })) || []
-    })
-
     onMounted(() => {
-        loadStats()
+        loadDashboard()
     })
 </script>
 
@@ -264,18 +250,12 @@
     .table-responsive {
         width: 100%;
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+        -webkit-overflow-scrolling: touch;
         border-radius: 8px;
-        box-shadow:0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         background: white;
         padding: 0.5rem;
         margin-top: 1rem;
-    }
-
-    /* Table tweaks */
-    .custom-activity-table table {
-        min-width: 600px; /* prevent shrinking on small screens */
-        border-collapse: separate !important; /* keep border-radius if any */
     }
 
     .loading {
@@ -292,14 +272,98 @@
         font-size: 0.95rem;
     }
 
-    /* Table rows */
-    .custom-activity-table tbody tr {
-        transition: background-color 0.25s ease;
+    /* Activity Stats */
+    .activity-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
     }
 
-    .custom-activity-table tbody tr:hover {
-        background-color: #d0e2ff;
-        cursor: pointer;
+    .activity-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    .action-badge {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .count {
+        background: #3b82f6;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* Top Folders */
+    .top-folders {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .folder-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border-left: 3px solid #3b82f6;
+    }
+
+    .folder-info h4 {
+        margin: 0 0 0.25rem 0;
+        color: #1e293b;
+    }
+
+    .folder-meta {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .shared-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: #3b82f6;
+        color: white;
+    }
+
+    /* Recent Activities */
+    .recent-activities {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border-left: 3px solid #4CAF50;
+    }
+
+    .activity-action {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .activity-time {
+        color: #64748b;
+        font-size: 0.85rem;
     }
 
     /* Responsive adjustments */

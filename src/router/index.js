@@ -12,9 +12,22 @@ import Activity from '../views/Activity.vue'
 import Recent from '../views/folder/Recent.vue'
 import Shared from '../views/folder/Shared.vue'
 import Settings from '../views/Settings.vue'
+import Departments from '../views/DepartmentsNew.vue'
+import Employees from '../views/Employees.vue'
+import EmployeeDetail from '../views/EmployeeDetail.vue'
+
+// Document Views
+import AllDocuments from '../views/documents/AllDocuments.vue'
+import Categories from '../views/documents/Categories.vue'
+import AuditTrail from '../views/documents/AuditTrail.vue'
+import Archived from '../views/documents/Archived.vue'
+
+// Department Views
+import DepartmentAnalytics from '../views/DepartmentAnalytics.vue'
+import OrgChart from '../views/OrgChart.vue'
 
 // Auth Views
-import Login from '../views/auth/Login.vue'
+import Login from '../views/Login.vue'
 import Register from '../views/auth/Register.vue'
 import Logout from '../views/auth/Logout.vue'
 import Users from '../views/auth/Users.vue'
@@ -66,6 +79,60 @@ const routes = [
             name: 'shared',
             component: Shared,
             meta: { title: '📤 Shared', requiresAuth: true }
+        },
+        {
+            path: 'documents',
+            name: 'documents',
+            component: AllDocuments,
+            meta: { title: '📄 All Documents', requiresAuth: true }
+        },
+        {
+            path: 'documents/categories',
+            name: 'categories',
+            component: Categories,
+            meta: { title: '🗂️ Categories', requiresAuth: true }
+        },
+        {
+            path: 'documents/audit',
+            name: 'audit',
+            component: AuditTrail,
+            meta: { title: '📋 Audit Trail', requiresAuth: true }
+        },
+        {
+            path: 'documents/archived',
+            name: 'archived',
+            component: Archived,
+            meta: { title: '📦 Archived', requiresAuth: true }
+        },
+        {
+            path: 'departments',
+            name: 'departments',
+            component: Departments,
+            meta: { title: '🏥 Departments', requiresAuth: true }
+        },
+        {
+            path: 'employees',
+            name: 'employees',
+            component: Employees,
+            meta: { title: '👥 Employees', requiresAuth: true }
+        },
+        {
+            path: 'employees/:id',
+            name: 'employee-detail',
+            component: EmployeeDetail,
+            meta: { title: '👤 Employee Detail', requiresAuth: true }
+        },
+        {
+            path: 'departments/analytics',
+            name: 'department-analytics',
+            component: DepartmentAnalytics,
+            meta: { title: '📊 Department Analytics', requiresAuth: true }
+        },
+        {
+            path: 'departments/orgchart',
+            name: 'org-chart',
+            component: OrgChart,
+            meta: { title: '🌳 Org Chart', requiresAuth: true }
         },
         {
             path: 'settings',

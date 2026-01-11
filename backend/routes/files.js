@@ -1,87 +1,64 @@
 import express from 'express';
+import { body, param } from 'express-validator';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import {
+  uploadFile,
+  getFiles,
+  getFile,
+  updateFile,
+  deleteFile,
+  archiveFile,
+  restoreFile,
+  getArchivedFiles,
+} from '../controllers/fileController.js';
 import { authenticateToken } from '../middleware/auth.js';
-import File from '../models/File.js';
-import Folder from '../models/Folder.js';
+import validateRequest from '../middleware/validateRequest.js';
 
 const router = express.Router();
 
-// Upload file to folder
-router.post('/:folderId/upload', authenticateToken, async (req, res) => {
-  try {
-    const { folderId } = req.params;
-    const { fileName, fileSize, mimeType } = req.body;
+router.use(authenticateToken);
 
-    // Verify folder exists and user owns it
-    const folder = await Folder.findById(folderId);
-    if (!folder || folder.owner.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Unauthorized access to folder' });
-    }
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
-    const file = new File({
-      name: fileName,
-      folder: folderId,
-      owner: req.userId,
-      fileSize,
-      mimeType,
-      uploadedAt: new Date()
-    });
-
-    await file.save();
-    res.status(201).json({ message: 'File uploaded successfully', file });
-  } catch (error) {
-    res.status(500).json({ message: 'Error uploading file', error: error.message });
-  }
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadsDir),
+  filename: (_req, file, cb) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const ext = path.extname(file.originalname);
+    cb(null, `${unique}${ext}`);
+  },
 });
 
-// Get files in folder
-router.get('/:folderId/files', authenticateToken, async (req, res) => {
-  try {
-    const { folderId } = req.params;
-
-    // Verify folder exists and user owns it
-    const folder = await Folder.findById(folderId);
-    if (!folder || folder.owner.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Unauthorized access to folder' });
-    }
-
-    const files = await File.find({ folder: folderId }).sort({ uploadedAt: -1 });
-    res.json({ files });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching files', error: error.message });
-  }
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-// Delete file
-router.delete('/:fileId', authenticateToken, async (req, res) => {
-  try {
-    const { fileId } = req.params;
+const uploadValidators = [
+  param('folderId').isMongoId().withMessage('Invalid folder id'),
+];
 
-    const file = await File.findById(fileId);
-    if (!file || file.owner.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Unauthorized to delete this file' });
-    }
+const folderIdValidators = [param('folderId').isMongoId().withMessage('Invalid folder id')];
 
-    await File.deleteOne({ _id: fileId });
-    res.json({ message: 'File deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting file', error: error.message });
-  }
-});
+const fileIdValidators = [param('fileId').isMongoId().withMessage('Invalid file id')];
 
-// Get file details
-router.get('/:fileId', authenticateToken, async (req, res) => {
-  try {
-    const { fileId } = req.params;
+const updateValidators = [
+  param('fileId').isMongoId().withMessage('Invalid file id'),
+  body('name').optional().trim().notEmpty().withMessage('File name required'),
+];
 
-    const file = await File.findById(fileId);
-    if (!file || file.owner.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Unauthorized access to file' });
-    }
-
-    res.json({ file });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching file', error: error.message });
-  }
-});
+router.post('/:folderId/upload', upload.single('file'), uploadFile);
+router.get('/:folderId/files', folderIdValidators, validateRequest, getFiles);
+router.get('/archived/all', getArchivedFiles);
+router.get('/:fileId', fileIdValidators, validateRequest, getFile);
+router.put('/:fileId', updateValidators, validateRequest, updateFile);
+router.put('/:fileId/archive', fileIdValidators, validateRequest, archiveFile);
+router.put('/:fileId/restore', fileIdValidators, validateRequest, restoreFile);
+router.delete('/:fileId', fileIdValidators, validateRequest, deleteFile);
 
 export default router;

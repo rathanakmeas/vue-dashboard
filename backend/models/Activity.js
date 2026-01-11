@@ -8,7 +8,7 @@ const activitySchema = new mongoose.Schema({
     },
     action: {
         type: String,
-        enum: ['LOGIN', 'LOGOUT', 'FILE_UPLOAD', 'FILE_DELETE', 'FOLDER_CREATE', 'FOLDER_UPDATE', 'FOLDER_DELETE', 'FOLDER_SHARE', 'PROFILE_UPDATE'],
+        enum: ['LOGIN', 'LOGOUT', 'FILE_UPLOAD', 'FILE_UPDATE', 'FILE_DELETE', 'FOLDER_CREATE', 'FOLDER_UPDATE', 'FOLDER_DELETE', 'FOLDER_SHARE', 'FOLDER_UNSHARE', 'PROFILE_UPDATE'],
         required: true
     },
     resourceType: {

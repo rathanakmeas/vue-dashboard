@@ -1,0 +1,1274 @@
+<!DOCTYPE html><html><body>
+  <div class="employees-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="title-section">
+          <i class="pi pi-users" style="font-size: 2rem; color: #0288D1;"></i>
+          <div>
+            <h1>áž‚áŸ’ážšáž”áŸ‹áž‚áŸ’ážšáž„áž”áž»áž‚áŸ’áž‚áž›áž·áž€</h1>
+            <p class="subtitle">áž‚áŸ’ážšáž”áŸ‹áž‚áŸ’ážšáž„áž”áž»áž‚áŸ’áž‚áž›áž·áž€ áž“áž·áž„áž”áž»áž‚áŸ’áž‚áž›áž·áž€áž˜áž“áŸ’áž‘áž¸ážšáž–áŸáž‘áŸ’áž™</p>
+          </div>
+        </div>
+        <button class="add-btn" @click="openDialog()">
+          <i class="pi pi-plus"></i> áž”áž“áŸ’ážáŸ‚áž˜áž”áž»áž‚áŸ’áž‚áž›áž·áž€
+        </button>
+      </div>
+    </div>
+
+    <!-- Employee Table -->
+    <div class="table-container">
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>ážšáž¼áž”áž—áž¶áž–</th>
+            <th>ážˆáŸ’áž˜áŸ„áŸ‡</th>
+            <th>ážŸáŸ’ážáž¶áž“áž—áž¶áž–</th>
+            <th>áž‘áž¼ážšážŸáŸáž–áŸ’áž‘</th>
+            <th>áž¢áŸŠáž¸áž˜áŸ‚áž›</th>
+            <th>ážŸáž€áž˜áŸ’áž˜áž—áž¶áž–</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="employee in employees" :key="employee._id">
+            <td>
+              <div class="photo-cell">
+                <img v-if="employee.photo" :src="`http://localhost:5000${employee.photo}`" alt="Photo" />
+                <div v-else class="photo-placeholder">
+                  <i class="pi pi-user"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="name-cell">
+                <div class="name-en">{{ employee.firstName }} {{ employee.lastName }}</div>
+                <div class="name-kh" v-if="employee.khmerName">{{ employee.khmerName }}</div>
+              </div>
+            </td>
+            <td>
+              <span :class="['status-badge', employee.status || 'active']">
+                {{ employee.status || 'Active' }}
+              </span>
+            </td>
+            <td>{{ employee.phone || '-' }}</td>
+            <td>{{ employee.email || '-' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon view" @click="viewEmployee(employee._id)" title="áž˜áž¾áž›">
+                  <i class="pi pi-eye"></i>
+                </button>
+                <button class="btn-icon edit" @click="editEmployee(employee)" title="áž€áŸ‚ážŸáž˜áŸ’ážšáž½áž›">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="btn-icon delete" @click="confirmDelete(employee)" title="áž›áž»áž”">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div v-if="employees.length === 0" class="empty-state">
+        <i class="pi pi-users" style="font-size: 4rem; color: #cbd5e1;"></i>
+        <p>áž˜áž·áž“áž˜áž¶áž“áž”áž»áž‚áŸ’áž‚áž›áž·áž€</p>
+      </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div v-if="dialogVisible" class="modal-overlay" @click.self="closeDialog">
+      <div class="modal-content-large">
+        <h3>{{ dialogMode === 'create' ? 'âž• áž€áŸ‚áž”áŸ’ážšáŸ‚áž–áŸážáŸŒáž˜áž¶áž“áž‘áž¼áž‘áŸ…áž•áŸ’áž‘áž¶áž›áŸ‹ážáŸ’áž›áž½áž“' : 'âœï¸ áž€áŸ‚áž”áŸ’ážšáŸ‚áž–áŸážáŸŒáž˜áž¶áž“áž‘áž¼áž‘áŸ…áž•áŸ’áž‘áž¶áž›áŸ‹ážáŸ’áž›áž½áž“' }}</h3>
+        <form @submit.prevent="handleSubmit">
+          <!-- Top Icon Navigation (TreeTab) -->
+          <div class="top-icon-tabs">
+            <button 
+              type="button"
+              v-for="(iconTab, idx) in iconTabs" 
+              :key="idx"
+              :class="['icon-tab', { active: activeIconTab === idx }]"
+              @click="activeIconTab = idx"
+            >
+              <div class="icon-circle">
+                <i :class="iconTab.icon"></i>
+              </div>
+              <span class="icon-label">{{ iconTab.label }}</span>
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-section">
+            <div class="progress-bar-container">
+              <div class="progress-bar" :style="{ width: progressPercentage + '%' }"></div>
+            </div>
+            <span class="progress-text">{{ progressPercentage }}% áž”áž¶áž“áž”áŸ†áž–áŸáž‰</span>
+          </div>
+
+          <!-- Tab Content -->
+          <div class="form-content">
+            <!-- Tab 0: Personal Information -->
+            <div v-show="activeIconTab === 0">
+            <!-- General Information Block -->
+            <div class="form-block general-info-block">
+              <div class="form-section-header">
+                <i class="pi pi-user"></i>
+                <h4>áž–áŸážáŸŒáž˜áž¶áž“áž‘áž¼áž‘áŸ…</h4>
+              </div>
+            
+            <div class="general-info-layout">
+              <!-- Photo Upload Section -->
+              <div class="photo-upload-section">
+                <div class="photo-preview">
+                  <img v-if="formData.photo" :src="formData.photo" alt="Photo" />
+                  <div v-else class="photo-placeholder">
+                    <i class="pi pi-user"></i>
+                  </div>
+                </div>
+                <div class="photo-buttons">
+                  <button type="button" class="btn-photo upload">áž”áž‰áŸ’áž…áž¼áž›</button>
+                  <button type="button" class="btn-photo delete">áž›áž»áž”</button>
+                </div>
+              </div>
+
+              <!-- Form Fields Next to Photo -->
+              <div class="general-info-fields">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž›áŸážážŸáŸ†áž”áž»ážáŸ’ážšáž€áŸ†ážŽáž¾áž</label>
+                    <input v-model="formData.birthCertificateNo" type="text" placeholder="áž›áŸážážŸáŸ†áž”áž»ážáŸ’ážšáž€áŸ†ážŽáž¾áž" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž›áŸážážŸáž˜áŸ’áž‚áž¶áž›áŸ‹áž”áž»áž‚áŸ’áž‚áž›áž·áž€ <span class="required">*</span></label>
+                    <input v-model="formData.employeeId" type="text" placeholder="áž›áŸážážŸáž˜áŸ’áž‚áž¶áž›áŸ‹áž”áž»áž‚áŸ’áž‚áž›áž·áž€" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž›áŸážáž¢ážáŸ’ážážŸáž‰áŸ’áž‰áž¶ážŽáž”áŸážŽáŸ’ážŽážŸáž‰áŸ’áž‡áž¶ážáž·ážáŸ’áž˜áŸ‚ážš <span class="required">*</span></label>
+                    <input v-model="formData.nationalIdNo" type="text" placeholder="010654986" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáž»áž–áž›áž—áž¶áž–áž¢ážáŸ’ážážŸáž‰áŸ’áž‰áž¶ážŽáž”áŸážŽáŸ’ážŽ <span class="required">*</span></label>
+                    <input v-model="formData.idValidFrom" type="date" placeholder="30/03/2016" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážáŸ’áž„áŸƒáž•áž»ážážŸáž»áž–áž›áž—áž¶áž–áž¢ážáŸ’ážážŸáž‰áŸ’áž‰áž¶ážŽáž”áŸážŽáŸ’ážŽ <span class="required">*</span></label>
+                    <input v-model="formData.idExpiryDate" type="date" placeholder="29/03/2026" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž›áŸážáž›áž·ážáž·ážáž†áŸ’áž›áž„ážŠáŸ‚áž“</label>
+                    <input v-model="formData.passportNo" type="text" placeholder="áž›áŸážáž›áž·ážáž·ážáž†áŸ’áž›áž„ážŠáŸ‚áž“" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž¢ážáŸ’ážáž›áŸážáž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš</label>
+                    <input v-model="formData.civilServantId" type="text" placeholder="áž¢ážáŸ’ážáž›áŸážáž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ <span class="required">*</span></label>
+                    <input v-model="formData.khmerSurname" type="text" placeholder="áž‚áŸ„ážáŸ’ážáž“áž¶áž˜" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž“áž¶áž˜ážáŸ’áž›áž½áž“ <span class="required">*</span></label>
+                    <input v-model="formData.khmerGivenName" type="text" placeholder="áž“áž¶áž˜ážáŸ’áž›áž½áž“" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáž‰áŸ’áž‡áž¶ážáž· <span class="required">*</span></label>
+                    <select v-model="formData.citizenship">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="foreigner">áž”ážšáž‘áŸážŸ</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜áž¡áž¶ážáž¶áŸ†áž„</label>
+                    <input v-model="formData.latinSurname" type="text" placeholder="Surname" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž“áž¶áž˜áž¡áž¶ážáž¶áŸ†áž„</label>
+                    <input v-model="formData.latinGivenName" type="text" placeholder="Given Name" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‡áž“áž‡áž¶ážáž· <span class="required">*</span></label>
+                    <select v-model="formData.ethnicity">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="chinese">áž…áž·áž“</option>
+                      <option value="vietnamese">ážœáŸ€ážážŽáž¶áž˜</option>
+                      <option value="cham">áž…áž¶áž˜</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>áž—áŸáž‘ <span class="required">*</span></label>
+                    <div class="radio-group">
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.gender" value="male" />
+                        <span>áž”áŸ’ážšáž»ážŸ</span>
+                      </label>
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.gender" value="female" />
+                        <span>ážŸáŸ’ážšáž¸</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Full width fields in general info block -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž <span class="required">*</span></label>
+                <div class="date-picker-group">
+                  <select v-model="formData.birthDay" class="date-select">
+                    <option value="">ážáŸ’áž„áŸƒ</option>
+                    <option v-for="day in 31" :key="day" :value="day">{{ day }}</option>
+                  </select>
+                  <select v-model="formData.birthMonth" class="date-select">
+                    <option value="">ážáŸ‚</option>
+                    <option value="1">áž˜áž€ážšáž¶</option>
+                    <option value="2">áž€áž»áž˜áŸ’áž—áŸˆ</option>
+                    <option value="3">áž˜áž¸áž“áž¶</option>
+                    <option value="4">áž˜áŸážŸáž¶</option>
+                    <option value="5">áž§ážŸáž—áž¶</option>
+                    <option value="6">áž˜áž·ážáž»áž“áž¶</option>
+                    <option value="7">áž€áž€áŸ’áž€ážŠáž¶</option>
+                    <option value="8">ážŸáž¸áž áž¶</option>
+                    <option value="9">áž€áž‰áŸ’áž‰áž¶</option>
+                    <option value="10">ážáž»áž›áž¶</option>
+                    <option value="11">ážœáž·áž…áŸ’áž†áž·áž€áž¶</option>
+                    <option value="12">áž’áŸ’áž“áž¼</option>
+                  </select>
+                  <select v-model="formData.birthYear" class="date-select">
+                    <option value="">áž†áŸ’áž“áž¶áŸ†</option>
+                    <option v-for="year in 100" :key="year" :value="2026 - year">{{ 2026 - year }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>áž”áŸ’ážšáž—áŸáž‘ážˆáž¶áž˜</label>
+                <select v-model="formData.bloodType">
+                  <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">Aâˆ’</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">Bâˆ’</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">ABâˆ’</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">Oâˆ’</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ážŸáŸ’ážáž¶áž“áž—áž¶áž–áž‚áŸ’ážšáž½ážŸáž¶ážš <span class="required">*</span></label>
+                <select v-model="formData.maritalStatus">
+                  <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                  <option value="single">áž“áŸ…áž›áž¸ážœ</option>
+                  <option value="married">ážšáŸ€áž”áž€áž¶ážš</option>
+                  <option value="divorced">áž›áŸ‚áž„áž›áŸ‡</option>
+                  <option value="widowed">áž˜áŸáž˜áŸ‰áž¶áž™/áž”áŸ’ážáž¸</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž›áŸážáž‘áž¼ážšážŸáŸáž–áŸ’áž‘áž‘áž¸áŸ¡ <span class="required">*</span></label>
+                <input v-model="formData.phone1" type="tel" placeholder="+855 12 345 678" />
+              </div>
+              <div class="form-group">
+                <label>áž›áŸážáž‘áž¼ážšážŸáŸáž–áŸ’áž‘áž‘áž¸áŸ¢</label>
+                <input v-model="formData.phone2" type="tel" placeholder="+855 12 345 678" />
+              </div>
+              <div class="form-group">
+                <label>áž¢áŸŠáž¸áž˜áŸ‰áŸ‚áž›</label>
+                <input v-model="formData.email" type="email" placeholder="email@example.com" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label>áž€áž¶áž™ážŸáž˜áŸ’áž”áž‘áž¶</label>
+                <textarea v-model="formData.physicalAttributes" rows="2" placeholder="áž€áž˜áŸ’áž–ážŸáŸ‹, áž‘áž˜áŸ’áž„áž“áŸ‹, áž“áž·áž„áž›áž€áŸ’ážážŽáŸˆáž€áž¶áž™ážŸáž˜áŸ’áž”áž‘áž¶áž•áŸ’ážŸáŸáž„áŸ—"></textarea>
+              </div>
+            </div>
+            </div>
+
+            <!-- Birth Place Block -->
+            <div class="form-block birthplace-block">
+              <div class="form-section-header">
+                <i class="pi pi-map-marker"></i>
+                <h4>áž‘áž¸áž€áž“áŸ’áž›áŸ‚áž„áž€áŸ†ážŽáž¾áž</h4>
+              </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                <input v-model="formData.birthProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+              </div>
+              <div class="form-group">
+                <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                <input v-model="formData.birthDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+              </div>
+              <div class="form-group">
+                <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                <input v-model="formData.birthCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž—áž¼áž˜áž·</label>
+                <input v-model="formData.birthVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+              </div>
+              <div class="form-group">
+                <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                <input v-model="formData.birthHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+              </div>
+              <div class="form-group">
+                <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                <input v-model="formData.birthStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+              </div>
+            </div>
+            </div>
+
+            <!-- Current Address Block -->
+            <div class="form-block address-block">
+              <div class="form-section-header">
+                <i class="pi pi-home"></i>
+                <h4>áž¢áž¶ážŸáž™ážŠáŸ’áž‹áž¶áž“</h4>
+              </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                <input v-model="formData.addressProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+              </div>
+              <div class="form-group">
+                <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                <input v-model="formData.addressDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+              </div>
+              <div class="form-group">
+                <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                <input v-model="formData.addressCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž—áž¼áž˜áž·</label>
+                <input v-model="formData.addressVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+              </div>
+              <div class="form-group">
+                <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                <input v-model="formData.addressHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+              </div>
+              <div class="form-group">
+                <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                <input v-model="formData.addressStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+              </div>
+            </div>
+            </div>
+
+            <!-- Emergency Contact Block -->
+            <div class="form-block emergency-block">
+              <div class="form-section-header">
+                <i class="pi pi-phone"></i>
+                <h4>áž–áŸážáŸŒáž˜áž¶áž“áž‘áŸ†áž“áž¶áž€áŸ‹áž‘áŸ†áž“áž„áž€áŸ’áž“áž»áž„áž€ážšážŽáž¸áž˜áž¶áž“áž¢áž¶ážŸáž“áŸ’áž“</h4>
+              </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜</label>
+                <input v-model="formData.emergencySurname" type="text" placeholder="áž‚áŸ„ážáŸ’ážáž“áž¶áž˜" />
+              </div>
+              <div class="form-group">
+                <label>áž“áž¶áž˜ážáŸ’áž›áž½áž“</label>
+                <input v-model="formData.emergencyGivenName" type="text" placeholder="áž“áž¶áž˜ážáŸ’áž›áž½áž“" />
+              </div>
+              <div class="form-group">
+                <label>áž—áŸáž‘</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input type="radio" v-model="formData.emergencyGender" value="male" />
+                    <span>áž”áŸ’ážšáž»ážŸ</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" v-model="formData.emergencyGender" value="female" />
+                    <span>ážŸáŸ’ážšáž¸</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž‘áŸ†áž“áž¶áž€áŸ‹áž‘áŸ†áž“áž„ážáŸ’ážšáž¼ážœáž‡áž¶</label>
+                <select v-model="formData.emergencyRelationship">
+                  <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                  <option value="parent">ážªáž–áž»áž€/áž˜áŸ’ážáž¶áž™</option>
+                  <option value="spouse">áž”áŸ’ážáž¸/áž”áŸ’ážšáž–áž“áŸ’áž’</option>
+                  <option value="sibling">áž”áž„áž”áŸ’áž¢áž¼áž“</option>
+                  <option value="child">áž€áž¼áž“</option>
+                  <option value="relative">ážŸáž¶áž…áŸ‹áž‰áž¶ážáž·</option>
+                  <option value="friend">áž˜áž·ážáŸ’ážáž—áž€áŸ’ážáž·</option>
+                  <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>áž˜áž»ážážšáž”ážš</label>
+                <select v-model="formData.emergencyOccupation">
+                  <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                  <option value="civil-servant">áž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš</option>
+                  <option value="teacher">áž‚áŸ’ážšáž¼áž”áž„áŸ’ážšáŸ€áž“</option>
+                  <option value="doctor">áž‚áŸ’ážšáž¼áž–áŸáž‘áŸ’áž™</option>
+                  <option value="business">áž¢áŸ’áž“áž€áž‡áŸ†áž“áž½áž‰</option>
+                  <option value="farmer">áž€ážŸáž·áž€ážš</option>
+                  <option value="worker">áž€áž˜áŸ’áž˜áž€ážš</option>
+                  <option value="student">áž“áž·ážŸáŸ’ážŸáž·áž</option>
+                  <option value="retired">ážšáž¶áž‡áž€áž¶ážšáž“áž·ážœážáŸ’áž</option>
+                  <option value="unemployed">áž‚áŸ’áž˜áž¶áž“áž€áž¶ážšáž„áž¶ážš</option>
+                  <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                <input v-model="formData.emergencyProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                <input v-model="formData.emergencyDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+              </div>
+              <div class="form-group">
+                <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                <input v-model="formData.emergencyCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+              </div>
+              <div class="form-group">
+                <label>áž—áž¼áž˜áž·</label>
+                <input v-model="formData.emergencyVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                <input v-model="formData.emergencyHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+              </div>
+              <div class="form-group">
+                <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                <input v-model="formData.emergencyStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+              </div>
+              <div class="form-group">
+                <label>áž›áŸážáž‘áž¼ážšážŸáŸáž–áŸ’áž‘</label>
+                <input v-model="formData.emergencyPhone" type="tel" placeholder="+855 12 345 678" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>áž¢áŸŠáž¸áž˜áŸ‰áŸ‚áž›</label>
+                <input v-model="formData.emergencyEmail" type="email" placeholder="email@example.com" />
+              </div>
+            </div>
+            </div>
+            </div>
+
+            <!-- Tab 1: Parent Information -->
+            <div v-show="activeIconTab === 1">
+              <!-- Father Information Block -->
+              <div class="form-block general-info-block">
+                <div class="form-section-header">
+                  <i class="pi pi-user"></i>
+                  <h4>áž–áŸážáŸŒáž˜áž¶áž“ážªáž–áž»áž€</h4>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜</label>
+                    <input v-model="formData.fatherName" type="text" placeholder="áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜áž¡áž¶ážáž¶áŸ†áž„</label>
+                    <input v-model="formData.fatherLatinName" type="text" placeholder="PALV RATHOERN" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž</label>
+                    <div class="date-picker-group">
+                      <select v-model="formData.fatherBirthDay" class="date-select">
+                        <option value="">ážáŸ’áž„áŸƒ</option>
+                        <option v-for="day in 31" :key="day" :value="day">{{ day }}</option>
+                      </select>
+                      <select v-model="formData.fatherBirthMonth" class="date-select">
+                        <option value="">ážáŸ‚</option>
+                        <option value="1">áž˜áž€ážšáž¶</option>
+                        <option value="2">áž€áž»áž˜áŸ’áž—áŸˆ</option>
+                        <option value="3">áž˜áž¸áž“áž¶</option>
+                        <option value="4">áž˜áŸážŸáž¶</option>
+                        <option value="5">áž§ážŸáž—áž¶</option>
+                        <option value="6">áž˜áž·ážáž»áž“áž¶</option>
+                        <option value="7">áž€áž€áŸ’áž€ážŠáž¶</option>
+                        <option value="8">ážŸáž¸áž áž¶</option>
+                        <option value="9">áž€áž‰áŸ’áž‰áž¶</option>
+                        <option value="10">ážáž»áž›áž¶</option>
+                        <option value="11">ážœáž·áž…áŸ’áž†áž·áž€áž¶</option>
+                        <option value="12">áž’áŸ’áž“áž¼</option>
+                      </select>
+                      <select v-model="formData.fatherBirthYear" class="date-select">
+                        <option value="">áž†áŸ’áž“áž¶áŸ†</option>
+                        <option v-for="year in 100" :key="year" :value="2026 - year">{{ 2026 - year }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážáž¶áž“áž—áž¶áž–</label>
+                    <div class="radio-group">
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.fatherStatus" value="alive" />
+                        <span>ážšážŸáŸ‹</span>
+                      </label>
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.fatherStatus" value="deceased" />
+                        <span>ážŸáŸ’áž›áž¶áž”áŸ‹</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‡áž“áž‡áž¶ážáž·</label>
+                    <select v-model="formData.fatherEthnicity">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="chinese">áž…áž·áž“</option>
+                      <option value="vietnamese">ážœáŸ€ážážŽáž¶áž˜</option>
+                      <option value="cham">áž…áž¶áž˜</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáž‰áŸ’áž‡áž¶ážáž·</label>
+                    <select v-model="formData.fatherNationality">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="foreigner">áž”ážšáž‘áŸážŸ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>áž˜áž»ážážšáž”ážš</label>
+                    <select v-model="formData.fatherOccupation">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="civil-servant">áž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš</option>
+                      <option value="teacher">áž‚áŸ’ážšáž¼áž”áž„áŸ’ážšáŸ€áž“</option>
+                      <option value="professor">ážŸáž¶ážŸáŸ’ážáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™áž˜áž áž¶áž”ážšáž·áž‰áŸ’áž‰áž¶</option>
+                      <option value="associate-professor">ážŸáž¶ážŸáŸ’ážŠáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™ážšáž„</option>
+                      <option value="assistant-professor">ážŸáž¶ážŸáŸ’ážŠáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™áž‡áŸ†áž“áž½áž™</option>
+                      <option value="medical-specialist">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážáž·ážáž¯áž€áž‘áŸážŸ</option>
+                      <option value="medical-master">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážáž·áž(áž‡áŸ†áž“áž¶áž‰/áž¢áž“áž»áž”ážŽáŸ’ážŒáž·áž)</option>
+                      <option value="medical-doctor">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="dentist">áž‘áž“áŸ’ážŠáž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="pharmacist">áž±ážŸážáž€áž¶ážšáž¸</option>
+                      <option value="nurse-bachelor">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€(áž”ážšáž·áž‰áŸ’áž‰áž¶áž”ážáŸ’ážš)</option>
+                      <option value="midwife-bachelor">áž†áŸ’áž˜áž”(áž”ážšáž·áž‰áŸ’áž‰áž¶áž”ážáŸ’ážš)</option>
+                      <option value="nurse-secondary">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="midwife-secondary">áž†áŸ’áž˜áž”áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="nurse-primary">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž”áž‹áž˜</option>
+                      <option value="dental-nurse">áž‘áž“áŸ’ážáž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="lab-technician">áž¢áŸ’áž“áž€áž”áž…áŸ’áž…áŸáž€áž‘áŸážŸáž˜áž“áŸ’áž‘áž¸ážšáž–áž·ážŸáŸ„áž’áž“áŸáž˜áž’áŸ’áž™áž˜</option>
+                      <option value="radiologist">áž¢áŸ’áž“áž€áž”áž…áŸ’áž…áŸáž€áž‘áŸážŸážœáž·áž‘áŸ’áž™áž»ážŸáž¶ážŸáŸ’ážšáŸ’áž</option>
+                      <option value="physiotherapist">áž–áŸ’áž™áž¶áž”áž¶áž›ážŠáŸ„áž™áž…áž›áž“áž¶áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="it-specialist">áž–áŸážáŸŒáž˜áž¶áž“ážœáž·áž‘áŸ’áž™áž¶</option>
+                      <option value="accountant">áž‚ážŽáž“áŸáž™áŸ’áž™áž€ážš</option>
+                      <option value="public-admin">ážšážŠáŸ’áž‹áž”áž¶áž›â€‹ážŸáž¶áž’áž¶ážšážŽáŸˆ</option>
+                      <option value="electrical-engineer">ážœáž·ážŸáŸ’ážœáž€áž˜áŸ’áž˜áž¢áž‚áŸ’áž‚áž·ážŸáž“áž¸</option>
+                      <option value="business">áž¢áž¶áž‡áž¸ážœáž€</option>
+                      <option value="trader">áž›áž€áŸ‹ážŠáž¼ážš</option>
+                      <option value="caregiver">áž¢áŸ’áž“áž€ážáŸ‚áž‘áž¶áŸ†</option>
+                      <option value="mid-doctor">áž‚áŸ’ážšáž¼áž–áŸáž‘áŸ’áž™áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="farmer">áž€ážŸáž·áž€ážš</option>
+                      <option value="worker">áž€áž˜áŸ’áž˜áž€ážš</option>
+                      <option value="student">áž“áž·ážŸáŸ’ážŸáž·áž</option>
+                      <option value="retired">ážšáž¶áž‡áž€áž¶ážšáž“áž·ážœážáŸ’áž</option>
+                      <option value="unemployed">áž‚áŸ’áž˜áž¶áž“áž€áž¶ážšáž„áž¶ážš</option>
+                      <option value="housewife">áž˜áŸáž•áŸ’áž‘áŸ‡</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="subsection-title">áž‘áž¸áž€áž“áŸ’áž›áŸ‚áž„áž€áŸ†ážŽáž¾ážážªáž–áž»áž€</div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                    <input v-model="formData.fatherBirthProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                    <input v-model="formData.fatherBirthDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                    <input v-model="formData.fatherBirthCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž—áž¼áž˜áž·</label>
+                    <input v-model="formData.fatherBirthVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                    <input v-model="formData.fatherBirthHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                    <input v-model="formData.fatherBirthStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž›áŸážáž‘áž¼ážšážŸáŸáž–áŸ’áž‘</label>
+                    <input v-model="formData.fatherPhone" type="tel" placeholder="+855 12 345 678" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mother Information Block -->
+              <div class="form-block birthplace-block">
+                <div class="form-section-header">
+                  <i class="pi pi-user"></i>
+                  <h4>áž–áŸážáŸŒáž˜áž¶áž“áž˜áŸ’ážáž¶áž™</h4>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜</label>
+                    <input v-model="formData.motherName" type="text" placeholder="áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜áž¡áž¶ážáž¶áŸ†áž„</label>
+                    <input v-model="formData.motherLatinName" type="text" placeholder="Latin Name" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž</label>
+                    <div class="date-picker-group">
+                      <select v-model="formData.motherBirthDay" class="date-select">
+                        <option value="">ážáŸ’áž„áŸƒ</option>
+                        <option v-for="day in 31" :key="day" :value="day">{{ day }}</option>
+                      </select>
+                      <select v-model="formData.motherBirthMonth" class="date-select">
+                        <option value="">ážáŸ‚</option>
+                        <option value="1">áž˜áž€ážšáž¶</option>
+                        <option value="2">áž€áž»áž˜áŸ’áž—áŸˆ</option>
+                        <option value="3">áž˜áž¸áž“áž¶</option>
+                        <option value="4">áž˜áŸážŸáž¶</option>
+                        <option value="5">áž§ážŸáž—áž¶</option>
+                        <option value="6">áž˜áž·ážáž»áž“áž¶</option>
+                        <option value="7">áž€áž€áŸ’áž€ážŠáž¶</option>
+                        <option value="8">ážŸáž¸áž áž¶</option>
+                        <option value="9">áž€áž‰áŸ’áž‰áž¶</option>
+                        <option value="10">ážáž»áž›áž¶</option>
+                        <option value="11">ážœáž·áž…áŸ’áž†áž·áž€áž¶</option>
+                        <option value="12">áž’áŸ’áž“áž¼</option>
+                      </select>
+                      <select v-model="formData.motherBirthYear" class="date-select">
+                        <option value="">áž†áŸ’áž“áž¶áŸ†</option>
+                        <option v-for="year in 100" :key="year" :value="2026 - year">{{ 2026 - year }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážáž¶áž“áž—áž¶áž–</label>
+                    <div class="radio-group">
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.motherStatus" value="alive" />
+                        <span>ážšážŸáŸ‹</span>
+                      </label>
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.motherStatus" value="deceased" />
+                        <span>ážŸáŸ’áž›áž¶áž”áŸ‹</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‡áž“áž‡áž¶ážáž·</label>
+                    <select v-model="formData.motherEthnicity">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="chinese">áž…áž·áž“</option>
+                      <option value="vietnamese">ážœáŸ€ážážŽáž¶áž˜</option>
+                      <option value="cham">áž…áž¶áž˜</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáž‰áŸ’áž‡áž¶ážáž·</label>
+                    <select v-model="formData.motherNationality">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="foreigner">áž”ážšáž‘áŸážŸ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>áž˜áž»ážážšáž”ážš</label>
+                    <select v-model="formData.motherOccupation">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="civil-servant">áž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš</option>
+                      <option value="teacher">áž‚áŸ’ážšáž¼áž”áž„áŸ’ážšáŸ€áž“</option>
+                      <option value="professor">ážŸáž¶ážŸáŸ’ážáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™áž˜áž áž¶áž”ážšáž·áž‰áŸ’áž‰áž¶</option>
+                      <option value="associate-professor">ážŸáž¶ážŸáŸ’ážŠáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™ážšáž„</option>
+                      <option value="assistant-professor">ážŸáž¶ážŸáŸ’ážŠáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™áž‡áŸ†áž“áž½áž™</option>
+                      <option value="medical-specialist">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážáž·ážáž¯áž€áž‘áŸážŸ</option>
+                      <option value="medical-master">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážáž·áž(áž‡áŸ†áž“áž¶áž‰/áž¢áž“áž»áž”ážŽáŸ’ážŒáž·áž)</option>
+                      <option value="medical-doctor">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="dentist">áž‘áž“áŸ’ážŠáž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="pharmacist">áž±ážŸážáž€áž¶ážšáž¸</option>
+                      <option value="nurse-bachelor">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€(áž”ážšáž·áž‰áŸ’áž‰áž¶áž”ážáŸ’ážš)</option>
+                      <option value="midwife-bachelor">áž†áŸ’áž˜áž”(áž”ážšáž·áž‰áŸ’áž‰áž¶áž”ážáŸ’ážš)</option>
+                      <option value="nurse-secondary">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="midwife-secondary">áž†áŸ’áž˜áž”áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="nurse-primary">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž”áž‹áž˜</option>
+                      <option value="dental-nurse">áž‘áž“áŸ’ážáž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="lab-technician">áž¢áŸ’áž“áž€áž”áž…áŸ’áž…áŸáž€áž‘áŸážŸáž˜áž“áŸ’áž‘áž¸ážšáž–áž·ážŸáŸ„áž’áž“áŸáž˜áž’áŸ’áž™áž˜</option>
+                      <option value="radiologist">áž¢áŸ’áž“áž€áž”áž…áŸ’áž…áŸáž€áž‘áŸážŸážœáž·áž‘áŸ’áž™áž»ážŸáž¶ážŸáŸ’ážšáŸ’áž</option>
+                      <option value="physiotherapist">áž–áŸ’áž™áž¶áž”áž¶áž›ážŠáŸ„áž™áž…áž›áž“áž¶áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="it-specialist">áž–áŸážáŸŒáž˜áž¶áž“ážœáž·áž‘áŸ’áž™áž¶</option>
+                      <option value="accountant">áž‚ážŽáž“áŸáž™áŸ’áž™áž€ážš</option>
+                      <option value="public-admin">ážšážŠáŸ’áž‹áž”áž¶áž›â€‹ážŸáž¶áž’áž¶ážšážŽáŸˆ</option>
+                      <option value="electrical-engineer">ážœáž·ážŸáŸ’ážœáž€áž˜áŸ’áž˜áž¢áž‚áŸ’áž‚áž·ážŸáž“áž¸</option>
+                      <option value="business">áž¢áž¶áž‡áž¸ážœáž€</option>
+                      <option value="trader">áž›áž€áŸ‹ážŠáž¼ážš</option>
+                      <option value="caregiver">áž¢áŸ’áž“áž€ážáŸ‚áž‘áž¶áŸ†</option>
+                      <option value="mid-doctor">áž‚áŸ’ážšáž¼áž–áŸáž‘áŸ’áž™áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="farmer">áž€ážŸáž·áž€ážš</option>
+                      <option value="worker">áž€áž˜áŸ’áž˜áž€ážš</option>
+                      <option value="student">áž“áž·ážŸáŸ’ážŸáž·áž</option>
+                      <option value="retired">ážšáž¶áž‡áž€áž¶ážšáž“áž·ážœážáŸ’áž</option>
+                      <option value="unemployed">áž‚áŸ’áž˜áž¶áž“áž€áž¶ážšáž„áž¶ážš</option>
+                      <option value="housewife">áž˜áŸáž•áŸ’áž‘áŸ‡</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="subsection-title">áž‘áž¸áž€áž“áŸ’áž›áŸ‚áž„áž€áŸ†ážŽáž¾ážáž˜áŸ’ážáž¶áž™</div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                    <input v-model="formData.motherBirthProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                    <input v-model="formData.motherBirthDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                    <input v-model="formData.motherBirthCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž—áž¼áž˜áž·</label>
+                    <input v-model="formData.motherBirthVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                    <input v-model="formData.motherBirthHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                    <input v-model="formData.motherBirthStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž›áŸážáž‘áž¼ážšážŸáŸáž–áŸ’áž‘</label>
+                    <input v-model="formData.motherPhone" type="tel" placeholder="+855 12 345 678" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Spouse Information -->
+            <div v-show="activeIconTab === 2">
+              <!-- Spouse Basic Information Block -->
+              <div class="form-block general-info-block">
+                <div class="form-section-header">
+                  <i class="pi pi-heart"></i>
+                  <h4>áž–áŸážáŸŒáž˜áž¶áž“ážŸáž áž–áŸáž‘áŸ’áž’</h4>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group full-width">
+                    <label class="checkbox-label">
+                      <input type="checkbox" v-model="formData.spouseWorksHere" />
+                      <span>áž”áŸ’ážšáž–áž“áŸ’áž’/áž”áŸ’ážáž¸áž’áŸ’ážœáž¾áž€áž¶ážšážŠáŸ‚ážš</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž›áŸážážŸáŸ†áž”áž»ážáŸ’ážšážšáŸ€áž”áž€áž¶ážš</label>
+                    <input v-model="formData.marriageCertificateNo" type="text" placeholder="áž›áŸážážŸáŸ†áž”áž»ážáŸ’ážšážšáŸ€áž”áž€áž¶ážš" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž›áŸážáž¢ážáŸ’ážážŸáž‰áŸ’áž‰áž¶ážŽáž”áŸážŽáŸ’ážŽážŸáž áž–áŸáž‘áŸ’áž’</label>
+                    <input v-model="formData.spouseNationalId" type="text" placeholder="áž›áŸážáž¢ážáŸ’ážážŸáž‰áŸ’áž‰áž¶ážŽáž”áŸážŽáŸ’ážŽ" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜</label>
+                    <input v-model="formData.spouseName" type="text" placeholder="áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜áž¡áž¶ážáž¶áŸ†áž„</label>
+                    <input v-model="formData.spouseLatinName" type="text" placeholder="Latin Name" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž</label>
+                    <div class="date-picker-group">
+                      <select v-model="formData.spouseBirthDay" class="date-select">
+                        <option value="">ážáŸ’áž„áŸƒ</option>
+                        <option v-for="day in 31" :key="day" :value="day">{{ day }}</option>
+                      </select>
+                      <select v-model="formData.spouseBirthMonth" class="date-select">
+                        <option value="">ážáŸ‚</option>
+                        <option value="1">áž˜áž€ážšáž¶</option>
+                        <option value="2">áž€áž»áž˜áŸ’áž—áŸˆ</option>
+                        <option value="3">áž˜áž¸áž“áž¶</option>
+                        <option value="4">áž˜áŸážŸáž¶</option>
+                        <option value="5">áž§ážŸáž—áž¶</option>
+                        <option value="6">áž˜áž·ážáž»áž“áž¶</option>
+                        <option value="7">áž€áž€áŸ’áž€ážŠáž¶</option>
+                        <option value="8">ážŸáž¸áž áž¶</option>
+                        <option value="9">áž€áž‰áŸ’áž‰áž¶</option>
+                        <option value="10">ážáž»áž›áž¶</option>
+                        <option value="11">ážœáž·áž…áŸ’áž†áž·áž€áž¶</option>
+                        <option value="12">áž’áŸ’áž“áž¼</option>
+                      </select>
+                      <select v-model="formData.spouseBirthYear" class="date-select">
+                        <option value="">áž†áŸ’áž“áž¶áŸ†</option>
+                        <option v-for="year in 100" :key="year" :value="2026 - year">{{ 2026 - year }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážáž¶áž“áž—áž¶áž–</label>
+                    <div class="radio-group">
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.spouseStatus" value="alive" />
+                        <span>ážšážŸáŸ‹</span>
+                      </label>
+                      <label class="radio-label">
+                        <input type="radio" v-model="formData.spouseStatus" value="deceased" />
+                        <span>ážŸáŸ’áž›áž¶áž”áŸ‹</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž˜áž»ážážšáž”ážš</label>
+                    <select v-model="formData.spouseOccupation">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="civil-servant">áž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš</option>
+                      <option value="teacher">áž‚áŸ’ážšáž¼áž”áž„áŸ’ážšáŸ€áž“</option>
+                      <option value="professor">ážŸáž¶ážŸáŸ’ážáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™áž˜áž áž¶áž”ážšáž·áž‰áŸ’áž‰áž¶</option>
+                      <option value="associate-professor">ážŸáž¶ážŸáŸ’ážŠáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™ážšáž„</option>
+                      <option value="assistant-professor">ážŸáž¶ážŸáŸ’ážŠáŸ’ážšáž¶áž…áž¶ážšáŸ’áž™áž‡áŸ†áž“áž½áž™</option>
+                      <option value="medical-specialist">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážáž·ážáž¯áž€áž‘áŸážŸ</option>
+                      <option value="medical-master">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážáž·áž(áž‡áŸ†áž“áž¶áž‰/áž¢áž“áž»áž”ážŽáŸ’ážŒáž·áž)</option>
+                      <option value="medical-doctor">ážœáŸáž‡áŸ’áž‡áž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="dentist">áž‘áž“áŸ’ážŠáž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="pharmacist">áž±ážŸážáž€áž¶ážšáž¸</option>
+                      <option value="nurse-bachelor">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€(áž”ážšáž·áž‰áŸ’áž‰áž¶áž”ážáŸ’ážš)</option>
+                      <option value="midwife-bachelor">áž†áŸ’áž˜áž”(áž”ážšáž·áž‰áŸ’áž‰áž¶áž”ážáŸ’ážš)</option>
+                      <option value="nurse-secondary">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="midwife-secondary">áž†áŸ’áž˜áž”áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="nurse-primary">áž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž”áž‹áž˜</option>
+                      <option value="dental-nurse">áž‘áž“áŸ’ážáž‚áž·áž›áž¶áž“áž»áž”ážŠáŸ’áž‹áž¶áž€áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="lab-technician">áž¢áŸ’áž“áž€áž”áž…áŸ’áž…áŸáž€áž‘áŸážŸáž˜áž“áŸ’áž‘áž¸ážšáž–áž·ážŸáŸ„áž’áž“áŸáž˜áž’áŸ’áž™áž˜</option>
+                      <option value="radiologist">áž¢áŸ’áž“áž€áž”áž…áŸ’áž…áŸáž€áž‘áŸážŸážœáž·áž‘áŸ’áž™áž»ážŸáž¶ážŸáŸ’ážšáŸ’áž</option>
+                      <option value="physiotherapist">áž–áŸ’áž™áž¶áž”áž¶áž›ážŠáŸ„áž™áž…áž›áž“áž¶áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="it-specialist">áž–áŸážáŸŒáž˜áž¶áž“ážœáž·áž‘áŸ’áž™áž¶</option>
+                      <option value="accountant">áž‚ážŽáž“áŸáž™áŸ’áž™áž€ážš</option>
+                      <option value="public-admin">ážšážŠáŸ’áž‹áž”áž¶áž›â€‹ážŸáž¶áž’áž¶ážšážŽáŸˆ</option>
+                      <option value="electrical-engineer">ážœáž·ážŸáŸ’ážœáž€áž˜áŸ’áž˜áž¢áž‚áŸ’áž‚áž·ážŸáž“áž¸</option>
+                      <option value="business">áž¢áž¶áž‡áž¸ážœáž€</option>
+                      <option value="trader">áž›áž€áŸ‹ážŠáž¼ážš</option>
+                      <option value="caregiver">áž¢áŸ’áž“áž€ážáŸ‚áž‘áž¶áŸ†</option>
+                      <option value="mid-doctor">áž‚áŸ’ážšáž¼áž–áŸáž‘áŸ’áž™áž˜áž’áŸ’áž™áž˜</option>
+                      <option value="farmer">áž€ážŸáž·áž€ážš</option>
+                      <option value="worker">áž€áž˜áŸ’áž˜áž€ážš</option>
+                      <option value="student">áž“áž·ážŸáŸ’ážŸáž·áž</option>
+                      <option value="retired">ážšáž¶áž‡áž€áž¶ážšáž“áž·ážœážáŸ’áž</option>
+                      <option value="unemployed">áž‚áŸ’áž˜áž¶áž“áž€áž¶ážšáž„áž¶ážš</option>
+                      <option value="housewife">áž˜áŸáž•áŸ’áž‘áŸ‡</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>áž‘áž¸áž€áž“áŸ’áž›áŸ‚áž„áž”áŸ†áž–áŸáž‰áž€áž¶ážšáž„áž¶ážš</label>
+                    <input v-model="formData.spouseWorkplace" type="text" placeholder="áž‘áž¸áž€áž“áŸ’áž›áŸ‚áž„áž”áŸ†áž–áŸáž‰áž€áž¶ážšáž„áž¶ážš" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž‡áž“áž‡áž¶ážáž·</label>
+                    <select v-model="formData.spouseEthnicity">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="chinese">áž…áž·áž“</option>
+                      <option value="vietnamese">ážœáŸ€ážážŽáž¶áž˜</option>
+                      <option value="cham">áž…áž¶áž˜</option>
+                      <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáž‰áŸ’áž‡áž¶ážáž·</label>
+                    <select v-model="formData.spouseNationality">
+                      <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                      <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                      <option value="foreigner">áž”ážšáž‘áŸážŸ</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Spouse Birth Place Block -->
+              <div class="form-block birthplace-block">
+                <div class="form-section-header">
+                  <i class="pi pi-map-marker"></i>
+                  <h4>áž‘áž¸áž€áž“áŸ’áž›áŸ‚áž„áž€áŸ†ážŽáž¾ážážŸáž áž–áŸáž‘áŸ’áž’</h4>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                    <input v-model="formData.spouseBirthProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                    <input v-model="formData.spouseBirthDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                    <input v-model="formData.spouseBirthCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž—áž¼áž˜áž·</label>
+                    <input v-model="formData.spouseBirthVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                    <input v-model="formData.spouseBirthHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                    <input v-model="formData.spouseBirthStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Spouse Current Address Block -->
+              <div class="form-block address-block">
+                <div class="form-section-header">
+                  <i class="pi pi-home"></i>
+                  <h4>áž¢áž¶ážŸáž™ážŠáŸ’áž‹áž¶áž“ážŸáž áž–áŸáž‘áŸ’áž’</h4>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž</label>
+                    <input v-model="formData.spouseAddressProvince" type="text" placeholder="ážšáž¶áž‡áž’áž¶áž“áž¸/ážáŸážáŸ’áž" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ</label>
+                    <input v-model="formData.spouseAddressDistrict" type="text" placeholder="ážŸáŸ’ážšáž»áž€/ážážŽáŸ’ážŒ" />
+                  </div>
+                  <div class="form-group">
+                    <label>ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹</label>
+                    <input v-model="formData.spouseAddressCommune" type="text" placeholder="ážƒáž»áŸ†/ážŸáž„áŸ’áž€áž¶ážáŸ‹" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž—áž¼áž˜áž·</label>
+                    <input v-model="formData.spouseAddressVillage" type="text" placeholder="áž—áž¼áž˜áž·" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž‘áŸ‡áž›áŸáž</label>
+                    <input v-model="formData.spouseAddressHouseNumber" type="text" placeholder="áž•áŸ’áž‘áŸ‡áž›áŸáž" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž•áŸ’áž›áž¼ážœáž›áŸáž</label>
+                    <input v-model="formData.spouseAddressStreetNumber" type="text" placeholder="áž•áŸ’áž›áž¼ážœáž›áŸáž" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Spouse Contact Information Block -->
+              <div class="form-block emergency-block">
+                <div class="form-section-header">
+                  <i class="pi pi-phone"></i>
+                  <h4>áž›áŸážáž‘áŸ†áž“áž¶áž€áŸ‹áž‘áŸ†áž“áž„</h4>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>áž›áŸážáž‘áž¼ážšážŸáŸáž–áŸ’áž‘</label>
+                    <input v-model="formData.spousePhone" type="tel" placeholder="+855 12 345 678" />
+                  </div>
+                  <div class="form-group">
+                    <label>áž¢áŸŠáž¸áž˜áŸ‰áŸ‚áž›</label>
+                    <input v-model="formData.spouseEmail" type="email" placeholder="email@example.com" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Children Information -->
+            <div v-show="activeIconTab === 3">
+              <div class="form-block general-info-block">
+                <div class="form-section-header">
+                  <i class="pi pi-users"></i>
+                  <h4>áž–áŸážáŸŒáž˜áž¶áž“áž€áž¼áž“</h4>
+                </div>
+
+                <button type="button" class="btn-add-child" @click="addChild">
+                  <i class="pi pi-plus"></i> áž”áž“áŸ’ážáŸ‚áž˜áž€áž¼áž“
+                </button>
+
+                <div v-if="formData.children && formData.children.length > 0" class="children-table-container">
+                  <table class="children-table">
+                    <thead>
+                      <tr>
+                        <th>áž›áŸážážŸáž˜áŸ’áž‚áž¶áž›áŸ‹áž€áž¼áž“</th>
+                        <th>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜</th>
+                        <th>áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜áž¡áž¶ážáž¶áŸ†áž„</th>
+                        <th>áž—áŸáž‘</th>
+                        <th>ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž</th>
+                        <th>áž˜áž»ážážšáž”ážš</th>
+                        <th>ážŸáŸ’ážáž¶áž“áž—áž¶áž–</th>
+                        <th>ážŸáž€áž˜áŸ’áž˜áž—áž¶áž–</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(child, index) in formData.children" :key="index">
+                        <td>
+                          <input v-model="child.childId" type="text" placeholder="áž›áŸáž" class="table-input" />
+                        </td>
+                        <td>
+                          <input v-model="child.name" type="text" placeholder="áž‚áŸ„ážáŸ’ážáž“áž¶áž˜ áž“áž·áž„áž“áž¶áž˜" class="table-input" />
+                        </td>
+                        <td>
+                          <input v-model="child.latinName" type="text" placeholder="Latin Name" class="table-input" />
+                        </td>
+                        <td>
+                          <select v-model="child.gender" class="table-select">
+                            <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                            <option value="male">áž”áŸ’ážšáž»ážŸ</option>
+                            <option value="female">ážŸáŸ’ážšáž¸</option>
+                          </select>
+                        </td>
+                        <td>
+                          <input v-model="child.dateOfBirth" type="date" class="table-input" />
+                        </td>
+                        <td>
+                          <select v-model="child.occupation" class="table-select">
+                            <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                            <option value="student">áž“áž·ážŸáŸ’ážŸáž·áž</option>
+                            <option value="civil-servant">áž˜áž“áŸ’ážáŸ’ážšáž¸ážšáž¶áž‡áž€áž¶ážš</option>
+                            <option value="teacher">áž‚áŸ’ážšáž¼áž”áž„áŸ’ážšáŸ€áž“</option>
+                            <option value="doctor">áž‚áŸ’ážšáž¼áž–áŸáž‘áŸ’áž™</option>
+                            <option value="business">áž¢áž¶áž‡áž¸ážœáž€</option>
+                            <option value="worker">áž€áž˜áŸ’áž˜áž€ážš</option>
+                            <option value="unemployed">áž‚áŸ’áž˜áž¶áž“áž€áž¶ážšáž„áž¶ážš</option>
+                            <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select v-model="child.status" class="table-select">
+                            <option value="">áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ</option>
+                            <option value="alive">ážšážŸáŸ‹</option>
+                            <option value="deceased">ážŸáŸ’áž›áž¶áž”áŸ‹</option>
+                          </select>
+                        </td>
+                        <td>
+                          <button type="button" class="btn-delete-child" @click="removeChild(index)" title="áž›áž»áž”">
+                            <i class="pi pi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div v-else class="empty-children">
+                  <p>áž˜áž·áž“áž‘áž¶áž“áŸ‹áž˜áž¶áž“áž–áŸážáŸŒáž˜áž¶áž“áž€áž¼áž“áŸ” ážŸáž¼áž˜áž…áž»áž…áž”áŸŠáž¼ážáž»áž„ "áž”áž“áŸ’ážáŸ‚áž˜áž€áž¼áž“" ážŠáž¾áž˜áŸ’áž”áž¸áž”áž“áŸ’ážáŸ‚áž˜áŸ”</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Education Level -->
+            <div v-show="activeIconTab === 4">
+              <div class="form-block general-info-block">
+                <div class="form-section-header">
+                  <i class="pi pi-graduation-cap"></i>
+                  <h4>áž–áŸážáŸŒáž˜áž¶áž“áž€áž˜áŸ’ážšáž·ážážœáž”áŸ’áž”áž’áž˜áŸŒ</h4>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label><i class="pi pi-book"></i> áž€áž˜áŸ’ážšáž·ážážœáž”áŸ’áž”áž’áž˜áŸŒ <span class="required">*</span></label>
+                    <select v-model="formData.educationLevel" class="form-input" required>
+                      <option value="">-- áž‡áŸ’ážšáž¾ážŸážšáž¾ážŸ --</option>
+                      <option value="áž˜áž·áž“áž…áŸáŸ‡áž¢áž€áŸ’ážŸážš">áž˜áž·áž“áž…áŸáŸ‡áž¢áž€áŸ’ážŸážš</option>
+                      <option value="áž”áž‹áž˜ážŸáž·áž€áŸ’ážŸáž¶">áž”áž‹áž˜ážŸáž·áž€áŸ’ážŸáž¶</option>
+                      <option value="áž¢áž“áž»ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™">áž¢áž“áž»ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™</option>
+                      <option value="ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™">ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™</option>
+                      <option value="áž”ážšáž·áž‰áŸ’áž‰áž¶áž”áŸážáŸ’ážš">áž”ážšáž·áž‰áŸ’áž‰áž¶áž”áŸážáŸ’ážš</option>
+                      <option value="áž”ážšáž·áž‰áŸ’áž‰áž¶áž”áŸážáŸ’ážšážšáž„">áž”ážšáž·áž‰áŸ’áž‰áž¶áž”áŸážáŸ’ážšážšáž„</option>
+                      <option value="áž¢áž“áž»áž”ážŽáŸ’ážŒáž·áž">áž¢áž“áž»áž”ážŽáŸ’ážŒáž·áž</option>
+                      <option value="áž”ážŽáŸ’ážŒáž·áž">áž”ážŽáŸ’ážŒáž·áž</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label><i class="pi pi-building"></i> ážˆáŸ’áž˜áŸ„áŸ‡ážŸáž¶áž›áž¶ážšáŸ€áž“/ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™áž…áž»áž„áž€áŸ’ážšáŸ„áž™</label>
+                    <input 
+                      type="text" 
+                      v-model="formData.lastSchool" 
+                      class="form-input"
+                      placeholder="áž”áž‰áŸ’áž…áž¼áž›ážˆáŸ’áž˜áŸ„áŸ‡ážŸáž¶áž›áž¶ážšáŸ€áž“/ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label><i class="pi pi-calendar"></i> áž†áŸ’áž“áž¶áŸ†áž”áž‰áŸ’áž…áž”áŸ‹</label>
+                    <input 
+                      type="number" 
+                      v-model="formData.graduationYear" 
+                      class="form-input"
+                      placeholder="áž†áŸ’áž“áž¶áŸ†áž”áž‰áŸ’áž…áž”áŸ‹"
+                      min="1900"
+                      max="2100"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label><i class="pi pi-star"></i> ážœáž‚áŸ’áž‚áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž”áž¶áž“áž…áž¼áž›ážšáž½áž˜</label>
+                    <textarea 
+                      v-model="formData.trainings" 
+                      class="form-input"
+                      rows="3"
+                      placeholder="áž”áž‰áŸ’áž‡áž¸ážœáž‚áŸ’áž‚áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›ážŠáŸ‚áž›áž”áž¶áž“áž…áž¼áž›ážšáž½áž˜ (áž”áŸ†áž”áŸ‚áž€ážŠáŸ„áž™ážŸáž‰áŸ’áž‰áž¶áž€áŸ’áž”áŸ€ážŸ)"
+                    ></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label><i class="pi pi-trophy"></i> ážŸáž˜áž·áž‘áŸ’áž’áž•áž› áž“áž·áž„áž”áž‘áž–áž·ážŸáŸ„áž’áž“áŸ</label>
+                    <textarea 
+                      v-model="formData.achievements" 
+                      class="form-input"
+                      rows="3"
+                      placeholder="ážŸáž˜áž·áž‘áŸ’áž’áž•áž› áž“áž·áž„áž”áž‘áž–áž·ážŸáŸ„áž’áž“áŸáž€áž¶ážšáž„áž¶ážš"
+                    ></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label><i class="pi pi-language"></i> áž—áž¶ážŸáž¶áž”ážšáž‘áŸážŸážŠáŸ‚áž›áž…áŸáŸ‡</label>
+                    <input 
+                      type="text" 
+                      v-model="formData.languages" 
+                      class="form-input"
+                      placeholder="áž§. áž¢áž„áŸ‹áž‚áŸ’áž›áŸážŸ, áž…áž·áž“, áž”áž¶ážšáž¶áŸ†áž„"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <div class="form-actions-left">
+              <button type="button" class="btn-back" @click="prevTab" v-if="activeIconTab > 0">
+                <i class="pi pi-chevron-left"></i> ážáŸ’ážšáž¡áž”áŸ‹áž€áŸ’ážšáŸ„áž™
+              </button>
+            </div>
+            <div class="form-actions-right">
+              <button type="button" class="btn-cancel" @click="closeDialog">
+                <i class="pi pi-times"></i> áž”áŸ„áŸ‡áž”áž„áŸ‹
+              </button>
+              <button type="button" class="btn-next" @click="nextTab" v-if="activeIconTab < iconTabs.length - 1">
+                áž”áž“áŸ’áž‘áž¶áž”áŸ‹ <i class="pi pi-chevron-right"></i>
+              </button>
+              <button type="submit" class="btn-submit">
+                <i class="pi pi-check"></i> ážšáž€áŸ’ážŸáž¶áž‘áž»áž€
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <div v-if="deleteDialogVisible" class="modal-overlay" @click.self="deleteDialogVisible = false">
+      <div class="modal-content-small">
+        <h3>áž”áž‰áŸ’áž‡áž¶áž€áŸ‹áž€áž¶ážšáž›áž»áž”</h3>
+        <div class="confirmation-content">
+          <i class="pi pi-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+          <p v-if="selectedEmployee">
+            ážáž¾áž¢áŸ’áž“áž€áž–áž·ážáž‡áž¶áž…áž„áŸ‹áž›áž»áž”áž”áž»áž‚áŸ’áž‚áž›áž·áž€ <strong>{{ selectedEmployee.firstName }} {{ selectedEmployee.lastName }}</strong>?
+          </p>
+        </div>
+        <div class="dialog-footer">
+          <button class="btn-cancel" @click="deleteDialogVisible = false">
+            <i class="pi pi-times"></i> áž”áŸ„áŸ‡áž”áž„áŸ‹
+          </button>
+          <button class="btn-delete" @click="deleteEmployee">
+            <i class="pi pi-trash"></i> áž›áž»áž”
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

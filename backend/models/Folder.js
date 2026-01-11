@@ -22,6 +22,15 @@ const folderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -29,6 +38,25 @@ const folderSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  }
+});
+
+// Auto-populate queries to exclude deleted folders
+folderSchema.pre('find', function() {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ isDeleted: false });
+  }
+});
+
+folderSchema.pre('findOne', function() {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ isDeleted: false });
+  }
+});
+
+folderSchema.pre('findOneAndUpdate', function() {
+  if (!this.getOptions().includeDeleted) {
+    this.where({ isDeleted: false });
   }
 });
 

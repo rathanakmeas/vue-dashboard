@@ -10,7 +10,12 @@
         <div v-if="showUploadModal" class="modal-overlay" @click.self="closeModal">
             <div class="modal-content">
                 <h3>Upload File</h3>
-                <div class="upload-area" @drop="handleDrop" @dragover.prevent @dragleave.prevent>
+                <div class="mode-toggle">
+                    <button type="button" :class="['mode-btn', { active: uploadMode === 'upload' }]" @click="setUploadMode('upload')">Upload file</button>
+                    <button type="button" :class="['mode-btn', { active: uploadMode === 'link' }]" @click="setUploadMode('link')">Add by link</button>
+                </div>
+
+                <div v-if="uploadMode === 'upload'" class="upload-area" @drop="handleDrop" @dragover.prevent @dragleave.prevent>
                     <input 
                         ref="fileInput"
                         type="file" 
@@ -22,12 +27,45 @@
                         <p>📄 {{ selectedFile.name }}</p>
                         <p class="file-size">{{ formatFileSize(selectedFile.size) }}</p>
                     </div>
+                    <p v-if="uploadError" class="error-text">{{ uploadError }}</p>
+                </div>
+
+                <div v-else class="link-form">
+                    <label class="input-label" for="link-name">File name</label>
+                    <input id="link-name" class="text-input" type="text" v-model="linkName" placeholder="Quarterly-report.pdf" />
+
+                    <label class="input-label" for="link-url">File URL</label>
+                    <input id="link-url" class="text-input" type="url" v-model="linkUrl" placeholder="https://example.com/report.pdf" />
+
+                    <label class="input-label" for="link-type">MIME type (optional)</label>
+                    <input id="link-type" class="text-input" type="text" v-model="linkType" placeholder="application/pdf" />
+
+                    <p class="helper-text">Use this when the file is already hosted elsewhere.</p>
+                    <p v-if="uploadError" class="error-text">{{ uploadError }}</p>
                 </div>
                 <div class="modal-actions">
-                    <button @click="uploadFile" :disabled="!selectedFile || uploading" class="btn-save">
-                        {{ uploading ? 'Uploading...' : 'Upload' }}
+                    <button @click="uploadFile" :disabled="!canSubmit" class="btn-save">
+                        {{ uploading ? (uploadMode === 'upload' ? 'Uploading...' : 'Saving...') : (uploadMode === 'upload' ? 'Upload' : 'Save Link') }}
                     </button>
                     <button @click="closeModal" class="btn-cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rename Modal -->
+        <div v-if="showRenameModal" class="modal-overlay" @click.self="closeRenameModal">
+            <div class="modal-content">
+                <h3>Rename File</h3>
+                <div class="form-group">
+                    <label>New name</label>
+                    <input type="text" v-model="renameName" placeholder="Enter new file name" />
+                </div>
+                <p v-if="renameError" class="error-text">{{ renameError }}</p>
+                <div class="modal-actions">
+                    <button class="btn-save" @click="renameFile" :disabled="renaming">
+                        {{ renaming ? 'Renaming...' : 'Save' }}
+                    </button>
+                    <button class="btn-cancel" @click="closeRenameModal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -50,12 +88,13 @@
                 </thead>
                 <tbody>
                     <tr v-for="file in files" :key="file._id">
-                        <td class="file-name">{{ getFileIcon(file.mimeType) }} {{ file.name }}</td>
+                        <td class="file-name">{{ getFileIcon(file.fileType) }} {{ file.name }}</td>
                         <td>{{ formatFileSize(file.fileSize) }}</td>
-                        <td>{{ file.mimeType }}</td>
-                        <td>{{ formatDate(file.uploadedAt) }}</td>
+                        <td>{{ file.fileType }}</td>
+                        <td>{{ formatDate(file.createdAt) }}</td>
                         <td class="actions">
                             <button @click="downloadFile(file)" class="btn-action" title="Download">⬇️</button>
+                            <button @click="openRename(file)" class="btn-action" title="Rename">✏️</button>
                             <button @click="deleteFile(file._id)" class="btn-action btn-danger" title="Delete">🗑️</button>
                         </td>
                     </tr>
@@ -66,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { fileAPI, folderAPI } from '../api'
 
@@ -80,6 +119,22 @@ const uploading = ref(false)
 const showUploadModal = ref(false)
 const selectedFile = ref(null)
 const fileInput = ref(null)
+const uploadError = ref('')
+const uploadMode = ref('upload')
+const linkName = ref('')
+const linkUrl = ref('')
+const linkType = ref('')
+const showRenameModal = ref(false)
+const renameTarget = ref(null)
+const renameName = ref('')
+const renameError = ref('')
+const renaming = ref(false)
+
+const canSubmit = computed(() => {
+    if (uploading.value) return false
+    if (uploadMode.value === 'upload') return !!selectedFile.value
+    return !!linkName.value && !!linkUrl.value
+})
 
 const loadFiles = async () => {
     loading.value = true
@@ -89,7 +144,7 @@ const loadFiles = async () => {
 
         // Also get folder name
         const folderResponse = await folderAPI.getFolder(folderId)
-        folderName.value = folderResponse.folder?.name || 'Files'
+        folderName.value = folderResponse.name || 'Files'
     } catch (error) {
         console.error('Failed to load files:', error)
     } finally {
@@ -98,31 +153,63 @@ const loadFiles = async () => {
 }
 
 const handleFileSelect = (event) => {
+    uploadError.value = ''
     selectedFile.value = event.target.files[0]
 }
 
 const handleDrop = (event) => {
     event.preventDefault()
+    uploadError.value = ''
     selectedFile.value = event.dataTransfer.files[0]
 }
 
 const uploadFile = async () => {
-    if (!selectedFile.value) return
+    if (uploadMode.value === 'upload' && !selectedFile.value) {
+        uploadError.value = 'Please select a file to upload.'
+        return
+    }
+
+    if (uploadMode.value === 'link' && (!linkName.value || !linkUrl.value)) {
+        uploadError.value = 'File name and URL are required.'
+        return
+    }
 
     uploading.value = true
+    uploadError.value = ''
     try {
-        await fileAPI.uploadFile(
-            folderId,
-            selectedFile.value.name,
-            selectedFile.value.size,
-            selectedFile.value.type
-        )
-        closeModal()
-        loadFiles()
+        if (uploadMode.value === 'upload') {
+            const result = await fileAPI.uploadFile(folderId, selectedFile.value)
+            console.log('Upload success:', result)
+            await loadFiles()
+            closeModal()
+        } else {
+            const result = await fileAPI.uploadFile(folderId, {
+                name: linkName.value,
+                fileUrl: linkUrl.value,
+                fileType: linkType.value
+            })
+            console.log('Link save success:', result)
+            await loadFiles()
+            closeModal()
+        }
     } catch (error) {
-        alert('Error uploading file: ' + error.message)
+        console.error('Upload error details:', error)
+        uploadError.value = error.message || 'Error uploading file'
     } finally {
         uploading.value = false
+    }
+}
+
+const setUploadMode = (mode) => {
+    uploadMode.value = mode
+    uploadError.value = ''
+    if (mode === 'upload') {
+        linkName.value = ''
+        linkUrl.value = ''
+        linkType.value = ''
+    } else {
+        selectedFile.value = null
+        if (fileInput.value) fileInput.value.value = ''
     }
 }
 
@@ -138,15 +225,54 @@ const deleteFile = async (fileId) => {
 }
 
 const downloadFile = (file) => {
-    // In a real app, this would download the file from server
-    // For now, just show a message
-    alert(`Download feature coming soon for: ${file.name}`)
+    if (file.fileUrl) {
+        window.open(file.fileUrl, '_blank')
+    } else {
+        alert(`Download link not available for: ${file.name}`)
+    }
+}
+
+const openRename = (file) => {
+    renameTarget.value = file
+    renameName.value = file.name
+    renameError.value = ''
+    showRenameModal.value = true
+}
+
+const renameFile = async () => {
+    if (!renameName.value.trim()) {
+        renameError.value = 'File name is required'
+        return
+    }
+    renaming.value = true
+    renameError.value = ''
+    try {
+        await fileAPI.updateFile(renameTarget.value._id, renameName.value.trim())
+        await loadFiles()
+        closeRenameModal()
+    } catch (error) {
+        renameError.value = error.message || 'Error renaming file'
+    } finally {
+        renaming.value = false
+    }
 }
 
 const closeModal = () => {
     showUploadModal.value = false
     selectedFile.value = null
+    uploadError.value = ''
+    linkName.value = ''
+    linkUrl.value = ''
+    linkType.value = ''
+    uploadMode.value = 'upload'
     if (fileInput.value) fileInput.value.value = ''
+}
+
+const closeRenameModal = () => {
+    showRenameModal.value = false
+    renameTarget.value = null
+    renameName.value = ''
+    renameError.value = ''
 }
 
 const formatFileSize = (bytes) => {
@@ -279,6 +405,32 @@ tr:hover {
     background-color: #dc2626;
 }
 
+.mode-toggle {
+    display: inline-flex;
+    gap: 0.75rem;
+    margin: 0.5rem 0 1rem;
+}
+
+.mode-btn {
+    padding: 0.6rem 1rem;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-btn.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #1d4ed8;
+}
+
+.mode-btn:not(.active):hover {
+    background: #e2e8f0;
+}
+
 /* Modal */
 .modal-overlay {
     position: fixed;
@@ -306,6 +458,32 @@ tr:hover {
     font-size: 1.5rem;
     color: #1e293b;
     margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .upload-area {
@@ -341,6 +519,38 @@ tr:hover {
     color: #1d4ed8;
 }
 
+.link-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 0;
+}
+
+.input-label {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.text-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.text-input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.helper-text {
+    color: #64748b;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
 .file-info {
     margin-top: 1rem;
     padding-top: 1rem;
@@ -356,6 +566,12 @@ tr:hover {
 .file-size {
     color: #64748b;
     font-size: 0.9rem;
+}
+
+.error-text {
+    color: #dc2626;
+    margin-top: 0.75rem;
+    font-weight: 600;
 }
 
 .modal-actions {

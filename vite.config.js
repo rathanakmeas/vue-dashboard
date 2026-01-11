@@ -16,5 +16,9 @@ export default defineConfig({
     esbuildOptions: {
       target: 'esnext'
     }
+  },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
   }
 })

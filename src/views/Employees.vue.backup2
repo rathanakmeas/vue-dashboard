@@ -1,0 +1,979 @@
+<template>
+  <div class="employee-detail-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <router-link to="/" class="breadcrumb-item">ទំព័រដើម</router-link>
+      <span class="separator">»</span>
+      <router-link to="/employees" class="breadcrumb-item">គ្រប់គ្រងបុគ្គលិក</router-link>
+    </nav>
+
+    <div v-if="loading" class="loading-state">
+      <i class="pi pi-spin pi-spinner" style="font-size: 3rem;"></i>
+      <p>កំពុងផ្ទុក...</p>
+    </div>
+
+    <div v-else-if="employee" class="employee-detail">
+      <!-- Top Section: Photo + Info Card -->
+      <div class="top-section">
+        <!-- Photo Card -->
+        <div class="photo-card">
+          <div class="photo-container">
+            <img 
+              v-if="employee.photo" 
+              :src="`http://localhost:5000${employee.photo}`" 
+              alt="Photo"
+              class="employee-photo"
+            />
+            <div v-else class="photo-placeholder">
+              <i class="pi pi-user"></i>
+            </div>
+          </div>
+          <button class="edit-photo-btn">
+            <i class="pi pi-camera"></i> កែសម្រួលរូបថត
+          </button>
+        </div>
+
+        <!-- Info Card -->
+        <div class="info-card">
+          <h2 class="card-title">ព័ត៌មានទូទៅ</h2>
+          
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-item">
+                <span class="label">គោត្តនាម ដំបូង:</span>
+                <span class="value">{{ employee.khmerName || employee.firstName + ' ' + employee.lastName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">លេខសំគាល់បុគ្គលិក:</span>
+                <span class="value blue">{{ employee.employeeId }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-item">
+                <span class="label">គោត្តនាម ដំបូង ឡាតាំង:</span>
+                <span class="value">{{ (employee.firstNameLatin || employee.firstName) + ' ' + (employee.lastNameLatin || employee.lastName) }}</span>
+          </div>
+          <div class="info-item">
+            <label>អត្តលេខ សាកលវិទ្យា:</label>
+            <span class="info-value">{{ employee.employeeId }}</span>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="info-item">
+            <label>ភេទ:</label>
+            <span class="info-value">{{ translateGender(employee.gender) }}</span>
+          </div>
+          <div class="info-item">
+            <label>អត្តលេខគណនេយ្យ:</label>
+            <span class="info-value">{{ employee.phone || '-' }}</span>
+          </div>
+
+          <!-- Row 4 -->
+          <div class="info-item">
+            <label>ថ្ងៃខែឆ្នាំកំណើត:</label>
+            <span class="info-value">{{ formatKhmerDate(employee.dateOfBirth) }}</span>
+          </div>
+          <div class="info-item">
+            <label>អត្តខុដរពូង:</label>
+            <span class="info-value">{{ employee.alternatePhone || '-' }}</span>
+          </div>
+
+          <!-- Row 5 -->
+          <div class="info-item">
+            <label>អត្តលេខសន្តានភាព:</label>
+            <span class="info-value">{{ employee.employeeId }}</span>
+          </div>
+          <div class="info-item">
+            <label>អ៊ីមែល:</label>
+            <span class="info-value email">{{ employee.email }}</span>
+          </div>
+
+          <!-- Row 6 -->
+          <div class="info-item">
+            <label>ទីតាំងភ្នាក់ងារ:</label>
+            <span class="info-value">{{ getDepartmentName(employee.department) }}</span>
+          </div>
+
+          <!-- Row 7 -->
+          <div class="info-item full-width">
+            <label>អត្តប្ញជ្ជា:</label>
+            <span class="info-value">{{ getFullAddress() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="tabs-container" v-if="employee">
+      <div class="tabs-header">
+        <button 
+          v-for="(tab, index) in tabs" 
+          :key="index"
+          :class="['tab-btn', { active: activeTab === index }]"
+          @click="activeTab = index"
+        >
+          <i :class="tab.icon"></i>
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <div class="tabs-content">
+        <!-- Tab 0: General Information -->
+        <div v-show="activeTab === 0" class="tab-pane">
+          <div class="form-section">
+            <div class="form-row-3">
+              <div class="form-field">
+                <label>អត្តលេខមន្ត្រីភ្នាក់ងារ</label>
+                <input type="text" v-model="employee.employeeId" readonly />
+              </div>
+              <div class="form-field">
+                <label>ថ្ងៃខែឆ្នាំចូលបម្រើការងារ</label>
+                <input type="date" v-model="employeeForm.hireDate" />
+              </div>
+              <div class="form-field">
+                <label>តាលឫប្ឋិទ្ធគុណវិបត្តិ</label>
+                <input type="date" v-model="employeeForm.probationEndDate" />
+              </div>
+              <div class="form-field">
+                <label>ព័ត៌មានពីសារៈបស់លោក</label>
+                <input type="text" v-model="employeeForm.notes" placeholder="ព័ត៌មានពីសារៈបស់លោក" />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <Button 
+                label="ត្រូវត្របណាត់តឹងព័ត៌មាន" 
+                icon="pi pi-save"
+                class="save-info-btn"
+                @click="saveEmployeeInfo"
+              />
+            </div>
+          </div>
+
+          <!-- Employment History -->
+          <div class="employment-history-section">
+            <div class="section-header">
+              <h3>+ មោលភាពការងារភ្ញាជ់</h3>
+            </div>
+
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>អត្តតេរីវ័ក</th>
+                    <th>ប្រូលវីវែថ្ងារី</th>
+                    <th>ប្រូល្ពជ្ញឃ</th>
+                    <th>សូខុតត</th>
+                    <th>ថ្ងៃខុខូស្តូនទទួល</th>
+                    <th>ថ្ងៃត្រាបុល</th>
+                    <th>សុង្គួរ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(history, index) in employmentHistory" :key="index">
+                    <td>{{ history.employeeId }}</td>
+                    <td>{{ history.letterNo }}</td>
+                    <td>{{ history.category }}</td>
+                    <td>{{ history.department }}</td>
+                    <td>{{ formatDate(history.startDate) }}</td>
+                    <td>{{ formatDate(history.endDate) }}</td>
+                    <td>
+                      <Button 
+                        icon="pi pi-ellipsis-v" 
+                        class="action-dropdown-btn"
+                        text
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+              <button class="page-btn">« ក្រោយ</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">បន្តទៀត »</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 1: Employment Documents -->
+        <div v-show="activeTab === 1" class="tab-pane">
+          <div class="documents-grid">
+            <div v-for="doc in employmentDocuments" :key="doc.id" class="document-card">
+              <i class="pi pi-file-pdf document-icon"></i>
+              <h4>{{ doc.name }}</h4>
+              <p>{{ doc.size }}</p>
+              <div class="document-actions">
+                <Button icon="pi pi-download" text size="small" />
+                <Button icon="pi pi-eye" text size="small" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Education -->
+        <div v-show="activeTab === 2" class="tab-pane">
+          <div class="education-list">
+            <div v-for="edu in employee.education" :key="edu._id" class="education-item">
+              <i class="pi pi-graduation-cap"></i>
+              <div>
+                <h4>{{ edu.degree }} - {{ edu.fieldOfStudy }}</h4>
+                <p>{{ edu.institution }} ({{ edu.graduationYear }})</p>
+              </div>
+            </div>
+            <div v-if="!employee.education || employee.education.length === 0" class="empty-state">
+              <p>គ្មានព័ត៌មានការសិក្សា</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Documents -->
+        <div v-show="activeTab === 3" class="tab-pane">
+          <div class="documents-list">
+            <div v-for="doc in employee.documents" :key="doc._id" class="document-item">
+              <i class="pi pi-file"></i>
+              <div class="doc-info">
+                <h4>{{ doc.name }}</h4>
+                <p>{{ formatFileSize(doc.size) }} - {{ formatDate(doc.uploadDate) }}</p>
+              </div>
+              <div class="doc-actions">
+                <Button icon="pi pi-download" text size="small" />
+              </div>
+            </div>
+            <div v-if="!employee.documents || employee.documents.length === 0" class="empty-state">
+              <p>គ្មានឯកសារ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Training & Certificates -->
+        <div v-show="activeTab === 4" class="tab-pane">
+          <div class="certifications-list">
+            <div v-for="cert in employee.certifications" :key="cert._id" class="cert-item">
+              <i class="pi pi-certificate"></i>
+              <div>
+                <h4>{{ cert.name }}</h4>
+                <p>{{ cert.issuingOrganization }}</p>
+                <p class="cert-date">{{ formatDate(cert.issueDate) }} - {{ formatDate(cert.expiryDate) }}</p>
+              </div>
+            </div>
+            <div v-if="!employee.certifications || employee.certifications.length === 0" class="empty-state">
+              <p>គ្មានវិញ្ញាបនបត្រ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Family -->
+        <div v-show="activeTab === 5" class="tab-pane">
+          <div class="family-list">
+            <div v-for="member in employee.family" :key="member._id" class="family-item">
+              <i class="pi pi-users"></i>
+              <div>
+                <h4>{{ member.name }}</h4>
+                <p>{{ member.relationship }} - {{ member.occupation }}</p>
+                <p v-if="member.phone">{{ member.phone }}</p>
+              </div>
+            </div>
+            <div v-if="!employee.family || employee.family.length === 0" class="empty-state">
+              <p>គ្មានព័ត៌មានគ្រួសារ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 6: Performance -->
+        <div v-show="activeTab === 6" class="tab-pane">
+          <div class="performance-section">
+            <p>ព័ត៌មានការអនុវត្តការងារ</p>
+          </div>
+        </div>
+
+        <!-- Tab 7: Leave History -->
+        <div v-show="activeTab === 7" class="tab-pane">
+          <div class="leave-history">
+            <p>ប្រវត្តិការឈប់សម្រាក</p>
+          </div>
+        </div>
+
+        <!-- Tab 8: Attendance -->
+        <div v-show="activeTab === 8" class="tab-pane">
+          <div class="attendance-section">
+            <p>ទិន្នផលវត្តមាន</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-overlay">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading...</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
+import Button from 'primevue/button';
+import api from '../api';
+
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
+
+const employee = ref(null);
+const loading = ref(false);
+const activeTab = ref(0);
+const departments = ref([]);
+
+const employeeForm = ref({
+  hireDate: null,
+  probationEndDate: null,
+  notes: ''
+});
+
+const employmentHistory = ref([
+  {
+    employeeId: '2891200261',
+    letterNo: 'មន្ត្រី/របរដូ្យ/អរ្នកតោះខុខ្ញោ',
+    category: 'អន្ត ប្រូរយស',
+    department: '',
+    startDate: '2019-07-18',
+    endDate: null
+  }
+]);
+
+const employmentDocuments = ref([]);
+
+const tabs = [
+  { label: '📄 សូខុតតមូរ', icon: 'pi pi-list' },
+  { label: '📁 ប្រូលទួនី នីងជាតិ', icon: 'pi pi-folder' },
+  { label: '🎓 មូលិន', icon: 'pi pi-graduation-cap' },
+  { label: '📎 តោណ្តោរ្មុងក៍សងម៍', icon: 'pi pi-paperclip' },
+  { label: '📜 កុងោបងន្តីរោសុកង', icon: 'pi pi-certificate' },
+  { label: '🏛 កោរោបរលង្កពទូបរង', icon: 'pi pi-building' },
+  { label: '🎖 កុនិកត្យតែង្កពូរល', icon: 'pi pi-star' },
+  { label: '📊 កុងីលូបខេរនទ', icon: 'pi pi-chart-bar' }
+];
+
+onMounted(async () => {
+  await fetchEmployee();
+  await fetchDepartments();
+});
+
+const fetchEmployee = async () => {
+  loading.value = true;
+  try {
+    const employeeId = route.params.id;
+    const response = await api.get(`/api/employees/${employeeId}`);
+    employee.value = response.data;
+    
+    // Initialize form
+    employeeForm.value = {
+      hireDate: employee.value.hireDate,
+      probationEndDate: employee.value.probationEndDate,
+      notes: employee.value.notes || ''
+    };
+  } catch (error) {
+    console.error('Error fetching employee:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load employee details',
+      life: 3000
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchDepartments = async () => {
+  try {
+    const response = await api.get('/api/departments');
+    departments.value = response.data;
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
+};
+
+const getDepartmentName = (deptCode) => {
+  const dept = departments.value.find(d => d.code === deptCode);
+  return dept ? dept.name : deptCode;
+};
+
+const getFullAddress = () => {
+  if (!employee.value?.address) return '-';
+  const addr = employee.value.address;
+  const parts = [addr.street, addr.city, addr.province, addr.country].filter(Boolean);
+  return parts.join(', ') || '-';
+};
+
+const translateGender = (gender) => {
+  const translations = {
+    'Male': 'ប្រុស',
+    'Female': 'ស្រី',
+    'Other': 'ផ្សេងៗ'
+  };
+  return translations[gender] || gender;
+};
+
+const formatKhmerDate = (date) => {
+  if (!date) return '-';
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `ថ្ងៃទី ${day} ខែ${month} ឆ្នាំ${year}`;
+};
+
+const formatDate = (date) => {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString('en-GB');
+};
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+};
+
+const editEmployee = () => {
+  router.push(`/employees?edit=${employee.value._id}`);
+};
+
+const saveEmployeeInfo = async () => {
+  try {
+    await api.put(`/api/employees/${employee.value._id}`, employeeForm.value);
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Employee information updated',
+      life: 3000
+    });
+    await fetchEmployee();
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update employee',
+      life: 3000
+    });
+  }
+};
+</script>
+
+<style scoped>
+.employee-detail-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #0288D1;
+}
+
+.breadcrumb-link {
+  color: #0288D1;
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.employee-detail-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Photo Card */
+.employee-photo-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.photo-container {
+  width: 250px;
+  height: 300px;
+  border: 3px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.employee-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  font-size: 4rem;
+}
+
+.edit-profile-btn {
+  width: 100%;
+  background: #dc2626;
+  border: none;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-profile-btn:hover {
+  background: #b91c1c;
+}
+
+/* Info Card */
+.employee-info-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.info-value.primary {
+  color: #0288D1;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.info-value.email {
+  color: #0288D1;
+}
+
+/* Tabs */
+.tabs-container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tabs-header {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  background: #f9fafb;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: fit-content;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: #f1f5f9;
+  color: #0288D1;
+}
+
+.tab-btn.active {
+  color: #0288D1;
+  border-bottom-color: #0288D1;
+  background: white;
+}
+
+.tabs-content {
+  padding: 2rem;
+}
+
+.tab-pane {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Section */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.form-field input {
+  padding: 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #0288D1;
+  box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1);
+}
+
+.form-field input:read-only {
+  background: #f9fafb;
+  color: #64748b;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-info-btn {
+  background: #6366f1;
+  border: none;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.save-info-btn:hover {
+  background: #4f46e5;
+}
+
+/* Employment History */
+.employment-history-section {
+  margin-top: 2rem;
+}
+
+.section-header h3 {
+  font-size: 1.1rem;
+  color: #10b981;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.history-table-container {
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table thead {
+  background: #f9fafb;
+}
+
+.history-table th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.history-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.action-dropdown-btn {
+  padding: 0.25rem;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover {
+  background: #f9fafb;
+  border-color: #0288D1;
+}
+
+.page-btn.active {
+  background: #0288D1;
+  color: white;
+  border-color: #0288D1;
+}
+
+/* Documents */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.document-card {
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.document-card:hover {
+  border-color: #0288D1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.document-icon {
+  font-size: 3rem;
+  color: #dc2626;
+  margin-bottom: 0.75rem;
+}
+
+.document-card h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.document-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* Lists */
+.education-list,
+.documents-list,
+.certifications-list,
+.family-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.education-item,
+.document-item,
+.cert-item,
+.family-item {
+  display: flex;
+  align-items: start;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.education-item:hover,
+.document-item:hover,
+.cert-item:hover,
+.family-item:hover {
+  border-color: #0288D1;
+  background: #f8fafc;
+}
+
+.education-item i,
+.cert-item i,
+.family-item i {
+  font-size: 2rem;
+  color: #0288D1;
+  margin-top: 0.25rem;
+}
+
+.document-item i {
+  font-size: 2rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.education-item h4,
+.cert-item h4,
+.family-item h4 {
+  margin: 0 0 0.25rem 0;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.education-item p,
+.cert-item p,
+.family-item p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.cert-date {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.doc-info {
+  flex: 1;
+}
+
+.doc-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.doc-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* Loading */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 9999;
+}
+
+.loading-overlay i {
+  font-size: 3rem;
+  color: #0288D1;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .employee-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs-header {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
