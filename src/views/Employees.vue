@@ -1072,7 +1072,7 @@
                 <i class="pi pi-users"></i>
                 <h4>ព័ត៌មានកូន</h4>
                 <button type="button" class="btn-add-child" @click="addChild">
-                  <i class="pi pi-plus"></i> បន្ថែម
+                  <i class="pi pi-user-plus"></i> បន្ថែមកូនថ្មី
                 </button>
               </div>
 
@@ -1254,7 +1254,7 @@
                       <label for="childFileInput" class="file-upload-label siemreap-font-12">
                         <i class="pi pi-cloud-upload"></i>
                         <span>ចុចដើម្បីយក​ឯកសារ ឬ Drag & Drop</span>
-                        <small>ឯកសារដែលទទួលយក: PDF, JPG, PNG, DOC, DOCX (ម៉ាក្សម៌ 5 Megabyte)</small>
+                        <small>ឯកសារដែលទទួលយក: PDF, JPG, PNG, DOC, DOCX (5 Megabyte)</small>
                       </label>
                     </div>
                     <div v-if="currentChild.attachmentFile" class="file-info">
