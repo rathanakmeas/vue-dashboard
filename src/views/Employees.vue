@@ -1065,6 +1065,174 @@
             </div>
           </div>
 
+          <!-- Tab 4: Children Information -->
+          <div v-show="activeIconTab === 4" class="tab-content">
+            <div class="form-block">
+              <div class="form-section-header">
+                <i class="pi pi-users"></i>
+                <h4>ព័ត៌មានកូន</h4>
+                <button type="button" class="btn-add-child" @click="addChild">
+                  <i class="pi pi-plus"></i> បន្ថែម
+                </button>
+              </div>
+
+              <div v-if="formData.children && formData.children.length > 0" class="children-table-container">
+                <table class="children-table">
+                  <thead>
+                    <tr>
+                      <th>ល.រ</th>
+                      <th>ឈ្មោះខ្មែរ</th>
+                      <th>ឈ្មោះលាតីន</th>
+                      <th>ភេទ</th>
+                      <th>ថ្ងៃកំណើត</th>
+                      <th>មុខរបរ</th>
+                      <th>ស្ថានភាព</th>
+                      <th>សម្ភាសន៍</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(child, index) in formData.children" :key="index">
+                      <td>{{ index + 1 }}</td>
+                      <td>{{ child.khmerName }}</td>
+                      <td>{{ child.latinName }}</td>
+                      <td>{{ child.gender }}</td>
+                      <td>{{ child.birthDate }}</td>
+                      <td>{{ child.occupation }}</td>
+                      <td>
+                        <span :class="['status-indicator', child.status === 'alive' ? 'alive' : 'deceased']">
+                          <i :class="child.status === 'alive' ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
+                        </span>
+                      </td>
+                      <td>
+                        <div class="action-buttons">
+                          <button type="button" class="btn-edit" @click="editChild(index)" title="កែប្រែ">
+                            <i class="pi pi-pencil"></i>
+                          </button>
+                          <button type="button" class="btn-delete-child" @click="deleteChild(index)" title="លុប">
+                            <i class="pi pi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div v-else class="empty-state">
+                <i class="pi pi-inbox"></i>
+                <p>មិនមាននិទ្ទេស/កូនទេ</p>
+              </div>
+            </div>
+
+            <!-- Child Form Modal -->
+            <div v-if="childFormVisible" class="child-form-overlay">
+              <div class="child-form-modal">
+                <div class="child-form-header">
+                  <h4>{{ editingChildIndex !== null ? 'កែប្រែទិន្នន័យកូន' : 'បន្ថែមកូនថ្មី' }}</h4>
+                  <button type="button" class="btn-close" @click="closeChildForm">
+                    <i class="pi pi-times"></i>
+                  </button>
+                </div>
+
+                <div class="child-form-body">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>ឈ្មោះខ្មែរ</label>
+                      <input v-model="currentChild.khmerName" type="text" placeholder="ឈ្មោះខ្មែរ" />
+                    </div>
+                    <div class="form-group">
+                      <label>ឈ្មោះលាតីន</label>
+                      <input v-model="currentChild.latinName" type="text" placeholder="ឈ្មោះលាតីន" />
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>ភេទ</label>
+                      <select v-model="currentChild.gender">
+                        <option value="">ជ្រើសរើស</option>
+                        <option value="ប្រុស">ប្រុស</option>
+                        <option value="ស្រី">ស្រី</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>ថ្ងៃកំណើត</label>
+                      <input v-model="currentChild.birthDate" type="date" />
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>មុខរបរ</label>
+                      <select v-model="currentChild.occupation">
+                        <option value="">ជ្រើសរើស</option>
+                        <option value="civil-servant">មន្ត្រីរាជការ</option>
+                        <option value="teacher">គ្រូបង្រៀន</option>
+                        <option value="professor">សាស្ត្រាចារ្យមហាបរិញ្ញា</option>
+                        <option value="associate-professor">សាស្ដ្រាចារ្យរង</option>
+                        <option value="assistant-professor">សាស្ដ្រាចារ្យជំនួយ</option>
+                        <option value="medical-specialist">វេជ្ជបណ្ខិតឯកទេស</option>
+                        <option value="medical-master">វេជ្ជបណ្ខិត(ជំនាញ/អនុបណ្ឌិត)</option>
+                        <option value="medical-doctor">វេជ្ជបណ្ឌិត</option>
+                        <option value="dentist">ទន្ដបណ្ឌិត</option>
+                        <option value="pharmacist">ឱសថការី</option>
+                        <option value="nurse-bachelor">គិលានុបដ្ឋាក(បរិញ្ញាបត្រ)</option>
+                        <option value="midwife-bachelor">ឆ្មប(បរិញ្ញាបត្រ)</option>
+                        <option value="nurse-secondary">គិលានុបដ្ឋាកមធ្យម</option>
+                        <option value="midwife-secondary">ឆ្មបមធ្យម</option>
+                        <option value="nurse-primary">គិលានុបដ្ឋាកបឋម</option>
+                        <option value="dental-nurse">ទន្តគិលានុបដ្ឋាកមធ្យម</option>
+                        <option value="lab-technician">អ្នកបច្ចេកទេសមន្ទីរពិសោធន៍មធ្យម</option>
+                        <option value="radiologist">អ្នកបច្ចេកទេសវិទ្យុសាស្រ្ត</option>
+                        <option value="physiotherapist">ព្យាបាលដោយចលនាមធ្យម</option>
+                        <option value="it-specialist">ព័ត៌មានវិទ្យា</option>
+                        <option value="accountant">គណនេយ្យករ</option>
+                        <option value="public-admin">រដ្ឋបាល​សាធារណៈ</option>
+                        <option value="electrical-engineer">វិស្វកម្មអគ្គិសនី</option>
+                        <option value="business">អាជីវក</option>
+                        <option value="trader">លក់ដូរ</option>
+                        <option value="caregiver">អ្នកថែទាំ</option>
+                        <option value="mid-doctor">គ្រូពេទ្យមធ្យម</option>
+                        <option value="farmer">កសិករ</option>
+                        <option value="worker">កម្មករ</option>
+                        <option value="student">និស្សិត</option>
+                        <option value="retired">រាជការនិវត្ត</option>
+                        <option value="unemployed">គ្មានការងារ</option>
+                        <option value="housewife">មេផ្ទះ</option>
+                        <option value="other">ផ្សេងៗ</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>ស្ថានភាព</label>
+                      <div class="radio-group">
+                        <label class="radio-label">
+                          <input type="radio" v-model="currentChild.status" value="alive" />
+                          <span>រស់</span>
+                        </label>
+                        <label class="radio-label">
+                          <input type="radio" v-model="currentChild.status" value="deceased" />
+                          <span>ស្លាប់</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="child-form-footer">
+                  <button type="button" class="btn-cancel" @click="closeChildForm">
+                    <i class="pi pi-times"></i> បោះបង់
+                  </button>
+                  <button type="button" class="btn-submit" @click="saveChild">
+                    <i class="pi pi-check"></i> រក្សាទុក
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Form Actions -->
           <div class="form-actions">
             <div class="form-actions-left">
@@ -1123,6 +1291,16 @@ const deleteDialogVisible = ref(false);
 const selectedEmployee = ref(null);
 const dialogMode = ref('create');
 const activeIconTab = ref(0);
+const childFormVisible = ref(false);
+const editingChildIndex = ref(null);
+const currentChild = ref({
+  khmerName: '',
+  latinName: '',
+  gender: '',
+  birthDate: '',
+  occupation: '',
+  status: 'alive'
+});
 
 const formData = ref({
   employeeId: '',
@@ -1233,7 +1411,9 @@ const formData = ref({
   spouseAddressHouseNumber: '',
   spouseAddressStreetNumber: '',
   spousePhone: '',
-  spouseEmail: ''
+  spouseEmail: '',
+  // Children Information
+  children: []
 });
 
 const iconTabs = [
@@ -1366,6 +1546,58 @@ const prevTab = () => {
   if (activeIconTab.value > 0) {
     activeIconTab.value--;
   }
+};
+
+const addChild = () => {
+  currentChild.value = {
+    khmerName: '',
+    latinName: '',
+    gender: '',
+    birthDate: '',
+    occupation: '',
+    status: 'alive'
+  };
+  editingChildIndex.value = null;
+  childFormVisible.value = true;
+};
+
+const editChild = (index) => {
+  currentChild.value = { ...formData.value.children[index] };
+  editingChildIndex.value = index;
+  childFormVisible.value = true;
+};
+
+const saveChild = () => {
+  if (!formData.value.children) {
+    formData.value.children = [];
+  }
+  
+  if (editingChildIndex.value !== null) {
+    formData.value.children[editingChildIndex.value] = { ...currentChild.value };
+  } else {
+    formData.value.children.push({ ...currentChild.value });
+  }
+  
+  closeChildForm();
+};
+
+const deleteChild = (index) => {
+  if (confirm('តើអ្នកពិតជាចង់លុបមនុស្សលើនេះ?')) {
+    formData.value.children.splice(index, 1);
+  }
+};
+
+const closeChildForm = () => {
+  childFormVisible.value = false;
+  editingChildIndex.value = null;
+  currentChild.value = {
+    khmerName: '',
+    latinName: '',
+    gender: '',
+    birthDate: '',
+    occupation: '',
+    status: 'alive'
+  };
 };
 
 const confirmDelete = (employee) => {
@@ -2066,6 +2298,204 @@ onMounted(() => {
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e2e8f0;
+}
+
+/* Children Table Styles */
+.children-table-container {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+.children-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.children-table thead {
+  background: #f1f5f9;
+}
+
+.children-table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.875rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.children-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.children-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.children-table .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit, .btn-delete-child {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #2563eb;
+}
+
+.btn-delete-child {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete-child:hover {
+  background: #dc2626;
+}
+
+.btn-add-child {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+
+.btn-add-child:hover {
+  background: #059669;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
+}
+
+/* Child Form Styles */
+.child-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.child-form-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+.child-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.child-form-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #475569;
+}
+
+.child-form-body {
+  padding: 1.5rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.child-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.status-indicator.alive {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-indicator.deceased {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-section-header h4 {
+  margin: 0;
+  color: #1e293b;
+  flex: 1;
 }
 
 @keyframes fadeIn {
