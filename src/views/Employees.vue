@@ -1138,32 +1138,24 @@
                 </div>
 
                 <div class="child-form-body">
-                  <!-- Birth Certificate Number -->
+                  <!-- Row 1: Birth Certificate and Khmer Name -->
                   <div class="form-row">
                     <div class="form-group">
                       <label>លេខសំបុត្រកំណើត</label>
                       <input v-model="currentChild.birthCertificateNo" type="text" placeholder="លេខសំបុត្រកំណើត" />
                     </div>
-                  </div>
-
-                  <!-- Khmer Name and Surname -->
-                  <div class="form-row">
                     <div class="form-group">
                       <label>គោត្តនាម និងនាម</label>
                       <input v-model="currentChild.khmerName" type="text" placeholder="គោត្តនាម និងនាម" />
                     </div>
                   </div>
 
-                  <!-- Latin Name and Surname -->
+                  <!-- Row 2: Latin Name and Gender -->
                   <div class="form-row">
                     <div class="form-group">
                       <label>គោត្តនាម និងនាមឡាតាំង</label>
                       <input v-model="currentChild.latinName" type="text" placeholder="គោត្តនាម និងនាមឡាតាំង" />
                     </div>
-                  </div>
-
-                  <!-- Gender -->
-                  <div class="form-row">
                     <div class="form-group">
                       <label>ភេទ</label>
                       <select v-model="currentChild.gender">
@@ -1174,7 +1166,7 @@
                     </div>
                   </div>
 
-                  <!-- Birth Date (Day/Month/Year) -->
+                  <!-- Row 3: Date of Birth and Occupation -->
                   <div class="form-row">
                     <div class="form-group">
                       <label>ថ្ងៃខែឆ្នាំកំណើត</label>
@@ -1184,10 +1176,6 @@
                         <input v-model="currentChild.birthYear" type="number" placeholder="ឆ្នាំ" min="1900" />
                       </div>
                     </div>
-                  </div>
-
-                  <!-- Occupation -->
-                  <div class="form-row">
                     <div class="form-group">
                       <label>មុខរបរ</label>
                       <select v-model="currentChild.occupation">
@@ -1232,7 +1220,7 @@
                     </div>
                   </div>
 
-                  <!-- Calculate Checkbox -->
+                  <!-- Row 4: Checkbox and Remarks -->
                   <div class="form-row">
                     <div class="form-group">
                       <label class="checkbox-label">
@@ -1240,11 +1228,12 @@
                         <span>គណនា</span>
                       </label>
                     </div>
+                    <div class="form-group"></div>
                   </div>
 
-                  <!-- Other/Remarks -->
+                  <!-- Row 5: Remarks (Full Width) -->
                   <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group full-width">
                       <label>ផ្សេងៗ</label>
                       <textarea v-model="currentChild.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
                     </div>
@@ -2589,6 +2578,11 @@ onMounted(() => {
 
 .checkbox-label span {
   margin-top: 0.25rem;
+}
+
+/* Full Width Form Group */
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
 /* Textarea */
