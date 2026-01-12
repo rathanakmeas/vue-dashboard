@@ -5,7 +5,7 @@
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label>ឈ្មោះអ្នកប្រើ</label>
-          <input v-model="credentials.username" type="text" placeholder="ឈ្មោះអ្នកប្រើ" />
+          <input v-model="credentials.email" type="email" placeholder="ឈ្មោះអ្នកប្រើ" />
         </div>
         <div class="form-group">
           <label>ពាក្យសម្ងាត់</label>
@@ -24,7 +24,7 @@ import api from '../api';
 
 const router = useRouter();
 const credentials = ref({
-  username: '',
+  email: '',
   password: ''
 });
 

@@ -37,6 +37,8 @@ services:
     networks:
       - vue-dashboard-network
     restart: unless-stopped
+    healthcheck:
+      disable: true
 
   frontend:
     build:

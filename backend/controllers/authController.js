@@ -42,10 +42,12 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    console.log('Login attempt - Body:', JSON.stringify(req.body), 'Email:', req.body?.email, 'Password:', req.body?.password ? '[provided]' : '[missing]');
     const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
+      console.log('VALIDATION FAILED - Email:', email, 'Password:', password ? '[provided]' : '[missing]');
       return res.status(400).json({ message: 'Email and password required' });
     }
 

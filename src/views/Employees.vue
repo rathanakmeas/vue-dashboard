@@ -1281,147 +1281,314 @@
 
           <!-- Tab 5: Education/Culture Information -->
           <div v-show="activeIconTab === 4" class="tab-content">
+            <!-- Cultural Level Block -->
             <div class="form-block">
               <div class="form-section-header">
-                <i class="pi pi-book"></i>
-                <h4>ព័ត៌មានកម្រិតវប្បធម៌</h4>
+                <i class="pi pi-graduation-cap"></i>
+                <h4>កម្រិតវប្បធម៌</h4>
+                <button type="button" class="btn-add-child" @click="addEducation">
+                  <i class="pi pi-plus"></i> បញ្ចូលកម្រិតវប្បធម៌
+                </button>
               </div>
 
-              <!-- Education History Section -->
-              <div class="form-block-section">
-                <div class="section-header" style="background-color: #e3f2fd; border-left: 4px solid #2196f3;">
-                  <i class="pi pi-graduation-cap"></i>
-                  <h5>ប្រវត្តិសាស្រ្ត​ការ​ដោះស្រាយ​ថ្នាក់</h5>
-                </div>
+              <div v-if="formData.educationRecords && formData.educationRecords.length > 0" class="children-table-container">
+                <table class="children-table">
+                  <thead>
+                    <tr>
+                      <th>ល.រ</th>
+                      <th>វគ្គសិក្សា</th>
+                      <th>កម្រិតសិក្សា</th>
+                      <th>ប្រភេទសញ្ញាបត្រ</th>
+                      <th>គ្រឹះស្ថានសិក្សា</th>
+                      <th>ជំនាញ</th>
+                      <th>ឆ្នាំចូល-បញ្ចប់</th>
+                      <th>សកម្មភាព</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(edu, index) in formData.educationRecords" :key="index">
+                      <td>{{ index + 1 }}</td>
+                      <td>{{ edu.courseType }}</td>
+                      <td>{{ edu.educationLevel }}</td>
+                      <td>{{ edu.certificateType }}</td>
+                      <td>{{ edu.institution }}</td>
+                      <td>{{ edu.major }}</td>
+                      <td>{{ edu.educationStartYear }} - {{ edu.educationEndYear }}</td>
+                      <td>
+                        <div class="action-buttons">
+                          <button type="button" class="btn-edit" @click="editEducation(index)" title="កែប្រែ">
+                            <i class="pi pi-pencil"></i>
+                          </button>
+                          <button type="button" class="btn-delete-child" @click="deleteEducation(index)" title="លុប">
+                            <i class="pi pi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>កម្រិត​ការ​ផ្តល់ ឬ ទម្រង់ការ​ដោះស្រាយ​ថ្នាក់</label>
-                    <select v-model="formData.educationLevel">
-                      <option value="">-- ជ្រើសរើស --</option>
-                      <option value="primary">ប្រាథមិក</option>
-                      <option value="secondary">មត្តិមសិក្សា</option>
-                      <option value="highschool">វិទ្យាល័យ</option>
-                      <option value="bachelor">បរិញ្ញាបត្រ</option>
-                      <option value="master">មេធាវី</option>
-                      <option value="phd">បណ្ឌិត</option>
-                      <option value="vocational">វិชាជីវៈ</option>
-                      <option value="other">ផ្សេងៗ</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>ឈ្មោះ​សាលា / ស្ថាប័ន</label>
-                    <input v-model="formData.schoolName" type="text" placeholder="ឈ្មោះ​សាលា / ស្ថាប័ន" />
-                  </div>
-                </div>
+              <div v-else class="empty-state">
+                <i class="pi pi-graduation-cap"></i>
+                <p>មិនទាន់មានកម្រិតវប្បធម៌។ សូមចុចប៊ូតុង "បញ្ចូលកម្រិតវប្បធម៌" ដើម្បីបន្ថែម។</p>
+              </div>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>ឆ្នាំ​ចាប់ផ្តើម</label>
-                    <input v-model="formData.startYear" type="number" placeholder="ឆ្នាំ​ចាប់ផ្តើម" min="1900" />
+              <!-- Education Form Modal -->
+              <div v-if="educationFormVisible" class="modal-overlay" @click.self="closeEducationForm">
+                <div class="modal-content-large">
+                  <div class="modal-header">
+                    <h3>{{ editingEducationIndex !== null ? 'កែប្រែកម្រិតវប្បធម៌' : 'បញ្ចូលកម្រិតវប្បធម៌' }}</h3>
+                    <button type="button" class="btn-close-modal" @click="closeEducationForm">
+                      <i class="pi pi-times"></i>
+                    </button>
                   </div>
-                  <div class="form-group">
-                    <label>ឆ្នាំ​បញ្ចប់</label>
-                    <input v-model="formData.endYear" type="number" placeholder="ឆ្នាំ​បញ្ចប់" min="1900" />
-                  </div>
-                  <div class="form-group">
-                    <label>វិស័យ / ឯកទេស</label>
-                    <input v-model="formData.major" type="text" placeholder="វិស័យ / ឯកទេស" />
-                  </div>
-                </div>
 
-                <div class="form-row">
-                  <div class="form-group full-width">
-                    <label>វិច្ឆិកាសញ្ញាប័ត្រ</label>
-                    <textarea v-model="formData.certificate" placeholder="ព័ត៌មាននៃវិច្ឆិកាសញ្ញាប័ត្រ" rows="3"></textarea>
+                  <div class="modal-body">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>វគ្គសិក្សា <span class="required">*</span></label>
+                        <select v-model="currentEducation.courseType" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="មត្តេយ្យសិក្សា">មត្តេយ្យសិក្សា</option>
+                          <option value="បឋមសិក្សា">បឋមសិក្សា</option>
+                          <option value="អនុវិទ្យាល័យ">អនុវិទ្យាល័យ</option>
+                          <option value="វិទ្យាល័យ">វិទ្យាល័យ</option>
+                          <option value="មហាវិទ្យាល័យ">មហាវិទ្យាល័យ</option>
+                          <option value="បរិញ្ញាបត្រ">បរិញ្ញាបត្រ</option>
+                          <option value="អនុបណ្ឌិត">អនុបណ្ឌិត</option>
+                          <option value="បណ្ឌិត">បណ្ឌិត</option>
+                          <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label>កម្រិតសិក្សា <span class="required">*</span></label>
+                        <select v-model="currentEducation.educationLevel" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="មិនចេះអក្សរ">មិនចេះអក្សរ</option>
+                          <option value="បឋមសិក្សា">បឋមសិក្សា</option>
+                          <option value="អនុវិទ្យាល័យ">អនុវិទ្យាល័យ</option>
+                          <option value="វិទ្យាល័យ">វិទ្យាល័យ</option>
+                          <option value="បរិញ្ញាបត្រ">បរិញ្ញាបត្រ</option>
+                          <option value="បរិញ្ញាបត្ររង">បរិញ្ញាបត្ររង</option>
+                          <option value="អនុបណ្ឌិត">អនុបណ្ឌិត</option>
+                          <option value="បណ្ឌិត">បណ្ឌិត</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>ប្រភេទសញ្ញាបត្រ</label>
+                        <select v-model="currentEducation.certificateType" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ">សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ</option>
+                          <option value="សញ្ញាបត្របរិញ្ញាបត្រ">សញ្ញាបត្របរិញ្ញាបត្រ</option>
+                          <option value="សញ្ញាបត្រអនុបណ្ឌិត">សញ្ញាបត្រអនុបណ្ឌិត</option>
+                          <option value="សញ្ញាបត្របណ្ឌិត">សញ្ញាបត្របណ្ឌិត</option>
+                          <option value="វិញ្ញាបនប័ត្រវិជ្ជាជីវៈ">វិញ្ញាបនប័ត្រវិជ្ជាជីវៈ</option>
+                          <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label>គ្រឹះស្ថានសិក្សា</label>
+                        <input v-model="currentEducation.institution" type="text" class="form-input" placeholder="បញ្ចូលឈ្មោះគ្រឹះស្ថានសិក្សា" />
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>ជំនាញ</label>
+                        <input v-model="currentEducation.major" type="text" class="form-input" placeholder="ជំនាញ / ឯកទេស" />
+                      </div>
+
+                      <div class="form-group">
+                        <label>ថ្ងៃខែឆ្នាំចូលសិក្សា</label>
+                        <div class="date-inputs">
+                          <select v-model="currentEducation.educationStartDay" class="form-input-small">
+                            <option value="">ថ្ងៃ</option>
+                            <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
+                          </select>
+                          <select v-model="currentEducation.educationStartMonth" class="form-input-small">
+                            <option value="">ខែ</option>
+                            <option v-for="m in 12" :key="m" :value="m">{{ m }}</option>
+                          </select>
+                          <select v-model="currentEducation.educationStartYear" class="form-input-small">
+                            <option value="">ឆ្នាំ</option>
+                            <option v-for="y in 100" :key="y" :value="2026 - y">{{ 2026 - y }}</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label>ថ្ងៃខែឆ្នាំបញ្ចប់សិក្សា</label>
+                        <div class="date-inputs">
+                          <select v-model="currentEducation.educationEndDay" class="form-input-small">
+                            <option value="">ថ្ងៃ</option>
+                            <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
+                          </select>
+                          <select v-model="currentEducation.educationEndMonth" class="form-input-small">
+                            <option value="">ខែ</option>
+                            <option v-for="m in 12" :key="m" :value="m">{{ m }}</option>
+                          </select>
+                          <select v-model="currentEducation.educationEndYear" class="form-input-small">
+                            <option value="">ឆ្នាំ</option>
+                            <option v-for="y in 100" :key="y" :value="2026 - y">{{ 2026 - y }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group full-width">
+                        <label>វគ្គបណ្តុះបណ្តាលផ្សេងៗ</label>
+                        <textarea v-model="currentEducation.otherTraining" class="form-input" rows="3" placeholder="វគ្គបណ្តុះបណ្តាលផ្សេងៗ"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group full-width">
+                        <label>ទីកន្លែងសិក្សា</label>
+                        <textarea v-model="currentEducation.studyLocation" class="form-input" rows="2" placeholder="ទីកន្លែងសិក្សា"></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="child-form-footer">
+                    <button type="button" class="btn-cancel" @click="closeEducationForm">
+                      <i class="pi pi-times"></i> បោះបង់
+                    </button>
+                    <button type="button" class="btn-submit" @click="saveEducation">
+                      <i class="pi pi-check"></i> រក្សាទុក
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Languages Section -->
-              <div class="form-block-section">
-                <div class="section-header" style="background-color: #f3e5f5; border-left: 4px solid #9c27b0;">
-                  <i class="pi pi-comments"></i>
-                  <h5>ភាសា</h5>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>ភាសាខ្មែរ</label>
-                    <select v-model="formData.khmerLanguage">
-                      <option value="">-- ជ្រើសរើស --</option>
-                      <option value="native">ម៉ាតាំង</option>
-                      <option value="fluent">ស្ដេច</option>
-                      <option value="good">ល្អ</option>
-                      <option value="fair">មិនច្រើន</option>
-                      <option value="basic">ងាយ</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>ភាសាអង់គ្លេស</label>
-                    <select v-model="formData.englishLanguage">
-                      <option value="">-- ជ្រើសរើស --</option>
-                      <option value="native">ម៉ាតាំង</option>
-                      <option value="fluent">ស្ដេច</option>
-                      <option value="good">ល្អ</option>
-                      <option value="fair">មិនច្រើន</option>
-                      <option value="basic">ងាយ</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>ភាសាបារាំង</label>
-                    <select v-model="formData.frenchLanguage">
-                      <option value="">-- ជ្រើសរើស --</option>
-                      <option value="native">ម៉ាតាំង</option>
-                      <option value="fluent">ស្ដេច</option>
-                      <option value="good">ល្អ</option>
-                      <option value="fair">មិនច្រើន</option>
-                      <option value="basic">ងាយ</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>ផ្សេងៗ</label>
-                    <input v-model="formData.otherLanguage" type="text" placeholder="ភាសាផ្សេងៗ" />
-                  </div>
-                </div>
+            <!-- Foreign Language Block -->
+            <div class="form-block" style="margin-top: 1.5rem;">
+              <div class="form-section-header">
+                <i class="pi pi-comments"></i>
+                <h4>កម្រិតភាសារបរទេស</h4>
+                <button type="button" class="btn-add-child" @click="addLanguage">
+                  <i class="pi pi-plus"></i> បញ្ចូលភាសារបរទេស
+                </button>
               </div>
 
-              <!-- Training & Certifications Section -->
-              <div class="form-block-section">
-                <div class="section-header" style="background-color: #e8f5e9; border-left: 4px solid #4caf50;">
-                  <i class="pi pi-certificate"></i>
-                  <h5>ការ​បណ្តុះបណ្តាល និង វិច្ឆិកា</h5>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group full-width">
-                    <label>ការបណ្តុះបណ្តាល</label>
-                    <textarea v-model="formData.training" placeholder="ព័ត៌មាននៃការបណ្តុះបណ្តាល / ដំណាលកម្មវិធី" rows="3"></textarea>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group full-width">
-                    <label>វិច្ឆិកា</label>
-                    <textarea v-model="formData.certifications" placeholder="ព័ត៌មាននៃវិច្ឆិកា / អនុលោមរង្វាន់" rows="3"></textarea>
-                  </div>
-                </div>
+              <div v-if="formData.languageRecords && formData.languageRecords.length > 0" class="children-table-container">
+                <table class="children-table">
+                  <thead>
+                    <tr>
+                      <th>ល.រ</th>
+                      <th>ភាសាបរទេស</th>
+                      <th>ការអាន</th>
+                      <th>ការសន្ទនា</th>
+                      <th>ការសរសេរ</th>
+                      <th>សកម្មភាព</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(lang, index) in formData.languageRecords" :key="index">
+                      <td>{{ index + 1 }}</td>
+                      <td>{{ lang.foreignLanguage }}</td>
+                      <td>{{ lang.readingLevel }}</td>
+                      <td>{{ lang.speakingLevel }}</td>
+                      <td>{{ lang.writingLevel }}</td>
+                      <td>
+                        <div class="action-buttons">
+                          <button type="button" class="btn-edit" @click="editLanguage(index)" title="កែប្រែ">
+                            <i class="pi pi-pencil"></i>
+                          </button>
+                          <button type="button" class="btn-delete-child" @click="deleteLanguage(index)" title="លុប">
+                            <i class="pi pi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
-              <!-- Cultural Skills Section -->
-              <div class="form-block-section">
-                <div class="section-header" style="background-color: #fff3e0; border-left: 4px solid #ff9800;">
-                  <i class="pi pi-star"></i>
-                  <h5>ជំនាញ សិល្បៈ និង វប្បធម៌</h5>
-                </div>
+              <div v-else class="empty-state">
+                <i class="pi pi-comments"></i>
+                <p>មិនទាន់មានភាសារបរទេស។ សូមចុចប៊ូតុង "បញ្ចូលភាសារបរទេស" ដើម្បីបន្ថែម។</p>
+              </div>
 
-                <div class="form-row">
-                  <div class="form-group full-width">
-                    <label>សកម្មភាព / ជំនាញ សិល្បៈ និង វប្បធម៌</label>
-                    <textarea v-model="formData.culturalSkills" placeholder="សម្ពាធ ឬ ជំនាញ សិល្បៈ វប្បធម៌ (រាំ, ច្រៀង, ទិន្នន័យ, កីឡា)..." rows="4"></textarea>
+              <!-- Language Form Modal -->
+              <div v-if="languageFormVisible" class="modal-overlay" @click.self="closeLanguageForm">
+                <div class="modal-content-large">
+                  <div class="modal-header">
+                    <h3>{{ editingLanguageIndex !== null ? 'កែប្រែភាសារបរទេស' : 'បញ្ចូលភាសារបរទេស' }}</h3>
+                    <button type="button" class="btn-close-modal" @click="closeLanguageForm">
+                      <i class="pi pi-times"></i>
+                    </button>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>ភាសាបរទេស <span class="required">*</span></label>
+                        <select v-model="currentLanguage.foreignLanguage" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="អង់គ្លេស">អង់គ្លេស</option>
+                          <option value="បារាំង">បារាំង</option>
+                          <option value="ចិន">ចិន</option>
+                          <option value="ជប៉ុន">ជប៉ុន</option>
+                          <option value="កូរ៉េ">កូរ៉េ</option>
+                          <option value="វៀតណាម">វៀតណាម</option>
+                          <option value="ថៃ">ថៃ</option>
+                          <option value="ឡាវ">ឡាវ</option>
+                          <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label>ការអាន <span class="required">*</span></label>
+                        <select v-model="currentLanguage.readingLevel" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="ពូកែ">ពូកែ</option>
+                          <option value="ល្អ">ល្អ</option>
+                          <option value="មធ្យម">មធ្យម</option>
+                          <option value="ខ្សោយ">ខ្សោយ</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>ការសន្ទនា <span class="required">*</span></label>
+                        <select v-model="currentLanguage.speakingLevel" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="ពូកែ">ពូកែ</option>
+                          <option value="ល្អ">ល្អ</option>
+                          <option value="មធ្យម">មធ្យម</option>
+                          <option value="ខ្សោយ">ខ្សោយ</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label>ការសរសេរ <span class="required">*</span></label>
+                        <select v-model="currentLanguage.writingLevel" class="form-input">
+                          <option value="">-- ជ្រើសរើស --</option>
+                          <option value="ពូកែ">ពូកែ</option>
+                          <option value="ល្អ">ល្អ</option>
+                          <option value="មធ្យម">មធ្យម</option>
+                          <option value="ខ្សោយ">ខ្សោយ</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="child-form-footer">
+                    <button type="button" class="btn-cancel" @click="closeLanguageForm">
+                      <i class="pi pi-times"></i> បោះបង់
+                    </button>
+                    <button type="button" class="btn-submit" @click="saveLanguage">
+                      <i class="pi pi-check"></i> រក្សាទុក
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1500,6 +1667,33 @@ const currentChild = ref({
   supportStatus: 'not-applied',
   remarks: '',
   attachmentFile: null
+});
+
+const educationFormVisible = ref(false);
+const editingEducationIndex = ref(null);
+const currentEducation = ref({
+  courseType: '',
+  educationLevel: '',
+  certificateType: '',
+  institution: '',
+  major: '',
+  educationStartDay: '',
+  educationStartMonth: '',
+  educationStartYear: '',
+  educationEndDay: '',
+  educationEndMonth: '',
+  educationEndYear: '',
+  otherTraining: '',
+  studyLocation: ''
+});
+
+const languageFormVisible = ref(false);
+const editingLanguageIndex = ref(null);
+const currentLanguage = ref({
+  foreignLanguage: '',
+  readingLevel: '',
+  speakingLevel: '',
+  writingLevel: ''
 });
 
 const formData = ref({
@@ -1615,11 +1809,27 @@ const formData = ref({
   // Children Information
   children: [],
   // Education/Culture Information
+  courseType: '',
   educationLevel: '',
+  certificateType: '',
+  institution: '',
+  major: '',
+  educationStartDay: '',
+  educationStartMonth: '',
+  educationStartYear: '',
+  educationEndDay: '',
+  educationEndMonth: '',
+  educationEndYear: '',
+  otherTraining: '',
+  studyLocation: '',
+  foreignLanguage: '',
+  readingLevel: '',
+  speakingLevel: '',
+  writingLevel: '',
+  // Legacy fields (keeping for backward compatibility)
   schoolName: '',
   startYear: '',
   endYear: '',
-  major: '',
   certificate: '',
   khmerLanguage: '',
   englishLanguage: '',
@@ -1627,7 +1837,10 @@ const formData = ref({
   otherLanguage: '',
   training: '',
   certifications: '',
-  culturalSkills: ''
+  culturalSkills: '',
+  educationRecords: [],
+  languageRecords: [],
+  culturalRecords: []
 });
 
 const iconTabs = [
@@ -1821,6 +2034,122 @@ const closeChildForm = () => {
     supportStatus: 'not-applied',
     remarks: '',
     attachmentFile: null
+  };
+};
+
+// Education methods
+const addEducation = () => {
+  currentEducation.value = {
+    courseType: '',
+    educationLevel: '',
+    certificateType: '',
+    institution: '',
+    major: '',
+    educationStartDay: '',
+    educationStartMonth: '',
+    educationStartYear: '',
+    educationEndDay: '',
+    educationEndMonth: '',
+    educationEndYear: '',
+    otherTraining: '',
+    studyLocation: ''
+  };
+  editingEducationIndex.value = null;
+  educationFormVisible.value = true;
+};
+
+const editEducation = (index) => {
+  currentEducation.value = { ...formData.value.educationRecords[index] };
+  editingEducationIndex.value = index;
+  educationFormVisible.value = true;
+};
+
+const saveEducation = () => {
+  if (!formData.value.educationRecords) {
+    formData.value.educationRecords = [];
+  }
+  
+  if (editingEducationIndex.value !== null) {
+    formData.value.educationRecords[editingEducationIndex.value] = { ...currentEducation.value };
+  } else {
+    formData.value.educationRecords.push({ ...currentEducation.value });
+  }
+  
+  closeEducationForm();
+};
+
+const deleteEducation = (index) => {
+  if (confirm('តើអ្នកពិតជាចង់លុបកម្រិតវប្បធម៌នេះ?')) {
+    formData.value.educationRecords.splice(index, 1);
+  }
+};
+
+const closeEducationForm = () => {
+  educationFormVisible.value = false;
+  editingEducationIndex.value = null;
+  currentEducation.value = {
+    courseType: '',
+    educationLevel: '',
+    certificateType: '',
+    institution: '',
+    major: '',
+    educationStartDay: '',
+    educationStartMonth: '',
+    educationStartYear: '',
+    educationEndDay: '',
+    educationEndMonth: '',
+    educationEndYear: '',
+    otherTraining: '',
+    studyLocation: ''
+  };
+};
+
+// Language methods
+const addLanguage = () => {
+  currentLanguage.value = {
+    foreignLanguage: '',
+    readingLevel: '',
+    speakingLevel: '',
+    writingLevel: ''
+  };
+  editingLanguageIndex.value = null;
+  languageFormVisible.value = true;
+};
+
+const editLanguage = (index) => {
+  currentLanguage.value = { ...formData.value.languageRecords[index] };
+  editingLanguageIndex.value = index;
+  languageFormVisible.value = true;
+};
+
+const saveLanguage = () => {
+  if (!formData.value.languageRecords) {
+    formData.value.languageRecords = [];
+  }
+  
+  if (editingLanguageIndex.value !== null) {
+    formData.value.languageRecords[editingLanguageIndex.value] = { ...currentLanguage.value };
+  } else {
+    formData.value.languageRecords.push({ ...currentLanguage.value });
+  }
+  
+  closeLanguageForm();
+};
+
+const deleteLanguage = (index) => {
+  if (confirm('តើអ្នកពិតជាចង់លុបភាសារបរទេសនេះ?')) {
+    formData.value.languageRecords.splice(index, 1);
+  }
+};
+
+const closeLanguageForm = () => {
+  languageFormVisible.value = false;
+  editingLanguageIndex.value = null;
+  currentLanguage.value = {
+    foreignLanguage: '',
+    readingLevel: '',
+    speakingLevel: '',
+    writingLevel: ''
   };
 };
 
@@ -2827,6 +3156,22 @@ onMounted(() => {
   color: #94a3b8;
 }
 
+.form-input-small {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: white;
+  color: #1e293b;
+}
+
+.form-input-small:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 /* 3-Column Form Row */
 .form-row-3col {
   display: grid;
@@ -3074,3 +3419,4 @@ textarea:focus {
   }
 }
 </style>
+
