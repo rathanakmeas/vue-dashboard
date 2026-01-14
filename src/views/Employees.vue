@@ -30,7 +30,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="employee in employees" :key="employee._id">
+          <tr v-for="employee in employees" :key="employee._id || employee.id">
             <td>
               <div class="photo-cell">
                 <img v-if="employee.photo" :src="`http://localhost:5000${employee.photo}`" alt="Photo" />
@@ -54,7 +54,7 @@
             <td>{{ employee.email || '-' }}</td>
             <td>
               <div class="action-buttons">
-                <button class="btn-icon view" @click="viewEmployee(employee._id)" title="មើល">
+                <button class="btn-icon view" @click="viewEmployee(employee._id || employee.id)" title="មើល">
                   <i class="pi pi-eye"></i>
                 </button>
                 <button class="btn-icon edit" @click="editEmployee(employee)" title="កែសម្រួល">
@@ -1860,7 +1860,13 @@ const progressPercentage = computed(() => {
 const loadEmployees = async () => {
   try {
     const response = await api.get('/employees');
-    employees.value = response.data;
+    // Backend returns { employees: [...], total, page, ... }
+    employees.value = response.data.employees || response.data;
+    console.log('Loaded employees:', employees.value);
+    if (employees.value.length > 0) {
+      console.log('First employee:', employees.value[0]);
+      console.log('First employee ID:', employees.value[0]._id);
+    }
   } catch (error) {
     console.error('Error loading employees:', error);
   }
@@ -1956,6 +1962,7 @@ const handleSubmit = async () => {
 };
 
 const viewEmployee = (id) => {
+  console.log('Viewing employee with ID:', id);
   router.push(`/employees/${id}`);
 };
 

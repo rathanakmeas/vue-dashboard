@@ -119,11 +119,11 @@
 
       <!-- Tab Content -->
       <div class="tab-content">
-        <!-- Tab 0: Civil Servant Status -->
+        <!-- Tab 0: ស្ថានភាពមន្ត្រី (Employee Status) -->
         <div v-show="activeTab === 0" class="tab-panel">
           <div class="form-grid">
             <div class="field">
-              <label>អត្ថលេខសំគាល់បុគ្គលិក</label>
+              <label>អត្តលេខមន្ត្រីរាជការ</label>
               <input 
                 type="text" 
                 :value="employee.civilServantId || employee.employeeId" 
@@ -133,7 +133,7 @@
             </div>
 
             <div class="field">
-              <label>ថ្ងៃខែឆ្នាំចូលបំរើការ</label>
+              <label>ថ្ងៃខែឆ្នាំចូលបម្រើការងារ</label>
               <input 
                 type="date" 
                 :value="employee.startWorkDate" 
@@ -143,7 +143,7 @@
             </div>
 
             <div class="field">
-              <label>កាលបរិច្ឆេទកំណត់កាល</label>
+              <label>កាលបរិច្ឆេទតាំងស៊ប់</label>
               <input 
                 type="date" 
                 :value="employee.appointmentDate" 
@@ -153,12 +153,12 @@
             </div>
 
             <div class="field">
-              <label>ពិណ៌នាលំអិតផងបូ</label>
+              <label>កំណត់សំគាល់ផ្សេងៗ</label>
               <input 
                 type="text" 
                 :value="employee.civilServantNotes" 
                 readonly
-                placeholder="ពិណ៌នាលំអិតផងបូ"
+                placeholder="កំណត់សំគាល់ផ្សេងៗ"
                 class="input-readonly"
               />
             </div>
@@ -166,10 +166,7 @@
 
           <div class="form-actions">
             <button class="btn-add" @click="addRecord('civilStatus')">
-              + មុខសម្រាយតារូតាំង
-            </button>
-            <button class="btn-save" @click="saveInfo">
-              រក្សាទុកពត៌មានកំណត់កាល
+              + បញ្ចូលស្ថានភាពមន្ត្រី
             </button>
           </div>
 
@@ -178,13 +175,13 @@
             <table>
               <thead>
                 <tr>
-                  <th>លេខបិទរូប</th>
-                  <th>ប្រភេទបិទរូប</th>
-                  <th>ប្រភេទគន</th>
-                  <th>សូត្រតាម</th>
-                  <th>ថ្ងៃខែឆ្នាំសុពលភាព</th>
-                  <th>ថ្ងៃបង់បព់ប</th>
-                  <th>ចុះបូម</th>
+                  <th>លេខលិខិត</th>
+                  <th>ប្រភេទលិខិត</th>
+                  <th>ប្រភេទមន្ត្រី</th>
+                  <th>ស្ថានភាព</th>
+                  <th>ថ្ងៃបញ្ចប់</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
                 </tr>
               </thead>
               <tbody>
@@ -193,277 +190,60 @@
                 </tr>
                 <tr v-for="(item, i) in employee.civilStatuses" :key="i">
                   <td>{{ item.letterNo || '-' }}</td>
-                  <td>{{ item.letterType || 'មុរច្ឆ័យណាចាំឡ្យ/មុរច្ឆាច្យឡ្យ' }}</td>
-                  <td>{{ item.employeeType || 'រាតុ ក្មូរុស' }}</td>
-                  <td>{{ formatDateKH(item.startDate) || '១៨/០៧/២០១៩' }}</td>
-                  <td>{{ item.status || 'បុងល្យុម' }}</td>
+                  <td>{{ item.letterType || '-' }}</td>
+                  <td>{{ item.employeeType || '-' }}</td>
+                  <td>{{ item.status || '-' }}</td>
                   <td>{{ formatDateKH(item.endDate) || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
                   <td>
                     <button class="action-btn" @click="editRecord('civilStatus', i)">
-                      <i class="pi pi-ellipsis-v"></i>
+                      <i class="pi pi-pencil"></i>
                     </button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-
-          <div class="pagination">
-            <button class="page-btn">« ក្រោម</button>
-            <button class="page-btn active">១</button>
-            <button class="page-btn">បន្ទុះ »</button>
-          </div>
         </div>
 
-        <!-- Tab 1: Family Info -->
+        <!-- Tab 1: ឋានន្តរស័ក្តិ និងថ្នាក់ (Rank and Grade) -->
         <div v-show="activeTab === 1" class="tab-panel">
-          <h3 class="subsection-title">ព័ត៌មានឪពុក</h3>
-          <div class="form-grid">
-            <div class="field">
-              <label>ឈ្មោះឪពុក</label>
-              <input type="text" :value="employee.fatherInfo?.name" readonly class="input-readonly" />
-            </div>
-            <div class="field">
-              <label>ឈ្មោះឡាតាំង</label>
-              <input type="text" :value="employee.fatherInfo?.latinName" readonly class="input-readonly" />
-            </div>
-            <div class="field">
-              <label>មុខរបរ</label>
-              <input type="text" :value="employee.fatherInfo?.occupation" readonly class="input-readonly" />
-            </div>
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('rankGrade')">
+              + បញ្ចូលឋានន្តរស័ក្តិ និងថ្នាក់
+            </button>
           </div>
 
-          <h3 class="subsection-title">ព័ត៌មានម្ដាយ</h3>
-          <div class="form-grid">
-            <div class="field">
-              <label>ឈ្មោះម្ដាយ</label>
-              <input type="text" :value="employee.motherInfo?.name" readonly class="input-readonly" />
-            </div>
-            <div class="field">
-              <label>ឈ្មោះឡាតាំង</label>
-              <input type="text" :value="employee.motherInfo?.latinName" readonly class="input-readonly" />
-            </div>
-            <div class="field">
-              <label>មុខរបរ</label>
-              <input type="text" :value="employee.motherInfo?.occupation" readonly class="input-readonly" />
-            </div>
-          </div>
-
-          <h3 class="subsection-title">ព័ត៌មានប្តី/ប្រពន្ធ</h3>
-          <div class="form-grid">
-            <div class="field">
-              <label>ឈ្មោះ</label>
-              <input type="text" :value="employee.spouseInfo?.name" readonly class="input-readonly" />
-            </div>
-            <div class="field">
-              <label>មុខរបរ</label>
-              <input type="text" :value="employee.spouseInfo?.occupation" readonly class="input-readonly" />
-            </div>
-            <div class="field">
-              <label>លេខទូរស័ព្ទ</label>
-              <input type="text" :value="employee.spouseInfo?.birthPlace?.phone" readonly class="input-readonly" />
-            </div>
-          </div>
-
-          <h3 class="subsection-title">ព័ត៌មានកូន</h3>
           <div class="data-table">
             <table>
               <thead>
                 <tr>
-                  <th>ឈ្មោះ</th>
-                  <th>ភេទ</th>
-                  <th>ថ្ងៃខែឆ្នាំកំណើត</th>
-                  <th>មុខរបរ</th>
+                  <th>លេខលិខិតយោង</th>
+                  <th>ប្រភេទលក្ខន្តិកៈ</th>
+                  <th>ក្របខ័ណ្ឌ</th>
+                  <th>ឋានន្តរស័ក្តិ និងថ្នាក់</th>
+                  <th>PayScale</th>
+                  <th>ថ្ងៃខែឆ្នាំបញ្ចប់</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="!employee.children || employee.children.length === 0">
-                  <td colspan="4" class="no-data">មិនមានទិន្នន័យ</td>
+                <tr v-if="!employee.rankGrades || employee.rankGrades.length === 0">
+                  <td colspan="8" class="no-data">មិនមានទិន្នន័យ</td>
                 </tr>
-                <tr v-for="(child, i) in employee.children" :key="i">
-                  <td>{{ child.name }}</td>
-                  <td>{{ child.gender }}</td>
-                  <td>{{ formatDateKH(child.dateOfBirth) }}</td>
-                  <td>{{ child.occupation || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 2: Education -->
-        <div v-show="activeTab === 2" class="tab-panel">
-          <h3 class="subsection-title">ការសិក្សា</h3>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>វគ្គ</th>
-                  <th>កម្រិត</th>
-                  <th>គ្រឹះស្ថាន</th>
-                  <th>ចាប់ផ្ដើម</th>
-                  <th>បញ្ចប់</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!employee.education || employee.education.length === 0">
-                  <td colspan="5" class="no-data">មិនមានទិន្នន័យ</td>
-                </tr>
-                <tr v-for="(edu, i) in employee.education" :key="i">
-                  <td>{{ edu.course || '-' }}</td>
-                  <td>{{ edu.level || '-' }}</td>
-                  <td>{{ edu.institution || '-' }}</td>
-                  <td>{{ formatDateKH(edu.startDate) }}</td>
-                  <td>{{ formatDateKH(edu.endDate) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 class="subsection-title">ភាសា</h3>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>ភាសា</th>
-                  <th>អាន</th>
-                  <th>និយាយ</th>
-                  <th>សរសេរ</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!employee.languages || employee.languages.length === 0">
-                  <td colspan="4" class="no-data">មិនមានទិន្នន័យ</td>
-                </tr>
-                <tr v-for="(lang, i) in employee.languages" :key="i">
-                  <td>{{ lang.language }}</td>
-                  <td>{{ lang.reading || '-' }}</td>
-                  <td>{{ lang.speaking || '-' }}</td>
-                  <td>{{ lang.writing || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 3: Ranks -->
-        <div v-show="activeTab === 3" class="tab-panel">
-          <h3 class="subsection-title">ថ្នាក់និងចំណាត់ថ្នាក់</h3>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>លេខយោង</th>
-                  <th>ប្រភេទ</th>
-                  <th>ក្របខណ្ឌ</th>
-                  <th>ថ្នាក់</th>
-                  <th>ប្រាក់ខែ</th>
-                  <th>ថ្ងៃបញ្ចប់</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!employee.ranks || employee.ranks.length === 0">
-                  <td colspan="6" class="no-data">មិនមានទិន្នន័យ</td>
-                </tr>
-                <tr v-for="(rank, i) in employee.ranks" :key="i">
-                  <td>{{ rank.referenceNo || '-' }}</td>
-                  <td>{{ rank.regulationType || '-' }}</td>
-                  <td>{{ rank.framework || '-' }}</td>
-                  <td>{{ rank.rankAndGrade || '-' }}</td>
-                  <td>{{ rank.payScale || '-' }}</td>
-                  <td>{{ formatDateKH(rank.endDate) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 4: Positions -->
-        <div v-show="activeTab === 4" class="tab-panel">
-          <h3 class="subsection-title">មុខតំណែង</h3>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>លេខលិខិត</th>
-                  <th>មុខតំណែង</th>
-                  <th>ថ្នាក់ស្មើ</th>
-                  <th>ថ្ងៃចុះហត្ថលេខា</th>
-                  <th>ក្រសួង</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!employee.positions || employee.positions.length === 0">
-                  <td colspan="5" class="no-data">មិនមានទិន្នន័យ</td>
-                </tr>
-                <tr v-for="(pos, i) in employee.positions" :key="i">
-                  <td>{{ pos.letterNo || '-' }}</td>
-                  <td>{{ pos.position || '-' }}</td>
-                  <td>{{ pos.equivalentRank || '-' }}</td>
-                  <td>{{ formatDateKH(pos.signatureDate) }}</td>
-                  <td>{{ pos.ministry || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 5: Private Sector -->
-        <div v-show="activeTab === 5" class="tab-panel">
-          <h3 class="subsection-title">បទពិសោធន៍វិស័យឯកជន</h3>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>ស្ថាប័ន</th>
-                  <th>តួនាទី</th>
-                  <th>ជំនាញ</th>
-                  <th>ចាប់ផ្ដើម</th>
-                  <th>បញ្ចប់</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!employee.privateSectors || employee.privateSectors.length === 0">
-                  <td colspan="5" class="no-data">មិនមានទិន្នន័យ</td>
-                </tr>
-                <tr v-for="(ps, i) in employee.privateSectors" :key="i">
-                  <td>{{ ps.organization || '-' }}</td>
-                  <td>{{ ps.role || '-' }}</td>
-                  <td>{{ ps.skills || '-' }}</td>
-                  <td>{{ formatDateKH(ps.startDate) }}</td>
-                  <td>{{ formatDateKH(ps.endDate) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 6: Recognition -->
-        <div v-show="activeTab === 6" class="tab-panel">
-          <h3 class="subsection-title">ការទទួលស្គាល់</h3>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>លេខយោង</th>
-                  <th>ប្រភេទ</th>
-                  <th>កាលបរិច្ឆេទ</th>
-                  <th>ក្រសួង</th>
-                  <th>រូបភាព</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!employee.recognitions || employee.recognitions.length === 0">
-                  <td colspan="5" class="no-data">មិនមានទិន្នន័យ</td>
-                </tr>
-                <tr v-for="(rec, i) in employee.recognitions" :key="i">
-                  <td>{{ rec.referenceNo || '-' }}</td>
-                  <td>{{ rec.recognitionType || '-' }}</td>
-                  <td>{{ formatDateKH(rec.date) }}</td>
-                  <td>{{ rec.ministry || '-' }}</td>
+                <tr v-for="(item, i) in employee.rankGrades" :key="i">
+                  <td>{{ item.referenceLetterNo || '-' }}</td>
+                  <td>{{ item.characteristicType || '-' }}</td>
+                  <td>{{ item.framework || '-' }}</td>
+                  <td>{{ item.rankAndGrade || '-' }}</td>
+                  <td>{{ item.payScale || '-' }}</td>
+                  <td>{{ formatDateKH(item.endDate) || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <img v-if="rec.imageFile" :src="rec.imageData" alt="Image" class="table-img" />
-                    <span v-else>-</span>
+                    <button class="action-btn" @click="editRecord('rankGrade', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -471,32 +251,179 @@
           </div>
         </div>
 
-        <!-- Tab 7: Disciplinary -->
-        <div v-show="activeTab === 7" class="tab-panel">
-          <h3 class="subsection-title">វិធានការបូលី</h3>
+        <!-- Tab 2: មុខតំណែង (Position) -->
+        <div v-show="activeTab === 2" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('position')">
+              + បញ្ចូលមុខតំណែង
+            </button>
+          </div>
+
           <div class="data-table">
             <table>
               <thead>
                 <tr>
-                  <th>លេខយោង</th>
-                  <th>ប្រភេទ</th>
+                  <th>លេខលិខិត</th>
+                  <th>មុខតំណែង</th>
+                  <th>ឋានៈស្មើ</th>
+                  <th>ថ្ងៃចុះហត្ថលេខា</th>
+                  <th>ថ្ងៃបញ្ចប់</th>
+                  <th>ក្រសួង-ស្ថាប័ន</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!employee.positions || employee.positions.length === 0">
+                  <td colspan="8" class="no-data">មិនមានទិន្នន័យ</td>
+                </tr>
+                <tr v-for="(item, i) in employee.positions" :key="i">
+                  <td>{{ item.letterNo || '-' }}</td>
+                  <td>{{ item.position || '-' }}</td>
+                  <td>{{ item.equivalentRank || '-' }}</td>
+                  <td>{{ formatDateKH(item.signatureDate) || '-' }}</td>
+                  <td>{{ formatDateKH(item.endDate) || '-' }}</td>
+                  <td>{{ item.ministryInstitution || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('position', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: វិស័យឯកជន (Private Sector) -->
+        <div v-show="activeTab === 3" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('privateSector')">
+              + បញ្ចូលវិស័យឯកជន
+            </button>
+          </div>
+
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>គ្រឹះស្ថាន-អង្គភាព</th>
+                  <th>តួនាទី</th>
+                  <th>ជំនាញ/បច្ចេកទេស</th>
+                  <th>ថ្ងៃចូលបម្រើការងារ</th>
+                  <th>ថ្ងៃបញ្ចប់ការងារ</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!employee.privateSectors || employee.privateSectors.length === 0">
+                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                </tr>
+                <tr v-for="(item, i) in employee.privateSectors" :key="i">
+                  <td>{{ item.institution || '-' }}</td>
+                  <td>{{ item.role || '-' }}</td>
+                  <td>{{ item.skill || '-' }}</td>
+                  <td>{{ formatDateKH(item.startDate) || '-' }}</td>
+                  <td>{{ formatDateKH(item.endDate) || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('privateSector', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 4: ការលើកសរសើរ (Awards/Recognition) -->
+        <div v-show="activeTab === 4" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('award')">
+              + បញ្ចូលការលើកសរសើរ
+            </button>
+          </div>
+
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>លេខលិខិតយោង</th>
+                  <th>ប្រភេទការលើកសរសើរ</th>
+                  <th>រូបភាពលើកសរសើរ</th>
                   <th>កាលបរិច្ឆេទ</th>
-                  <th>ក្រសួង</th>
-                  <th>រូបភាព</th>
+                  <th>ក្រសួង-ស្ថាប័ន</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!employee.awards || employee.awards.length === 0">
+                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                </tr>
+                <tr v-for="(item, i) in employee.awards" :key="i">
+                  <td>{{ item.referenceLetterNo || '-' }}</td>
+                  <td>{{ item.awardType || '-' }}</td>
+                  <td>
+                    <img v-if="item.awardImage" :src="item.awardImage" alt="Award" class="table-image" />
+                    <span v-else>-</span>
+                  </td>
+                  <td>{{ formatDateKH(item.date) || '-' }}</td>
+                  <td>{{ item.ministryInstitution || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('award', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 5: ការដាក់ពិន័យ (Disciplinary Actions) -->
+        <div v-show="activeTab === 5" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('disciplinary')">
+              + បញ្ចូលការដាក់ពិន័យ
+            </button>
+          </div>
+
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>លេខលិខិតយោង</th>
+                  <th>ប្រភេទការដាក់ពិន័យ</th>
+                  <th>រូបភាពការដាក់ពិន័យ</th>
+                  <th>កាលបរិច្ឆេទ</th>
+                  <th>ក្រសួង-ស្ថាប័ន</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!employee.disciplinaryActions || employee.disciplinaryActions.length === 0">
-                  <td colspan="5" class="no-data">មិនមានទិន្នន័យ</td>
+                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
                 </tr>
-                <tr v-for="(disc, i) in employee.disciplinaryActions" :key="i">
-                  <td>{{ disc.referenceNo || '-' }}</td>
-                  <td>{{ disc.disciplinaryType || '-' }}</td>
-                  <td>{{ formatDateKH(disc.date) }}</td>
-                  <td>{{ disc.ministry || '-' }}</td>
+                <tr v-for="(item, i) in employee.disciplinaryActions" :key="i">
+                  <td>{{ item.referenceLetterNo || '-' }}</td>
+                  <td>{{ item.actionType || '-' }}</td>
                   <td>
-                    <img v-if="disc.imageFile" :src="disc.imageData" alt="Image" class="table-img" />
+                    <img v-if="item.actionImage" :src="item.actionImage" alt="Disciplinary" class="table-image" />
                     <span v-else>-</span>
+                  </td>
+                  <td>{{ formatDateKH(item.date) || '-' }}</td>
+                  <td>{{ item.ministryInstitution || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('disciplinary', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -527,15 +454,14 @@ const loading = ref(true);
 const activeTab = ref(0);
 
 const tabs = [
-  { label: 'ស្ថានភាព', icon: 'pi pi-check-circle' },
-  { label: 'ប្រវត្តិគ្រួសារ និងគូនែ', icon: 'pi pi-users' },
-  { label: 'មុខតំណែង និងការ', icon: 'pi pi-briefcase' },
-  { label: 'ថ្នាក់ និងដំណាក់', icon: 'pi pi-star' },
-  { label: 'ការរៀបចំគេស្តារទី', icon: 'pi pi-folder' },
-  { label: 'កាពបទីកជ្ឈមេការ', icon: 'pi pi-building' },
-  { label: 'គតិសពេលគីប្រី', icon: 'pi pi-trophy' },
-  { label: 'វិធានការបូលី', icon: 'pi pi-exclamation-triangle' }
+  { label: 'ស្ថានភាពមន្ត្រី', icon: 'pi pi-check-circle' },
+  { label: 'ឋានន្តរស័ក្តិ និងថ្នាក់', icon: 'pi pi-star' },
+  { label: 'មុខតំណែង', icon: 'pi pi-briefcase' },
+  { label: 'វិស័យឯកជន', icon: 'pi pi-building' },
+  { label: 'ការលើកសរសើរ', icon: 'pi pi-trophy' },
+  { label: 'ការដាក់ពិន័យ', icon: 'pi pi-exclamation-triangle' }
 ];
+
 
 const fetchEmployee = async () => {
   try {
@@ -975,6 +901,20 @@ onMounted(() => {
 .action-btn:hover {
   background: #e0e7ff;
   color: #4f46e5;
+}
+
+.table-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.table-image:hover {
+  transform: scale(1.1);
 }
 
 .table-img {
