@@ -36,12 +36,15 @@
 
         <!-- Right: Info Card -->
         <div class="info-card">
-          <h2 class="section-title">ព័ត៌មានទូទៅ</h2>
+          <h2 class="section-title">
+            <i class="pi pi-info-circle"></i>
+            ព័ត៌មានទូទៅ
+          </h2>
           
           <div class="info-list">
             <div class="info-row">
               <div class="info-col">
-                <span class="info-label">គោត្តនាម ដំបូង:</span>
+                <span class="info-label">គោត្តនាម និងនាម:</span>
                 <span class="info-value">{{ employee.khmerName || (employee.firstName + ' ' + employee.lastName) }}</span>
               </div>
               <div class="info-col">
@@ -52,11 +55,11 @@
 
             <div class="info-row">
               <div class="info-col">
-                <span class="info-label">គោត្តនាម ដំបូង ឡាតាំង:</span>
+                <span class="info-label">គោត្តនាម និងនាម ឡាតាំង:</span>
                 <span class="info-value">{{ (employee.firstNameLatin || employee.firstName).toUpperCase() }} {{ (employee.lastNameLatin || employee.lastName).toUpperCase() }}</span>
               </div>
               <div class="info-col">
-                <span class="info-label">លេខទូ សព្វសារព័ត៌មាន:</span>
+                <span class="info-label">លេខអត្ត.សញ្ជាតិខ្មែរ:</span>
                 <span class="info-value">{{ employee.nationalId || '០៩០៨៦៦៦៥៩' }}</span>
               </div>
             </div>
@@ -67,8 +70,8 @@
                 <span class="info-value">{{ employee.gender === 'Female' ? 'ស្រី' : 'ប្រុស' }}</span>
               </div>
               <div class="info-col">
-                <span class="info-label">លេខទីប់លាត់អង្គ័:</span>
-                <span class="info-value">{{ employee.civilServantId || 'គុម' }}</span>
+                <span class="info-label">លេខលិខិតឆ្លងដែន:</span>
+                <span class="info-value">{{ employee.passportNo || 'គុម' }}</span>
               </div>
             </div>
 
@@ -85,12 +88,21 @@
 
             <div class="info-row">
               <div class="info-col">
-                <span class="info-label">អត្ថលេខសំគាល់បុគ្គលិក:</span>
+                <span class="info-label">អត្តលេខមន្ត្រីរាជការ:</span>
                 <span class="info-value">{{ employee.civilServantId || employee.employeeId }}</span>
               </div>
               <div class="info-col">
+                <span class="info-label">លេខសំបុត្រកំណើត:</span>
+                <span class="info-value">{{ employee.birthCertificateNo || 'គុម' }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-col">
                 <span class="info-label">អុីមែល:</span>
                 <span class="info-value">{{ employee.email }}</span>
+              </div>
+              <div class="info-col">
               </div>
             </div>
 
@@ -430,6 +442,140 @@
             </table>
           </div>
         </div>
+
+        <!-- Tab 6: ព័ត៌មានសហព័ទ្ធ (Union Information) -->
+        <div v-show="activeTab === 6" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('union')">
+              + បញ្ចូលព័ត៌មានសហព័ទ្ធ
+            </button>
+          </div>
+
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>លេខសមាជិក</th>
+                  <th>ប្រភេទសហព័ទ្ធ</th>
+                  <th>កាលបរិច្ឆេទចូលរួម</th>
+                  <th>តួនាទី</th>
+                  <th>ស្ថានភាព</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!employee.unionInfo || employee.unionInfo.length === 0">
+                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                </tr>
+                <tr v-for="(item, i) in employee.unionInfo" :key="i">
+                  <td>{{ item.memberNo || '-' }}</td>
+                  <td>{{ item.unionType || '-' }}</td>
+                  <td>{{ formatDateKH(item.joinDate) || '-' }}</td>
+                  <td>{{ item.role || '-' }}</td>
+                  <td>{{ item.status || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('union', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 7: កម្រិតវប្បធម៌ (Cultural Level) -->
+        <div v-show="activeTab === 7" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('cultural')">
+              + បញ្ចូលកម្រិតវប្បធម៌
+            </button>
+          </div>
+
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>កម្រិតវប្បធម៌</th>
+                  <th>ឆ្នាំបញ្ចប់</th>
+                  <th>សាលារៀន/ស្ថាប័ន</th>
+                  <th>ជំនាញ</th>
+                  <th>សញ្ញាបត្រ</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!employee.culturalLevels || employee.culturalLevels.length === 0">
+                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                </tr>
+                <tr v-for="(item, i) in employee.culturalLevels" :key="i">
+                  <td>{{ item.level || '-' }}</td>
+                  <td>{{ item.graduationYear || '-' }}</td>
+                  <td>{{ item.institution || '-' }}</td>
+                  <td>{{ item.major || '-' }}</td>
+                  <td>{{ item.certificate || '-' }}</td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('cultural', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 8: ឯកសារពាក់ព័ន្ធ (Related Documents) -->
+        <div v-show="activeTab === 8" class="tab-panel">
+          <div class="form-actions">
+            <button class="btn-add" @click="addRecord('document')">
+              + បញ្ចូលឯកសារពាក់ព័ន្ធ
+            </button>
+          </div>
+
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ឈ្មោះឯកសារ</th>
+                  <th>ប្រភេទឯកសារ</th>
+                  <th>លេខឯកសារ</th>
+                  <th>កាលបរិច្ឆេទ</th>
+                  <th>ឯកសារភ្ជាប់</th>
+                  <th>ផ្សេងៗ</th>
+                  <th>សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!employee.relatedDocuments || employee.relatedDocuments.length === 0">
+                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                </tr>
+                <tr v-for="(item, i) in employee.relatedDocuments" :key="i">
+                  <td>{{ item.documentName || '-' }}</td>
+                  <td>{{ item.documentType || '-' }}</td>
+                  <td>{{ item.documentNo || '-' }}</td>
+                  <td>{{ formatDateKH(item.date) || '-' }}</td>
+                  <td>
+                    <a v-if="item.attachment" :href="item.attachment" target="_blank" class="file-link">
+                      <i class="pi pi-file-pdf"></i> មើល
+                    </a>
+                    <span v-else>-</span>
+                  </td>
+                  <td>{{ item.remarks || '-' }}</td>
+                  <td>
+                    <button class="action-btn" @click="editRecord('document', i)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -459,7 +605,10 @@ const tabs = [
   { label: 'មុខតំណែង', icon: 'pi pi-briefcase' },
   { label: 'វិស័យឯកជន', icon: 'pi pi-building' },
   { label: 'ការលើកសរសើរ', icon: 'pi pi-trophy' },
-  { label: 'ការដាក់ពិន័យ', icon: 'pi pi-exclamation-triangle' }
+  { label: 'ការដាក់ពិន័យ', icon: 'pi pi-exclamation-triangle' },
+  { label: 'ព័ត៌មានសហព័ទ្ធ', icon: 'pi pi-users' },
+  { label: 'កម្រិតវប្បធម៌', icon: 'pi pi-book' },
+  { label: 'ឯកសារពាក់ព័ន្ធ', icon: 'pi pi-file' }
 ];
 
 
@@ -654,10 +803,19 @@ onMounted(() => {
 }
 
 .section-title {
+  font-family: 'Siemreap', cursive;
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
   color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title i {
+  color: #6366f1;
+  font-size: 1.1rem;
 }
 
 .info-list {
@@ -684,12 +842,14 @@ onMounted(() => {
 }
 
 .info-label {
-  font-size: 0.875rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   color: #6b7280;
 }
 
 .info-value {
-  font-size: 0.9rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   color: #1f2937;
   font-weight: 500;
 }
@@ -717,7 +877,8 @@ onMounted(() => {
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   font-weight: 500;
   color: #6b7280;
   transition: all 0.2s;
@@ -782,17 +943,19 @@ onMounted(() => {
 }
 
 .field label {
-  font-size: 0.875rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   font-weight: 500;
   color: #374151;
 }
 
 .field input,
 .field select {
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   padding: 0.625rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-  font-size: 0.875rem;
 }
 
 .input-readonly {
@@ -856,7 +1019,8 @@ onMounted(() => {
 .data-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
 }
 
 .data-table thead {
@@ -864,6 +1028,8 @@ onMounted(() => {
 }
 
 .data-table th {
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   padding: 0.75rem;
   text-align: left;
   font-weight: 600;
@@ -872,6 +1038,8 @@ onMounted(() => {
 }
 
 .data-table td {
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
   padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
   color: #1f2937;
@@ -923,6 +1091,22 @@ onMounted(() => {
   object-fit: cover;
   border-radius: 0.25rem;
   border: 1px solid #e5e7eb;
+}
+
+.file-link {
+  font-family: 'Siemreap', cursive;
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s;
+}
+
+.file-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 /* Pagination */

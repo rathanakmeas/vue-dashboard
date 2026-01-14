@@ -37,9 +37,9 @@ const startServer = async () => {
   console.log('About to listen on port:', PORT);
   
   if (process.env.NODE_ENV !== 'test') {
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
-      console.log('Server is now accepting connections');
+      console.log('Server is now accepting connections from all network interfaces');
     });
     
     server.on('error', (error) => {
@@ -70,15 +70,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow multiple localhost ports for development
+    // Allow multiple localhost ports and network IPs for development
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:3000',
+      'http://192.168.1.180:5173',
       process.env.CORS_ORIGIN
     ];
     
-    if (!origin || allowedOrigins.includes(origin)) {
+    // In development, allow all origins
+    if (!origin || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
