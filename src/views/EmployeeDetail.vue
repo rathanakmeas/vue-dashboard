@@ -4,7 +4,7 @@
     <nav class="breadcrumb">
       <router-link to="/" class="breadcrumb-link">ទំព័រដើម</router-link>
       <span class="breadcrumb-sep">»</span>
-      <router-link to="/employees" class="breadcrumb-link active">គ្រប់គ្រងបុគ្គលិក</router-link>
+      <router-link to="/employees" class="breadcrumb-link active">គ្រប់គ្រងបុគ្គលិក មន្រ្តីរាជការ</router-link>
     </nav>
 
     <div v-if="loading" class="loading-state">

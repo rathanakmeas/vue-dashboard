@@ -6,8 +6,8 @@
         <div class="title-section">
           <i class="pi pi-users" style="font-size: 2rem; color: #0288D1;"></i>
           <div>
-            <h1>គ្រប់គ្រងបុគ្គលិក</h1>
-            <p class="subtitle">គ្រប់គ្រងបុគ្គលិក និងបុគ្គលិកមន្ទីរពេទ្យ</p>
+            <h1>គ្រប់គ្រងបុគ្គលិក មន្រ្តីរាជការ</h1>
+            <p class="subtitle">ការគ្រប់គ្រងព័ត៌មានបុគ្គលិក មន្រ្តីរាជការ</p>
           </div>
         </div>
         <button class="add-btn" @click="openDialog()">
@@ -2235,14 +2235,17 @@ onMounted(() => {
 
 .title-section h1 {
   margin: 0;
-  font-size: 1.75rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 16px;
+  font-weight: bold;
   color: #1e293b;
 }
 
 .subtitle {
   margin: 0.25rem 0 0 0;
   color: #64748b;
-  font-size: 0.875rem;
+  font-family: 'Siemreap', cursive;
+  font-size: 11px;
 }
 
 .add-btn {
