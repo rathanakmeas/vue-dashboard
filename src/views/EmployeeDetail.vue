@@ -1141,7 +1141,6 @@ const documentTypes = [
 
 // Dropdown options for installation types
 const installationTypes = [
-  'ជ្រើសរើស',
   'វេនជ្រើសរើស',
   'សញ្ញាបត្រ',
   'ពិសេស',
