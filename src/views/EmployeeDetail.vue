@@ -679,7 +679,7 @@
             </div>
             <div class="form-field">
               <label>កាលបរិច្ឆេទបញ្ចប់</label>
-              <input v-model="formData.endDate" type="date" />
+              <input v-model="formData.endDate" type="date" :disabled="formData.isCurrent" />
             </div>
             <div class="form-field">
               <label>ប្រភេទលិខិត</label>
@@ -1949,6 +1949,15 @@ onMounted(() => {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-field input:disabled,
+.form-field textarea:disabled,
+.form-field select:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .form-field textarea {
