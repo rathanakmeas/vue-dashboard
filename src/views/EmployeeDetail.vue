@@ -699,7 +699,7 @@
               <label>ប្រភេទការតម្លើង</label>
               <select v-model="formData.installationType">
                 <option value="">ជ្រើសរើស</option>
-                <option v-for="option in documentTypes" :key="option" :value="option">{{ option }}</option>
+                <option v-for="option in installationTypes" :key="option" :value="option">{{ option }}</option>
               </select>
             </div>
             <div class="form-field">
@@ -1137,6 +1137,18 @@ const documentTypes = [
   'លិខិតបញ្ជាក់',
   'សេចក្តីសម្រេចថ្នាក់មូលដ្ឋាន',
   'កំណែធម្មតា លិខិតឧទ្ទេសនាម'
+];
+
+// Dropdown options for installation types
+const installationTypes = [
+  'ជ្រើសរើស',
+  'វេនជ្រើសរើស',
+  'សញ្ញាបត្រ',
+  'ពិសេស',
+  'តាមអតីតភាព',
+  'ប្តូរប្របែង្ក័ណ្ឌ និយ័តកម្មថ្នាក់ មុនសមាហរណកម្មឆ្នាំ២០១៥',
+  'ក្របខណ្ឌថ្មី',
+  'តាំងស៊ប់'
 ];
 
 // Computed rank options based on selected framework
