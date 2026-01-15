@@ -301,11 +301,16 @@ const employeeSchema = new mongoose.Schema({
   // Rank and Grade
   rankGrades: [{
     referenceLetterNo: String,
+    startDate: Date,
+    appointmentDate: Date,
+    isCurrent: Boolean,
+    endDate: Date,
+    documentType: String,
     characteristicType: String,
+    installationType: String,
     framework: String,
     rankAndGrade: String,
     payScale: String,
-    endDate: Date,
     remarks: String,
     // Legacy fields
     referenceNo: String,

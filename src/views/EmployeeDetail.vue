@@ -667,10 +667,43 @@
               <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
             </div>
             <div class="form-field">
+              <label>កាលបរិច្ឆេទចាប់ផ្តើម</label>
+              <input v-model="formData.startDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទតែងតាំង</label>
+              <input v-model="formData.appointmentDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>បច្ចុប្បន្ន</label>
+              <button class="btn-toggle" :class="{ active: formData.isCurrent }" @click="formData.isCurrent = !formData.isCurrent">
+                <i :class="formData.isCurrent ? 'pi pi-check' : 'pi pi-times'"></i>
+                {{ formData.isCurrent ? 'បាទ' : 'ទេ' }}
+              </button>
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទបញ្ចប់</label>
+              <input v-model="formData.endDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទលិខិត</label>
+              <select v-model="formData.documentType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in documentTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
               <label>ប្រភេទលក្ខន្តិកៈ</label>
               <select v-model="formData.characteristicType">
                 <option value="">ជ្រើសរើស</option>
                 <option v-for="option in characteristicTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទការតម្លើង</label>
+              <select v-model="formData.installationType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in documentTypes" :key="option" :value="option">{{ option }}</option>
               </select>
             </div>
             <div class="form-field">
@@ -684,16 +717,15 @@
               <label>ឋានន្តរស័ក្តិ និងថ្នាក់</label>
               <select v-model="formData.rankAndGrade">
                 <option value="">ជ្រើសរើស</option>
-                <option v-for="option in rankGradeOptions" :key="option" :value="option">{{ option }}</option>
+                <option v-for="option in computedRankGradeOptions" :key="option" :value="option">{{ option }}</option>
               </select>
             </div>
             <div class="form-field">
-              <label>PayScale</label>
-              <input v-model="formData.payScale" type="text" placeholder="PayScale" />
-            </div>
-            <div class="form-field">
-              <label>ថ្ងៃខែឆ្នាំបញ្ចប់</label>
-              <input v-model="formData.endDate" type="date" />
+              <label>ថ្នាក់ (PayScale)</label>
+              <select v-model="formData.payScale">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in computedRankClassOptions" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field full-width">
               <label>ផ្សេងៗ</label>
@@ -912,7 +944,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../api.js';
 
@@ -1026,12 +1058,12 @@ const rankGradeMapping = {
   'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលមធ្យម': [
     'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែពិសេស(ខ.១.)',
     'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.២.)',
-    'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.៣.)'
+    'មន្រ្តីសុខាភិបាលមធ្យម (ខ.៣.)'
   ],
   'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលជាន់ខ្ពស់': [
     'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)',
     'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)',
-    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់(ក.៣.)'
+    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ (ខ.៣.)'
   ]
 };
 
@@ -1040,7 +1072,14 @@ const rankClassMapping = {
   'មន្រ្តីសុខាភិបាលបឋម(គ)': [
     'ថ្នាក់លេខ១',
     'ថ្នាក់លេខ២',
-    'ថ្នាក់លេខ៣'
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦',
+    'ថ្នាក់លេខ៧',
+    'ថ្នាក់លេខ៨',
+    'ថ្នាក់លេខ៩',
+    'ថ្នាក់លេខ១០'
   ],
   'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែពិសេស(ខ.១.)': [
     'ថ្នាក់លេខ១',
@@ -1056,7 +1095,7 @@ const rankClassMapping = {
     'ថ្នាក់លេខ៣',
     'ថ្នាក់លេខ៤'
   ],
-  'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.៣.)': [
+  'មន្រ្តីសុខាភិបាលមធ្យម (ខ.៣.)': [
     'ថ្នាក់លេខ១',
     'ថ្នាក់លេខ២',
     'ថ្នាក់លេខ៣',
@@ -1065,16 +1104,34 @@ const rankClassMapping = {
   'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)': [
     'ថ្នាក់លេខ១',
     'ថ្នាក់លេខ២',
-    'ថ្នាក់លេខ៣'
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
   ],
   'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)': [
     'ថ្នាក់លេខ១',
-    'ថ្នាក់លេខ២'
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
   ],
-  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់(ក.៣.)': [
-    'ថ្នាក់លេខ១'
+  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ (ខ.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
   ]
 };
+
+// Dropdown options for document and installation types
+const documentTypes = [
+  'វេនជ្រើសរើស',
+  'សញ្ញាបត ពិសេស',
+  'តាមអតីតភាព',
+  'ប្តូរប្របែង្ក័ណ្ឌ និយ័តកម្មថ្នាក់ មុនសមាហរណកម្មឆ្នាំ២០១៥',
+  'ក្របខណ្ឌថ្មី',
+  'តាំងស៊ប់'
+];
 
 // Computed rank options based on selected framework
 const computedRankGradeOptions = computed(() => {
@@ -1891,6 +1948,35 @@ onMounted(() => {
 .form-field textarea {
   resize: vertical;
   min-height: 80px;
+}
+
+.btn-toggle {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #f3f4f6;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-toggle:hover {
+  border-color: #9ca3af;
+  background-color: #e5e7eb;
+}
+
+.btn-toggle.active {
+  background-color: #10b981;
+  color: white;
+  border-color: #059669;
+}
+
+.btn-toggle.active:hover {
+  background-color: #059669;
+  border-color: #047857;
 }
 
 .dialog-footer {
