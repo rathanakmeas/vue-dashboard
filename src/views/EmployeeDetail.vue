@@ -180,6 +180,9 @@
             <button class="btn-add" @click="addRecord('civilStatus')">
               + បញ្ចូលស្ថានភាពមន្ត្រី
             </button>
+            <button class="btn-edit-blue" @click="editInstallationDate">
+              កែប្រែកាលបរិច្ឆេទតាំងស៊ប់
+            </button>
           </div>
 
           <!-- Data Table -->
@@ -651,12 +654,30 @@
               </select>
             </div>
             <div class="form-field">
-              <label>ថ្ងៃបញ្ចប់</label>
-              <input v-model="formData.endDate" type="date" />
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <select v-model="formData.ministry">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in ministries" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទចាប់ផ្តើម*</label>
+              <input v-model="formData.startDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>បច្ចុប្បន្ន</label>
+              <button class="btn-toggle" :class="{ active: formData.isCurrent }" @click="formData.isCurrent = !formData.isCurrent">
+                <i :class="formData.isCurrent ? 'pi pi-check' : 'pi pi-times'"></i>
+                {{ formData.isCurrent ? 'បាទ' : 'ទេ' }}
+              </button>
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទបញ្ចប់</label>
+              <input v-model="formData.endDate" type="date" :disabled="formData.isCurrent" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.other" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.other" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -706,7 +727,7 @@
               <label>ក្របខ័ណ្ឌ</label>
               <select v-model="formData.framework">
                 <option value="">ជ្រើសរើស</option>
-                <option v-for="option in frameworks" :key="option" :value="option">{{ option }}</option>
+                <option v-for="option in computedFrameworks" :key="option" :value="option">{{ option }}</option>
               </select>
             </div>
             <div class="form-field">
@@ -936,6 +957,37 @@
         </div>
       </div>
     </div>
+
+    <!-- Dialog for Installation Date -->
+    <div v-if="showInstallationDialog" class="dialog-overlay" @click="closeInstallationDialog">
+      <div class="dialog-container" @click.stop style="max-width: 400px;">
+        <div class="dialog-header">
+          <h3>កែប្រែកាលបរិច្ឆេទតាំងស៊ប់</h3>
+          <button class="btn-close" @click="closeInstallationDialog">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+        
+        <div class="dialog-body">
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label>កាលបរិច្ឆេទតាំងស៊ប់</label>
+              <input 
+                v-model="installationDate" 
+                type="datetime-local" 
+                class="datetime-input"
+                :disabled="false"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button class="btn-cancel" @click="closeInstallationDialog">បោះបង់</button>
+          <button class="btn-save" @click="saveInstallationDate">រក្សាទុក</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -955,6 +1007,8 @@ const dialogType = ref('');
 const dialogTitle = ref('');
 const formData = ref({});
 const editIndex = ref(-1);
+const showInstallationDialog = ref(false);
+const installationDate = ref('');
 
 const tabs = [
   { label: 'ស្ថានភាពមន្ត្រី', icon: 'pi pi-check-circle' },
@@ -980,11 +1034,15 @@ const letterTypes = [
   'សេចក្តីប្រកាស',
   'សេចក្តីជូនដំណឹង',
   'សេចក្តីសម្រេចរាជរដ្ឋាភិបាល',
-  'សេចក្តីសម្រេចក្រសួង លិខិតរដ្ឋបាល',
-  'លិខិតសាម៉ីខ្លួន ដីការតុលាការ លិខិតបង្គាប់ការ',
+  'សេចក្តីសម្រេចក្រសួង',
+  'លិខិតរដ្ឋបាល',
+  'លិខិតសាម៉ីខ្លួន',
+  'ដីការតុលាការ',
+  'លិខិតបង្គាប់ការ',
   'លិខិតបញ្ជាក់',
   'សេចក្តីសម្រេចថ្នាក់មូលដ្ឋាន',
-  'កំណែធម្មតា លិខិតឧទ្ទេសនាម'
+  'កំណែធម្មតា',
+  'លិខិតឧទ្ទេសនាម'
 ];
 
 const employeeTypes = [
@@ -999,12 +1057,14 @@ const employeeTypes = [
 const statusOptions = [
   'ថ្នាក់ដឹកនាំ',
   'មន្ត្រី សកម្ម',
-  'មន្ត្រី ផ្ទេរចេញ មន្ត្រី ផ្ទេរចូល',
+  'មន្ត្រី ផ្ទេរចេញ',
+  'មន្ត្រី ផ្ទេរចូល',
   'មន្ត្រី ស្ថិតនៅក្នុងភាពទំនេរគ្មានបៀវត្ស',
   'មន្ត្រី ស្ថិតនៅក្រៅក្របខ័ណ្ឌដើម',
   'មន្ត្រី ជាប់បេសកកម្មក្នុងប្រទេស',
   'មន្ត្រី ជាប់បេសកកម្មក្រៅប្រទេស',
-  'មន្ត្រី ជាប់សិក្សាក្នុងប្រទេស មន្ត្រី ជាប់សិក្សាក្រៅប្រទេស',
+  'មន្ត្រី ជាប់សិក្សាក្នុងប្រទេស',
+  'មន្ត្រី ជាប់សិក្សាក្រៅប្រទេស',
   'មន្ត្រី ស្ថិតក្នុងរយៈពេលកម្មសិក្សា',
   'មន្ត្រី បាត់បង់សម្ថភាពពលកម្ម',
   'មន្ត្រី មានជំងឺរាំរ៉ៃ',
@@ -1017,12 +1077,63 @@ const statusOptions = [
   'មន្ត្រី ស៊ីឈ្មោះគេ',
   'មន្ត្រី ក្រោយពីជំរឿន',
   'មន្ត្រី សកម្មក្រោយពីជំរឿន',
-  'មន្ត្រី ទីប្រឹក្សា មន្ត្រី ជំនួយការ មន្ត្រី បំរើការងារពីរកន្លង',
-  'មន្ត្រី ត្រូវបានប្ដូរអត្តលេខ អត្តលេខលប់',
+  'មន្ត្រី ទីប្រឹក្សា',
+  'មន្ត្រី ជំនួយការ',
+  'មន្ត្រី បំរើការងារពីរកន្លង',
+  'មន្ត្រី ត្រូវបានប្ដូរអត្តលេខ',
+  'អត្តលេខលប់',
   'បម្រុង',
   'និរាករ',
   'មន្ត្រី មិនទាន់បានប្រាក់ឧបត្ថម ចូលនិវត្តន៏',
   'មន្ត្រី រង់ចាំប្រាក់ឧបត្ថម្ភ ចូលនិវត្តន៏'
+];
+
+const ministries = [
+  '1-ក្រសួងកសិកម្ម រុក្ខាប្រមាញ់ និងនេសាទ',
+  '2-ក្រសួងអធិការកិច្ច',
+  '3-អាកាសចរស៊ីវិល',
+  '4-ក្រសួងមុខងារសាធារណៈ',
+  '5-ក្រសួងពាណិជ្ជកម្ម',
+  '6-ទីស្តីការគណៈរដ្ឋមន្ត្រី',
+  '7-ក្រសួងធម្មការ និងសាសនា',
+  '8-ក្រសួងវប្បធម៌ និង វិចិត្រសិល្បៈ',
+  '9-ក្រសួងសេដ្ឋកិច្ច និង ហិរញ្ញវត្ថុ',
+  '10-ក្រសួងអប់រំ យុវជន និង កីឡា',
+  '11-ក្រសួងបរិស្ថាន',
+  '12-ក្រសួងការបរទេស និង សហប្រតិបត្តិការអន្តរជាតិ',
+  '13-ក្រសួងសុខាភិបាល',
+  '14-ក្រសួងឧស្សាហកម្ម វិទ្យាសាស្រ្ត បច្ចេកវិទ្យា និងនវានុវត្តន៍',
+  '15-ក្រសួងព័ត៌មាន',
+  '16-ក្រសួងមហាផ្ទៃ',
+  '17-ក្រសួងយុត្តិធម៌',
+  '18-ក្រសួងការពារជាតិ',
+  '19-ក្រសួងផែនការ',
+  '20-ក្រសួងប្រៃសណ៍យ៍ និងទូរគមនាគមន៍',
+  '21-ក្រសួងសាធារណការ និង ដឹកជញ្ជូន',
+  '22-ក្រសួងព្រះបរមរាជវាំង',
+  '23-ក្រសួងអភិវឌ្ឍន៍ជនបទ',
+  '24-ក្រសួងសង្គមកិច្ច អតីតយុទ្ធជន និងយុវនីតិសម្បទា',
+  '25-ក្រសួងទេសចរណ៍',
+  '26-ក្រសួងរៀបចំដែនដី នគរូបនីយកម្ម និង សំណង់',
+  '27-ក្រសួងធនធានទឹក និង ឧតុនិយម',
+  '28-ក្រសួងកិច្ចការនារី',
+  '29-តុលាការកំពូល',
+  '31-ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ',
+  '32-អង្គភាពប្រឆាំងអំពើពុករលួយ',
+  '33-ក្រសួងរ៉ែ និងថាមពល',
+  '34-សាលាឧទ្ធរណ៍',
+  '37-រដ្ឋលេខាធិការដ្ឋានកិច្ចការព្រំដែន',
+  '7299-រដ្ឋលេខាធិការដ្ឋានមុខងារសាធារណ',
+  '7309-ធនាគាជាតិនៃកម្ពុជា',
+  '7326-ព្រឹទ្ធសភាជាតិ',
+  '7337-រដ្ឋសភាជាតិ',
+  '7346-គណៈកម្មាធិការជាតិរៀបចំការបោះឆ្នោត (គ.ជ.ប)',
+  '7357-អង្គជំនុំជម្រះវិសាមញ្ញក្នុងតុលាការ',
+  '8244-សមាគមន៍នារីមជ្ឈឹម',
+  '8245-សហព័ន្ធសហជីពកម្ពុជា',
+  '8254-ក្រសួងត្រួតពិនិត្យកិច្ចការរដ្ឋ',
+  '9688-ក្រុមប្រឹក្សាអភិវឌ្ឍន៍កម្ពុជា',
+  '10352-អាជ្ញាធរសវនកម្មជាតិ'
 ];
 
 // Dropdown options for rank and grade tab
@@ -1059,7 +1170,20 @@ const rankGradeMapping = {
   'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលជាន់ខ្ពស់': [
     'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)',
     'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)',
-    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ (ខ.៣.)'
+    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ (ក.៣.)'
+  ],
+  'មន្រ្តីបច្ចេកទេសបឋម': [
+    'មន្រ្តីបច្ចេកទេសបឋម(គ)'
+  ],
+  'មន្រ្តីបច្ចេកទេសមធ្យម': [
+    'មន្រ្តីបច្ចេកទេសមធ្យម ដើមខ្សែពិសេស(ខ.១.)',
+    'មន្រ្តីបច្ចេកទេសមធ្យម ដើមខ្សែ(ខ.២.)',
+    'មន្រ្តីបច្ចេកទេសមធ្យម (ខ.៣.)'
+  ],
+  'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់': [
+    'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)',
+    'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)',
+    'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់(ក.៣.)'
   ]
 };
 
@@ -1111,7 +1235,59 @@ const rankClassMapping = {
     'ថ្នាក់លេខ៣',
     'ថ្នាក់លេខ៤'
   ],
-  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ (ខ.៣.)': [
+  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ (ក.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'មន្រ្តីបច្ចេកទេសបឋម(គ)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦',
+    'ថ្នាក់លេខ៧',
+    'ថ្នាក់លេខ៨',
+    'ថ្នាក់លេខ៩',
+    'ថ្នាក់លេខ១០'
+  ],
+  'មន្រ្តីបច្ចេកទេសមធ្យម ដើមខ្សែពិសេស(ខ.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'មន្រ្តីបច្ចេកទេសមធ្យម ដើមខ្សែ(ខ.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'មន្រ្តីបច្ចេកទេសមធ្យម (ខ.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់(ក.៣.)': [
     'ថ្នាក់លេខ១',
     'ថ្នាក់លេខ២',
     'ថ្នាក់លេខ៣',
@@ -1132,11 +1308,15 @@ const documentTypes = [
   'សេចក្តីប្រកាស',
   'សេចក្តីជូនដំណឹង',
   'សេចក្តីសម្រេចរាជរដ្ឋាភិបាល',
-  'សេចក្តីសម្រេចក្រសួង លិខិតរដ្ឋបាល',
-  'លិខិតសាម៉ីខ្លួន ដីការតុលាការ លិខិតបង្គាប់ការ',
+  'សេចក្តីសម្រេចក្រសួង',
+  'លិខិតរដ្ឋបាល',
+  'លិខិតសាម៉ីខ្លួន',
+  'ដីការតុលាការ',
+  'លិខិតបង្គាប់ការ',
   'លិខិតបញ្ជាក់',
   'សេចក្តីសម្រេចថ្នាក់មូលដ្ឋាន',
-  'កំណែធម្មតា លិខិតឧទ្ទេសនាម'
+  'កំណែធម្មតា',
+  'លិខិតឧទ្ទេសនាម'
 ];
 
 // Dropdown options for installation types
@@ -1145,10 +1325,28 @@ const installationTypes = [
   'សញ្ញាបត្រ',
   'ពិសេស',
   'តាមអតីតភាព',
-  'ប្តូរប្របែង្ក័ណ្ឌ និយ័តកម្មថ្នាក់ មុនសមាហរណកម្មឆ្នាំ២០១៥',
+  'ប្តូរប្រភេទក្របខ័ណ្ឌ',
+  'និយ័តកម្មថ្នាក់',
+  'មុនសមាហរណកម្មឆ្នាំ២០១៥',
   'ក្របខណ្ឌថ្មី',
   'តាំងស៊ប់'
 ];
+
+// Computed frameworks based on selected characteristic type
+const computedFrameworks = computed(() => {
+  const characteristicType = formData.value.characteristicType;
+  
+  if (characteristicType === 'បច្ចេកទេស') {
+    return [
+      'មន្រ្តីបច្ចេកទេសបឋម',
+      'មន្រ្តីបច្ចេកទេសមធ្យម',
+      'មន្រ្តីបច្ចេកទេសជាន់ខ្ពស់'
+    ];
+  }
+  
+  // Default frameworks for other characteristic types
+  return frameworks;
+});
 
 // Computed rank options based on selected framework
 const computedRankGradeOptions = computed(() => {
@@ -1224,6 +1422,38 @@ const addRecord = (type) => {
   
   dialogTitle.value = titles[type] || 'បញ្ចូលទិន្នន័យ';
   showDialog.value = true;
+};
+
+const editInstallationDate = () => {
+  // Load current installation date if exists
+  if (employee.value && employee.value.installationDate) {
+    installationDate.value = employee.value.installationDate;
+  } else {
+    installationDate.value = '';
+  }
+  showInstallationDialog.value = true;
+};
+
+const closeInstallationDialog = () => {
+  showInstallationDialog.value = false;
+  installationDate.value = '';
+};
+
+const saveInstallationDate = async () => {
+  try {
+    // Save installation date to employee record
+    const response = await api.put(`/api/employees/${employee.value._id}`, {
+      ...employee.value,
+      installationDate: installationDate.value
+    });
+    
+    employee.value = response.data;
+    closeInstallationDialog();
+    alert('រក្សាទុកកាលបរិច្ឆេទតាំងស៊ប់បានជោគជ័យ');
+  } catch (error) {
+    console.error('Error saving installation date:', error);
+    alert('មានបញ្ហាក្នុងការរក្សាទុក');
+  }
 };
 
 const editRecord = (type, index) => {
@@ -1675,6 +1905,22 @@ onMounted(() => {
   background: #059669;
 }
 
+.btn-edit-blue {
+  padding: 0.625rem 1.25rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-edit-blue:hover {
+  background: #2563eb;
+}
+
 .btn-save {
   padding: 0.625rem 1.5rem;
   background: white;
@@ -1969,6 +2215,14 @@ onMounted(() => {
   color: #9ca3af;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.datetime-input {
+  background-color: white !important;
+  color: #111827 !important;
+  cursor: text !important;
+  opacity: 1 !important;
+  width: 100%;
 }
 
 .form-field textarea {
