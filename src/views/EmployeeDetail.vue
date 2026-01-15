@@ -671,10 +671,6 @@
               <input v-model="formData.startDate" type="date" />
             </div>
             <div class="form-field">
-              <label>កាលបរិច្ឆេទតែងតាំង</label>
-              <input v-model="formData.appointmentDate" type="date" />
-            </div>
-            <div class="form-field">
               <label>បច្ចុប្បន្ន</label>
               <button class="btn-toggle" :class="{ active: formData.isCurrent }" @click="formData.isCurrent = !formData.isCurrent">
                 <i :class="formData.isCurrent ? 'pi pi-check' : 'pi pi-times'"></i>
