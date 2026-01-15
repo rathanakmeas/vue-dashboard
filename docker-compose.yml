@@ -33,7 +33,7 @@ services:
       PORT: 5000
       CORS_ORIGIN: http://localhost:5173
     ports:
-      - "5000:5000"
+      - "5001:5000"
     networks:
       - vue-dashboard-network
     restart: unless-stopped
@@ -48,7 +48,7 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_URL: http://localhost:5000/api
+      VITE_API_URL: http://localhost:5001/api
     ports:
       - "5173:5173"
     networks:

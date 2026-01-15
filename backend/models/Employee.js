@@ -299,15 +299,18 @@ const employeeSchema = new mongoose.Schema({
   }],
   
   // Rank and Grade
-  ranks: [{
-    referenceNo: String,
-    regulationType: String,
+  rankGrades: [{
+    referenceLetterNo: String,
+    characteristicType: String,
     framework: String,
     rankAndGrade: String,
     payScale: String,
     endDate: Date,
-    other: String,
+    remarks: String,
     // Legacy fields
+    referenceNo: String,
+    regulationType: String,
+    other: String,
     rankTitle: String,
     level: String,
     effectiveDate: Date,
@@ -323,40 +326,89 @@ const employeeSchema = new mongoose.Schema({
     equivalentRank: String,
     signatureDate: Date,
     endDate: Date,
+    ministryInstitution: String,
+    remarks: String,
+    // Legacy
     ministry: String,
     other: String
   }],
   
   // Private Sector Experience
   privateSectors: [{
-    organization: String,
+    institution: String,
     role: String,
-    skills: String,
+    skill: String,
     startDate: Date,
     endDate: Date,
+    remarks: String,
+    // Legacy
+    organization: String,
+    skills: String,
     other: String
   }],
   
   // Recognition/Awards
-  recognitions: [{
+  awards: [{
+    referenceLetterNo: String,
+    awardType: String,
+    awardImage: String,
+    date: Date,
+    ministryInstitution: String,
+    remarks: String,
+    // Legacy
     referenceNo: String,
     recognitionType: String,
     imageFile: String,
     imageData: String,
-    date: Date,
     ministry: String,
     other: String
   }],
   
   // Disciplinary Actions
   disciplinaryActions: [{
+    referenceLetterNo: String,
+    actionType: String,
+    actionImage: String,
+    date: Date,
+    ministryInstitution: String,
+    remarks: String,
+    // Legacy
     referenceNo: String,
     disciplinaryType: String,
     imageFile: String,
     imageData: String,
-    date: Date,
     ministry: String,
     other: String
+  }],
+  
+  // Union Information (Array)
+  unionInfo: [{
+    memberNo: String,
+    unionType: String,
+    joinDate: Date,
+    role: String,
+    status: String,
+    remarks: String
+  }],
+  
+  // Cultural Level (Array for education levels)
+  culturalLevels: [{
+    level: String, // កម្រិតវប្បធម៌
+    graduationYear: String,
+    institution: String,
+    major: String,
+    certificate: String,
+    remarks: String
+  }],
+  
+  // Related Documents
+  relatedDocuments: [{
+    documentName: String,
+    documentType: String,
+    documentNo: String,
+    date: Date,
+    attachment: String,
+    remarks: String
   }],
   
   certifications: [{

@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 
 # Build with API URL pointing to localhost (as browser will access it)
-ENV VITE_API_URL=http://localhost:5000/api
+ENV VITE_API_URL=http://localhost:5001/api
 RUN npm run build
 
 # Production stage

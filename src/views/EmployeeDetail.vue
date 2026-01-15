@@ -208,8 +208,11 @@
                   <td>{{ formatDateKH(item.endDate) || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('civilStatus', i)">
+                    <button class="action-btn" @click="editRecord('civilStatus', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('civilStatus', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -253,8 +256,11 @@
                   <td>{{ formatDateKH(item.endDate) || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('rankGrade', i)">
+                    <button class="action-btn" @click="editRecord('rankGrade', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('rankGrade', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -298,8 +304,11 @@
                   <td>{{ item.ministryInstitution || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('position', i)">
+                    <button class="action-btn" @click="editRecord('position', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('position', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -341,8 +350,11 @@
                   <td>{{ formatDateKH(item.endDate) || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('privateSector', i)">
+                    <button class="action-btn" @click="editRecord('privateSector', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('privateSector', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -387,8 +399,11 @@
                   <td>{{ item.ministryInstitution || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('award', i)">
+                    <button class="action-btn" @click="editRecord('award', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('award', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -433,8 +448,11 @@
                   <td>{{ item.ministryInstitution || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('disciplinary', i)">
+                    <button class="action-btn" @click="editRecord('disciplinary', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('disciplinary', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -476,8 +494,11 @@
                   <td>{{ item.status || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('union', i)">
+                    <button class="action-btn" @click="editRecord('union', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('union', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -519,8 +540,11 @@
                   <td>{{ item.certificate || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('cultural', i)">
+                    <button class="action-btn" @click="editRecord('cultural', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('cultural', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -567,8 +591,11 @@
                   </td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
-                    <button class="action-btn" @click="editRecord('document', i)">
+                    <button class="action-btn" @click="editRecord('document', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteRecord('document', i)" title="លុប">
+                      <i class="pi pi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -584,6 +611,303 @@
       <p>មិនអាចរកឃើញបុគ្គលិក</p>
       <router-link to="/employees" class="btn-back">ត្រឡប់ក្រោយ</router-link>
     </div>
+
+    <!-- Dialog for Adding/Editing Records -->
+    <div v-if="showDialog" class="dialog-overlay" @click="closeDialog">
+      <div class="dialog-container" @click.stop>
+        <div class="dialog-header">
+          <h3>{{ dialogTitle }}</h3>
+          <button class="btn-close" @click="closeDialog">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+        
+        <div class="dialog-body">
+          <!-- Civil Status Form -->
+          <div v-if="dialogType === 'civilStatus'" class="form-grid">
+            <div class="form-field">
+              <label>លេខលិខិត</label>
+              <input v-model="formData.letterNo" type="text" placeholder="លេខលិខិត" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទលិខិត</label>
+              <select v-model="formData.letterType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in letterTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទមន្ត្រី</label>
+              <select v-model="formData.employeeType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in employeeTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ស្ថានភាព</label>
+              <select v-model="formData.status">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in statusOptions" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ថ្ងៃបញ្ចប់</label>
+              <input v-model="formData.endDate" type="date" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.other" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Rank and Grade Form -->
+          <div v-if="dialogType === 'rankGrade'" class="form-grid">
+            <div class="form-field">
+              <label>លេខលិខិតយោង</label>
+              <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទលក្ខន្តិកៈ</label>
+              <select v-model="formData.characteristicType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in characteristicTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ក្របខ័ណ្ឌ</label>
+              <select v-model="formData.framework">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in frameworks" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ឋានន្តរស័ក្តិ និងថ្នាក់</label>
+              <select v-model="formData.rankAndGrade">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in rankGradeOptions" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>PayScale</label>
+              <input v-model="formData.payScale" type="text" placeholder="PayScale" />
+            </div>
+            <div class="form-field">
+              <label>ថ្ងៃខែឆ្នាំបញ្ចប់</label>
+              <input v-model="formData.endDate" type="date" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Position Form -->
+          <div v-if="dialogType === 'position'" class="form-grid">
+            <div class="form-field">
+              <label>លេខលិខិត</label>
+              <input v-model="formData.letterNo" type="text" placeholder="លេខលិខិត" />
+            </div>
+            <div class="form-field">
+              <label>មុខតំណែង</label>
+              <input v-model="formData.position" type="text" placeholder="មុខតំណែង" />
+            </div>
+            <div class="form-field">
+              <label>ឋានៈស្មើ</label>
+              <input v-model="formData.equivalentRank" type="text" placeholder="ឋានៈស្មើ" />
+            </div>
+            <div class="form-field">
+              <label>ថ្ងៃចុះហត្ថលេខា</label>
+              <input v-model="formData.signatureDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>ថ្ងៃបញ្ចប់</label>
+              <input v-model="formData.endDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Private Sector Form -->
+          <div v-if="dialogType === 'privateSector'" class="form-grid">
+            <div class="form-field">
+              <label>គ្រឹះស្ថាន-អង្គភាព</label>
+              <input v-model="formData.institution" type="text" placeholder="គ្រឹះស្ថាន-អង្គភាព" />
+            </div>
+            <div class="form-field">
+              <label>តួនាទី</label>
+              <input v-model="formData.role" type="text" placeholder="តួនាទី" />
+            </div>
+            <div class="form-field">
+              <label>ជំនាញ/បច្ចេកទេស</label>
+              <input v-model="formData.skill" type="text" placeholder="ជំនាញ/បច្ចេកទេស" />
+            </div>
+            <div class="form-field">
+              <label>ថ្ងៃចូលបម្រើការងារ</label>
+              <input v-model="formData.startDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>ថ្ងៃបញ្ចប់ការងារ</label>
+              <input v-model="formData.endDate" type="date" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Award Form -->
+          <div v-if="dialogType === 'award'" class="form-grid">
+            <div class="form-field">
+              <label>លេខលិខិតយោង</label>
+              <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទការលើកសរសើរ</label>
+              <input v-model="formData.awardType" type="text" placeholder="ប្រភេទការលើកសរសើរ" />
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទ</label>
+              <input v-model="formData.date" type="date" />
+            </div>
+            <div class="form-field">
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
+            </div>
+            <div class="form-field full-width">
+              <label>រូបភាពលើកសរសើរ (URL)</label>
+              <input v-model="formData.awardImage" type="text" placeholder="URL រូបភាព" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Disciplinary Action Form -->
+          <div v-if="dialogType === 'disciplinary'" class="form-grid">
+            <div class="form-field">
+              <label>លេខលិខិតយោង</label>
+              <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទការដាក់ពិន័យ</label>
+              <input v-model="formData.actionType" type="text" placeholder="ប្រភេទការដាក់ពិន័យ" />
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទ</label>
+              <input v-model="formData.date" type="date" />
+            </div>
+            <div class="form-field">
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
+            </div>
+            <div class="form-field full-width">
+              <label>រូបភាពការដាក់ពិន័យ (URL)</label>
+              <input v-model="formData.actionImage" type="text" placeholder="URL រូបភាព" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Union Info Form -->
+          <div v-if="dialogType === 'union'" class="form-grid">
+            <div class="form-field">
+              <label>លេខសមាជិក</label>
+              <input v-model="formData.memberNo" type="text" placeholder="លេខសមាជិក" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទសហព័ទ្ធ</label>
+              <input v-model="formData.unionType" type="text" placeholder="ប្រភេទសហព័ទ្ធ" />
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទចូលរួម</label>
+              <input v-model="formData.joinDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>តួនាទី</label>
+              <input v-model="formData.role" type="text" placeholder="តួនាទី" />
+            </div>
+            <div class="form-field">
+              <label>ស្ថានភាព</label>
+              <input v-model="formData.status" type="text" placeholder="ស្ថានភាព" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Cultural Level Form -->
+          <div v-if="dialogType === 'cultural'" class="form-grid">
+            <div class="form-field">
+              <label>កម្រិតវប្បធម៌</label>
+              <input v-model="formData.level" type="text" placeholder="កម្រិតវប្បធម៌" />
+            </div>
+            <div class="form-field">
+              <label>ឆ្នាំបញ្ចប់</label>
+              <input v-model="formData.graduationYear" type="text" placeholder="ឆ្នាំបញ្ចប់" />
+            </div>
+            <div class="form-field">
+              <label>សាលារៀន/ស្ថាប័ន</label>
+              <input v-model="formData.institution" type="text" placeholder="សាលារៀន/ស្ថាប័ន" />
+            </div>
+            <div class="form-field">
+              <label>ជំនាញ</label>
+              <input v-model="formData.major" type="text" placeholder="ជំនាញ" />
+            </div>
+            <div class="form-field">
+              <label>សញ្ញាបត្រ</label>
+              <input v-model="formData.certificate" type="text" placeholder="សញ្ញាបត្រ" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Related Document Form -->
+          <div v-if="dialogType === 'document'" class="form-grid">
+            <div class="form-field">
+              <label>ឈ្មោះឯកសារ</label>
+              <input v-model="formData.documentName" type="text" placeholder="ឈ្មោះឯកសារ" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទឯកសារ</label>
+              <input v-model="formData.documentType" type="text" placeholder="ប្រភេទឯកសារ" />
+            </div>
+            <div class="form-field">
+              <label>លេខឯកសារ</label>
+              <input v-model="formData.documentNo" type="text" placeholder="លេខឯកសារ" />
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទ</label>
+              <input v-model="formData.date" type="date" />
+            </div>
+            <div class="form-field full-width">
+              <label>ឯកសារភ្ជាប់ (URL)</label>
+              <input v-model="formData.attachment" type="text" placeholder="URL ឯកសារ" />
+            </div>
+            <div class="form-field full-width">
+              <label>ផ្សេងៗ</label>
+              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button class="btn-cancel" @click="closeDialog">បោះបង់</button>
+          <button class="btn-save" @click="saveRecord">រក្សាទុក</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -598,6 +922,11 @@ const router = useRouter();
 const employee = ref(null);
 const loading = ref(true);
 const activeTab = ref(0);
+const showDialog = ref(false);
+const dialogType = ref('');
+const dialogTitle = ref('');
+const formData = ref({});
+const editIndex = ref(-1);
 
 const tabs = [
   { label: 'ស្ថានភាពមន្ត្រី', icon: 'pi pi-check-circle' },
@@ -610,6 +939,154 @@ const tabs = [
   { label: 'កម្រិតវប្បធម៌', icon: 'pi pi-book' },
   { label: 'ឯកសារពាក់ព័ន្ធ', icon: 'pi pi-file' }
 ];
+
+// Dropdown options for civil status tab
+const letterTypes = [
+  'ព្រះរាជក្រម',
+  'ព្រះរាជក្រឹត្យ',
+  'អនុក្រឹត្យ',
+  'ប្រកាស',
+  'ដីកា',
+  'សារាចរ',
+  'សារាចរណែនាំ',
+  'សេចក្តីប្រកាស',
+  'សេចក្តីជូនដំណឹង',
+  'សេចក្តីសម្រេចរាជរដ្ឋាភិបាល',
+  'សេចក្តីសម្រេចក្រសួង លិខិតរដ្ឋបាល',
+  'លិខិតសាម៉ីខ្លួន ដីការតុលាការ លិខិតបង្គាប់ការ',
+  'លិខិតបញ្ជាក់',
+  'សេចក្តីសម្រេចថ្នាក់មូលដ្ឋាន',
+  'កំណែធម្មតា លិខិតឧទ្ទេសនាម'
+];
+
+const employeeTypes = [
+  'មន្ត្រីពេញសិទ្ធ/មន្ត្រី',
+  'ក្របខណ្ឌ មន្ត្រីកិច្ចសន្យា',
+  'មន្ត្រីកម្មសិក្សា',
+  'គ្មានក្របខណ្ឌ',
+  'និវត្តជន',
+  'ទីប្រឹក្សាបច្ចេកទេស'
+];
+
+const statusOptions = [
+  'ថ្នាក់ដឹកនាំ',
+  'មន្ត្រី សកម្ម',
+  'មន្ត្រី ផ្ទេរចេញ មន្ត្រី ផ្ទេរចូល',
+  'មន្ត្រី ស្ថិតនៅក្នុងភាពទំនេរគ្មានបៀវត្ស',
+  'មន្ត្រី ស្ថិតនៅក្រៅក្របខ័ណ្ឌដើម',
+  'មន្ត្រី ជាប់បេសកកម្មក្នុងប្រទេស',
+  'មន្ត្រី ជាប់បេសកកម្មក្រៅប្រទេស',
+  'មន្ត្រី ជាប់សិក្សាក្នុងប្រទេស មន្ត្រី ជាប់សិក្សាក្រៅប្រទេស',
+  'មន្ត្រី ស្ថិតក្នុងរយៈពេលកម្មសិក្សា',
+  'មន្ត្រី បាត់បង់សម្ថភាពពលកម្ម',
+  'មន្ត្រី មានជំងឺរាំរ៉ៃ',
+  'មន្ត្រី ដល់អាយុចូលនិវត្តន្តិ និង ចូលនិវត្តន៏',
+  'មន្ត្រី ស្លាប់',
+  'មន្ត្រី ជាប់ទណ្ឌកម្មដោយសាលក្រម ឬ សាលដីកា',
+  'មន្ត្រី បោះបង់ចោលការងារ',
+  'មន្ត្រី សុំលាឈប់ពីការងារ',
+  'មន្ត្រី ត្រូវបានលប់ឈ្មោះ',
+  'មន្ត្រី ស៊ីឈ្មោះគេ',
+  'មន្ត្រី ក្រោយពីជំរឿន',
+  'មន្ត្រី សកម្មក្រោយពីជំរឿន',
+  'មន្ត្រី ទីប្រឹក្សា មន្ត្រី ជំនួយការ មន្ត្រី បំរើការងារពីរកន្លង',
+  'មន្ត្រី ត្រូវបានប្ដូរអត្តលេខ អត្តលេខលប់',
+  'បម្រុង',
+  'និរាករ',
+  'មន្ត្រី មិនទាន់បានប្រាក់ឧបត្ថម ចូលនិវត្តន៏',
+  'មន្ត្រី រង់ចាំប្រាក់ឧបត្ថម្ភ ចូលនិវត្តន៏'
+];
+
+// Dropdown options for rank and grade tab
+const characteristicTypes = [
+  'រដ្ឋបាលទូទៅ',
+  'ក្រសួងមហាផ្ទៃ',
+  'ការទូត',
+  'អប់រំ',
+  'សុខាភិបាល',
+  'បច្ចេកទេស',
+  'លក្ខន្តិកៈដោយឡែកនៃក្របខណ្ឌមន្រ្តីរាជការនៃ គ.ជ.ប',
+  'លក្ខន្តិកៈដោយឡែកនៃក្របខណ្ឌ ចៅក្រម និងព្រះរាជអាជ្ញា',
+  'លក្ខន្តិកៈដោយឡែកនៃក្របខណ្ឌមន្រ្តីពន្ធនាគារ ក្រសួងមហផ្ទៃ',
+  'លក្ខន្តិកៈដោយឡែកនៃក្របខណ្ឌមន្រ្តីនគរបាលជាតិ ក្រសួងមហផ្ទៃ',
+  'លក្ខន្តិកៈទូទៅចំពោះយោធិននៃកងយោធពលខេមរភូមិន្ទ'
+];
+
+const frameworks = [
+  'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលបឋម',
+  'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលមធ្យម',
+  'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលជាន់ខ្ពស់'
+];
+
+// Mapping of framework to rank options
+const rankGradeMapping = {
+  'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលបឋម': [
+    'មន្រ្តីសុខាភិបាលបឋម(គ)'
+  ],
+  'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលមធ្យម': [
+    'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែពិសេស(ខ.១.)',
+    'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.២.)',
+    'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.៣.)'
+  ],
+  'ក្របខ័ណ្ឌមន្រ្តីសុខាភិបាលជាន់ខ្ពស់': [
+    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)',
+    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)',
+    'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់(ក.៣.)'
+  ]
+};
+
+// Mapping of rank to class options
+const rankClassMapping = {
+  'មន្រ្តីសុខាភិបាលបឋម(គ)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣'
+  ],
+  'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែពិសេស(ខ.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'មន្រ្តីសុខាភិបាលមធ្យម ដើមខ្សែ(ខ.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែពិសេស(ក.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣'
+  ],
+  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់ ដើមខ្សែ(ក.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២'
+  ],
+  'មន្រ្តីសុខាភិបាលជាន់ខ្ពស់(ក.៣.)': [
+    'ថ្នាក់លេខ១'
+  ]
+};
+
+// Computed rank options based on selected framework
+const computedRankGradeOptions = computed(() => {
+  const framework = formData.value.framework;
+  return rankGradeMapping[framework] || [];
+});
+
+// Computed rank class options based on selected rankAndGrade
+const computedRankClassOptions = computed(() => {
+  const rankGrade = formData.value.rankAndGrade;
+  return rankClassMapping[rankGrade] || [];
+});
 
 
 const fetchEmployee = async () => {
@@ -655,11 +1132,149 @@ const openPhotoDialog = () => {
 };
 
 const addRecord = (type) => {
-  console.log('Add record:', type);
+  dialogType.value = type;
+  editIndex.value = -1;
+  formData.value = {};
+  
+  const titles = {
+    civilStatus: 'បញ្ចូលស្ថានភាពមន្ត្រី',
+    rankGrade: 'បញ្ចូលឋានន្តរស័ក្តិ និងថ្នាក់',
+    position: 'បញ្ចូលមុខតំណែង',
+    privateSector: 'បញ្ចូលវិស័យឯកជន',
+    award: 'បញ្ចូលការលើកសរសើរ',
+    disciplinary: 'បញ្ចូលការដាក់ពិន័យ',
+    union: 'បញ្ចូលព័ត៌មានសហព័ទ្ធ',
+    cultural: 'បញ្ចូលកម្រិតវប្បធម៌',
+    document: 'បញ្ចូលឯកសារពាក់ព័ន្ធ'
+  };
+  
+  dialogTitle.value = titles[type] || 'បញ្ចូលទិន្នន័យ';
+  showDialog.value = true;
 };
 
 const editRecord = (type, index) => {
-  console.log('Edit record:', type, index);
+  dialogType.value = type;
+  editIndex.value = index;
+  
+  const fieldMap = {
+    civilStatus: 'civilStatuses',
+    rankGrade: 'rankGrades',
+    position: 'positions',
+    privateSector: 'privateSectors',
+    award: 'awards',
+    disciplinary: 'disciplinaryActions',
+    union: 'unionInfo',
+    cultural: 'culturalLevels',
+    document: 'relatedDocuments'
+  };
+  
+  const fieldName = fieldMap[type];
+  const records = employee.value[fieldName] || [];
+  
+  if (records[index]) {
+    formData.value = { ...records[index] };
+  }
+  
+  const titles = {
+    civilStatus: 'កែសម្រួលស្ថានភាពមន្ត្រី',
+    rankGrade: 'កែសម្រួលឋានន្តរស័ក្តិ និងថ្នាក់',
+    position: 'កែសម្រួលមុខតំណែង',
+    privateSector: 'កែសម្រួលវិស័យឯកជន',
+    award: 'កែសម្រួលការលើកសរសើរ',
+    disciplinary: 'កែសម្រួលការដាក់ពិន័យ',
+    union: 'កែសម្រួលព័ត៌មានសហព័ទ្ធ',
+    cultural: 'កែសម្រួលកម្រិតវប្បធម៌',
+    document: 'កែសម្រួលឯកសារពាក់ព័ន្ធ'
+  };
+  
+  dialogTitle.value = titles[type] || 'កែសម្រួលទិន្នន័យ';
+  showDialog.value = true;
+};
+
+const closeDialog = () => {
+  showDialog.value = false;
+  formData.value = {};
+  editIndex.value = -1;
+};
+
+const saveRecord = async () => {
+  try {
+    const fieldMap = {
+      civilStatus: 'civilStatuses',
+      rankGrade: 'rankGrades',
+      position: 'positions',
+      privateSector: 'privateSectors',
+      award: 'awards',
+      disciplinary: 'disciplinaryActions',
+      union: 'unionInfo',
+      cultural: 'culturalLevels',
+      document: 'relatedDocuments'
+    };
+    
+    const fieldName = fieldMap[dialogType.value];
+    
+    if (!employee.value[fieldName]) {
+      employee.value[fieldName] = [];
+    }
+    
+    if (editIndex.value >= 0) {
+      // Update existing record
+      employee.value[fieldName][editIndex.value] = { ...formData.value };
+    } else {
+      // Add new record
+      employee.value[fieldName].push({ ...formData.value });
+    }
+    
+    // Save to backend
+    await api.put(`/employees/${route.params.id}`, {
+      [fieldName]: employee.value[fieldName]
+    });
+    
+    closeDialog();
+    
+    // Refresh employee data
+    await fetchEmployee();
+  } catch (error) {
+    console.error('Failed to save record:', error);
+    alert('មិនអាចរក្សាទុកទិន្នន័យបានទេ: ' + (error.response?.data?.message || error.message));
+  }
+};
+
+const deleteRecord = async (type, index) => {
+  if (!confirm('តើអ្នកប្រាកដថាចង់លុបទិន្នន័យនេះទេ?')) {
+    return;
+  }
+  
+  try {
+    const fieldMap = {
+      civilStatus: 'civilStatuses',
+      rankGrade: 'rankGrades',
+      position: 'positions',
+      privateSector: 'privateSectors',
+      award: 'awards',
+      disciplinary: 'disciplinaryActions',
+      union: 'unionInfo',
+      cultural: 'culturalLevels',
+      document: 'relatedDocuments'
+    };
+    
+    const fieldName = fieldMap[type];
+    
+    if (employee.value[fieldName]) {
+      employee.value[fieldName].splice(index, 1);
+      
+      // Save to backend
+      await api.put(`/employees/${route.params.id}`, {
+        [fieldName]: employee.value[fieldName]
+      });
+      
+      // Refresh employee data
+      await fetchEmployee();
+    }
+  } catch (error) {
+    console.error('Failed to delete record:', error);
+    alert('មិនអាចលុបទិន្នន័យបានទេ: ' + (error.response?.data?.message || error.message));
+  }
 };
 
 const saveInfo = () => {
@@ -1071,6 +1686,15 @@ onMounted(() => {
   color: #4f46e5;
 }
 
+.action-btn.delete {
+  color: #ef4444;
+}
+
+.action-btn.delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
 .table-image {
   width: 60px;
   height: 60px;
@@ -1154,6 +1778,168 @@ onMounted(() => {
 
   .tab-bar {
     overflow-x: scroll;
+  }
+}
+
+/* Dialog Styles */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.dialog-container {
+  background: white;
+  border-radius: 0.5rem;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.dialog-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: 'Khmer OS Siemreap', 'Segoe UI', sans-serif;
+  transition: all 0.2s;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: 'Khmer OS Siemreap', 'Segoe UI', sans-serif;
+}
+
+.btn-cancel {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-cancel:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-save {
+  background: #6366f1;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #4f46e5;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dialog-container {
+    max-height: 95vh;
   }
 }
 </style>

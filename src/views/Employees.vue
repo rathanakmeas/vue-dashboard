@@ -1595,6 +1595,206 @@
             </div>
           </div>
 
+          <!-- Tab 6: Work/Official Information -->
+          <div v-show="activeIconTab === 5" class="tab-content">
+            <!-- Position and Rank Block -->
+            <div class="form-block">
+              <div class="form-section-header">
+                <i class="pi pi-briefcase"></i>
+                <h4>ព័ត៌មានការងារ និងឋានៈ</h4>
+              </div>
+
+              <!-- Employment Basic Info -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label>លេខមន្រ្តីរាជការ <span class="required">*</span></label>
+                  <input v-model="formData.civilServantId" type="text" placeholder="លេខមន្រ្តីរាជការ" />
+                </div>
+                <div class="form-group">
+                  <label>ថ្ងៃចូលបម្រើការងារ</label>
+                  <input v-model="formData.startWorkDate" type="date" />
+                </div>
+                <div class="form-group">
+                  <label>ថ្ងៃតែងតាំង</label>
+                  <input v-model="formData.appointmentDate" type="date" />
+                </div>
+              </div>
+
+              <!-- Position Information -->
+              <div class="form-block general-info-block">
+                <div class="form-section-header">
+                  <i class="pi pi-sitemap"></i>
+                  <h4>ឋានន្តរស័ក្តិ (Position)</h4>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ឋានន្តរស័ក្តិបច្ចុប្បន្ន <span class="required">*</span></label>
+                    <select v-model="formData.position">
+                      <option value="">ជ្រើសរើស</option>
+                      <option value="អនុរដ្ឋលេខាធិការ">អនុរដ្ឋលេខាធិការ</option>
+                      <option value="អគ្គនាយក">អគ្គនាយក</option>
+                      <option value="អគ្គនាយករង">អគ្គនាយករង</option>
+                      <option value="អគ្គប្រធាន">អគ្គប្រធាន</option>
+                      <option value="អគ្គប្រធានរង">អគ្គប្រធានរង</option>
+                      <option value="នាយក">នាយក</option>
+                      <option value="នាយករង">នាយករង</option>
+                      <option value="ប្រធាន">ប្រធាន</option>
+                      <option value="ប្រធានរង">ប្រធានរង</option>
+                      <option value="ប្រធានការិយាល័យ">ប្រធានការិយាល័យ</option>
+                      <option value="អនុប្រធានការិយាល័យ">អនុប្រធានការិយាល័យ</option>
+                      <option value="ប្រធានផ្នែក">ប្រធានផ្នែក</option>
+                      <option value="អនុប្រធានផ្នែក">អនុប្រធានផ្នែក</option>
+                      <option value="ប្រធានកុម្មង">ប្រធានកុម្មង</option>
+                      <option value="អនុប្រធានកុម្មង">អនុប្រធានកុម្មង</option>
+                      <option value="អ្នកឯកទេស">អ្នកឯកទេស</option>
+                      <option value="អ្នកជំនាញ">អ្នកជំនាញ</option>
+                      <option value="អនុប្រធានក្រុម">អនុប្រធានក្រុម</option>
+                      <option value="មន្រ្តីបច្ចេកទេស">មន្រ្តីបច្ចេកទេស</option>
+                      <option value="មន្រ្តីរដ្ឋបាល">មន្រ្តីរដ្ឋបាល</option>
+                      <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ក្រសួង/ស្ថាប័ន</label>
+                    <input v-model="formData.ministry" type="text" placeholder="ក្រសួង/ស្ថាប័ន" />
+                  </div>
+                  <div class="form-group">
+                    <label>នាយកដ្ឋាន/អង្គភាព</label>
+                    <input v-model="formData.department" type="text" placeholder="នាយកដ្ឋាន/អង្គភាព" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>លេខអនុក្រឹត្យ/សេចក្តីសម្រេចតែងតាំង</label>
+                    <input v-model="formData.appointmentLetterNo" type="text" placeholder="លេខអនុក្រឹត្យ/សេចក្តីសម្រេច" />
+                  </div>
+                  <div class="form-group">
+                    <label>ថ្ងៃចុះហត្ថលេខា</label>
+                    <input v-model="formData.appointmentSignatureDate" type="date" />
+                  </div>
+                  <div class="form-group">
+                    <label>ថ្ងៃផុតកំណត់</label>
+                    <input v-model="formData.appointmentEndDate" type="date" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rank and Grade Information -->
+              <div class="form-block general-info-block">
+                <div class="form-section-header">
+                  <i class="pi pi-star"></i>
+                  <h4>ថ្នាក់និងជំហាន (Rank and Grade)</h4>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>ថ្នាក់និងជំហាន <span class="required">*</span></label>
+                    <select v-model="formData.rankAndGrade">
+                      <option value="">ជ្រើសរើស</option>
+                      <option value="ថ្នាក់ខ ជំហាន១">ថ្នាក់ខ ជំហាន១</option>
+                      <option value="ថ្នាក់ខ ជំហាន២">ថ្នាក់ខ ជំហាន២</option>
+                      <option value="ថ្នាក់ខ ជំហាន៣">ថ្នាក់ខ ជំហាន៣</option>
+                      <option value="ថ្នាក់ខ ជំហាន៤">ថ្នាក់ខ ជំហាន៤</option>
+                      <option value="ថ្នាក់គ ជំហាន១">ថ្នាក់គ ជំហាន១</option>
+                      <option value="ថ្នាក់គ ជំហាន២">ថ្នាក់គ ជំហាន២</option>
+                      <option value="ថ្នាក់គ ជំហាន៣">ថ្នាក់គ ជំហាន៣</option>
+                      <option value="ថ្នាក់គ ជំហាន៤">ថ្នាក់គ ជំហាន៤</option>
+                      <option value="ថ្នាក់គ ជំហាន៥">ថ្នាក់គ ជំហាន៥</option>
+                      <option value="ថ្នាក់គ ជំហាន៦">ថ្នាក់គ ជំហាន៦</option>
+                      <option value="ថ្នាក់គ ជំហាន៧">ថ្នាក់គ ជំហាន៧</option>
+                      <option value="ថ្នាក់ឃ ជំហាន១">ថ្នាក់ឃ ជំហាន១</option>
+                      <option value="ថ្នាក់ឃ ជំហាន២">ថ្នាក់ឃ ជំហាន២</option>
+                      <option value="ថ្នាក់ឃ ជំហាន៣">ថ្នាក់ឃ ជំហាន៣</option>
+                      <option value="ថ្នាក់ឃ ជំហាន៤">ថ្នាក់ឃ ជំហាន៤</option>
+                      <option value="ថ្នាក់ឃ ជំហាន៥">ថ្នាក់ឃ ជំហាន៥</option>
+                      <option value="ថ្នាក់ឃ ជំហាន៦">ថ្នាក់ឃ ជំហាន៦</option>
+                      <option value="ថ្នាក់ឃ ជំហាន៧">ថ្នាក់ឃ ជំហាន៧</option>
+                      <option value="ថ្នាក់ឃ ជំហាន៨">ថ្នាក់ឃ ជំហាន៨</option>
+                      <option value="ថ្នាក់ង ជំហាន១">ថ្នាក់ង ជំហាន១</option>
+                      <option value="ថ្នាក់ង ជំហាន២">ថ្នាក់ង ជំហាន២</option>
+                      <option value="ថ្នាក់ង ជំហាន៣">ថ្នាក់ង ជំហាន៣</option>
+                      <option value="ថ្នាក់ង ជំហាន៤">ថ្នាក់ង ជំហាន៤</option>
+                      <option value="ថ្នាក់ង ជំហាន៥">ថ្នាក់ង ជំហាន៥</option>
+                      <option value="ថ្នាក់ង ជំហាន៦">ថ្នាក់ង ជំហាន៦</option>
+                      <option value="ថ្នាក់ង ជំហាន៧">ថ្នាក់ង ជំហាន៧</option>
+                      <option value="ថ្នាក់ង ជំហាន៨">ថ្នាក់ង ជំហាន៨</option>
+                      <option value="ថ្នាក់ង ជំហាន៩">ថ្នាក់ង ជំហាន៩</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>មាត្រដ្ឋានប្រាក់ខែ (Pay Scale)</label>
+                    <select v-model="formData.payScale">
+                      <option value="">ជ្រើសរើស</option>
+                      <option value="CC១">CC១</option>
+                      <option value="CC២">CC២</option>
+                      <option value="CC៣">CC៣</option>
+                      <option value="CC៤">CC៤</option>
+                      <option value="CS១">CS១</option>
+                      <option value="CS២">CS២</option>
+                      <option value="CS៣">CS៣</option>
+                      <option value="CS៤">CS៤</option>
+                      <option value="CS៥">CS៥</option>
+                      <option value="CS៦">CS៦</option>
+                      <option value="CS៧">CS៧</option>
+                      <option value="PE១">PE១</option>
+                      <option value="PE២">PE២</option>
+                      <option value="PE៣">PE៣</option>
+                      <option value="PE៤">PE៤</option>
+                      <option value="PE៥">PE៥</option>
+                      <option value="PE៦">PE៦</option>
+                      <option value="PE៧">PE៧</option>
+                      <option value="PE៨">PE៨</option>
+                      <option value="S១">S១</option>
+                      <option value="S២">S២</option>
+                      <option value="S៣">S៣</option>
+                      <option value="S៤">S៤</option>
+                      <option value="S៥">S៥</option>
+                      <option value="S៦">S៦</option>
+                      <option value="S៧">S៧</option>
+                      <option value="S៨">S៨</option>
+                      <option value="S៩">S៩</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ក្របខ័ណ្ឌ (Framework)</label>
+                    <input v-model="formData.framework" type="text" placeholder="ក្របខ័ណ្ឌ" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>លេខយោង</label>
+                    <input v-model="formData.rankReferenceNo" type="text" placeholder="លេខយោង" />
+                  </div>
+                  <div class="form-group">
+                    <label>ប្រភេទបទប្បញ្ញត្តិ</label>
+                    <select v-model="formData.regulationType">
+                      <option value="">ជ្រើសរើស</option>
+                      <option value="អនុក្រឹត្យ">អនុក្រឹត្យ</option>
+                      <option value="សេចក្តីសម្រេច">សេចក្តីសម្រេច</option>
+                      <option value="ប្រកាស">ប្រកាស</option>
+                      <option value="សារាចរ">សារាចរ</option>
+                      <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>ថ្ងៃមានប្រសិទ្ធភាព</label>
+                    <input v-model="formData.rankEffectiveDate" type="date" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group full-width">
+                    <label>កំណត់សម្គាល់</label>
+                    <textarea v-model="formData.civilServantNotes" rows="2" placeholder="កំណត់សម្គាល់"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Form Actions -->
           <div class="form-actions">
             <div class="form-actions-left">
@@ -1840,7 +2040,23 @@ const formData = ref({
   culturalSkills: '',
   educationRecords: [],
   languageRecords: [],
-  culturalRecords: []
+  culturalRecords: [],
+  // Work/Official Information
+  position: '',
+  ministry: '',
+  department: '',
+  appointmentLetterNo: '',
+  appointmentSignatureDate: null,
+  appointmentEndDate: null,
+  rankAndGrade: '',
+  payScale: '',
+  framework: '',
+  rankReferenceNo: '',
+  regulationType: '',
+  rankEffectiveDate: null,
+  startWorkDate: null,
+  appointmentDate: null,
+  civilServantNotes: ''
 });
 
 const iconTabs = [
@@ -1848,7 +2064,8 @@ const iconTabs = [
   { icon: 'pi pi-home', label: 'ព័ត៌មានឪពុកម្តាយ' },
   { icon: 'pi pi-heart', label: 'ព័ត៌មានសហព័ទ្ធ' },
   { icon: 'pi pi-users', label: 'ព័ត៌មានកូន' },
-  { icon: 'pi pi-book', label: 'ព័ត៌មានកម្រិតវប្បធម៌' }
+  { icon: 'pi pi-book', label: 'ព័ត៌មានកម្រិតវប្បធម៌' },
+  { icon: 'pi pi-briefcase', label: 'ព័ត៌មានការងារ' }
 ];
 
 const progressPercentage = computed(() => {
