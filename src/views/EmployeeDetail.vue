@@ -710,17 +710,36 @@
               </select>
             </div>
             <div class="form-field">
-              <label>ប្រភេទលក្ខន្តិកៈ</label>
-              <select v-model="formData.characteristicType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in characteristicTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
-            </div>
-            <div class="form-field">
               <label>ប្រភេទការតម្លើង</label>
               <select v-model="formData.installationType">
                 <option value="">ជ្រើសរើស</option>
                 <option v-for="option in installationTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <select v-model="formData.ministryInstitution">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in ministries" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>អង្គភាពចំណុះ</label>
+              <input v-model="formData.department" type="text" placeholder="អង្គភាពចំណុះ" />
+            </div>
+            <div class="form-field">
+              <label>នាយកដ្ឋាន-អង្គភាព</label>
+              <input v-model="formData.division" type="text" placeholder="នាយកដ្ឋាន-អង្គភាព" />
+            </div>
+            <div class="form-field">
+              <label>ការិយាល័យ-ផ្នែក</label>
+              <input v-model="formData.office" type="text" placeholder="ការិយាល័យ-ផ្នែក" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទលក្ខន្តិកៈ</label>
+              <select v-model="formData.characteristicType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in characteristicTypes" :key="option" :value="option">{{ option }}</option>
               </select>
             </div>
             <div class="form-field">
@@ -745,8 +764,8 @@
               </select>
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -777,8 +796,8 @@
               <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -805,8 +824,8 @@
               <input v-model="formData.endDate" type="date" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -833,8 +852,8 @@
               <input v-model="formData.awardImage" type="text" placeholder="URL រូបភាព" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -861,8 +880,8 @@
               <input v-model="formData.actionImage" type="text" placeholder="URL រូបភាព" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -889,8 +908,8 @@
               <input v-model="formData.status" type="text" placeholder="ស្ថានភាព" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -917,8 +936,8 @@
               <input v-model="formData.certificate" type="text" placeholder="សញ្ញាបត្រ" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
 
@@ -945,8 +964,8 @@
               <input v-model="formData.attachment" type="text" placeholder="URL ឯកសារ" />
             </div>
             <div class="form-field full-width">
-              <label>ផ្សេងៗ</label>
-              <textarea v-model="formData.remarks" placeholder="ផ្សេងៗ" rows="3"></textarea>
+              <label>កំណត់សម្គាល់</label>
+              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
             </div>
           </div>
         </div>
@@ -1190,6 +1209,11 @@ const rankGradeMapping = {
     'វរៈមន្រ្តី(ក.២.)',
     'អនុមន្រ្តី(ក.៣.)'
   ],
+  'មន្រ្តីរដ្ឋបាលជាន់ខ្ពស់': [
+    'ឧត្តមន្រ្តី(ក.១.)',
+    'វរៈមន្រ្តី(ក.២.)',
+    'អនុមន្រ្តី(ក.៣.)'
+  ],
   'មន្រ្តីក្រមការ': [
     'នាយក្រមការ(ខ.១.)',
     'ក្រមការដើមខ្សែ(ខ.២.)',
@@ -1197,6 +1221,29 @@ const rankGradeMapping = {
   ],
   'លេខាធិការរដ្ឋបាល': [
     'លេខាធិការរដ្ឋបាល(គ)'
+  ],
+  'ក្របខ័ណ្ឌគ្រូបង្រៀនកម្រិតឧត្តម': [
+    'គ្រូបង្រៀនកម្រិតឧត្តម ដើមខ្សែពិសេស(ក.១.)',
+    'គ្រូបង្រៀនកម្រិតឧត្តម ដើមខ្សែ(ក.២.)',
+    'គ្រូបង្រៀនកម្រិតឧត្តម(ក.៣.)'
+  ],
+  'ក្របខ័ណ្ឌគ្រូបង្រៀនកម្រិតមូលដ្ឋាន': [
+    'គ្រូបង្រៀនកម្រិតមូលដ្ឋាន ដើមខ្សែពិសេស(ខ.១.)',
+    'គ្រូបង្រៀនកម្រិតមូលដ្ឋាន ដើមខ្សែ(ខ.២.)',
+    'គ្រូបង្រៀនកម្រិតមូលដ្ឋាន(ខ.៣.)'
+  ],
+  'ក្របខ័ណ្ឌគ្រូបង្រៀនកម្រិតបឋម': [
+    'គ្រូបង្រៀនកម្រិតបឋម(គ)'
+  ],
+  'មន្រ្តីការទូតជាន់ខ្ពស់': [
+    'ឧត្តមមន្រ្តីការបរទេស(ក.១.)',
+    'វរៈមន្រ្តីការបរទេស(ក.២.)',
+    'អនុមន្រ្តីការបរទេស(ក.៣.)'
+  ],
+  'មន្រ្តីក្រមការបរទេស': [
+    'នាយក្រមការបរទេស(ខ.១.)',
+    'ក្រមការដើមខ្សែការបរទេស(ខ.២.)',
+    'ក្រមការការបរទេស(ខ.៣.)'
   ]
 };
 
@@ -1314,6 +1361,14 @@ const rankClassMapping = {
     'ថ្នាក់លេខ៥',
     'ថ្នាក់លេខ៦'
   ],
+  'ឧត្តមន្រ្តី(ក.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
   'វរៈមន្រ្តី(ក.២.)': [
     'ថ្នាក់លេខ១',
     'ថ្នាក់លេខ២',
@@ -1331,7 +1386,8 @@ const rankClassMapping = {
     'ថ្នាក់លេខ២',
     'ថ្នាក់លេខ៣',
     'ថ្នាក់លេខ៤',
-    'ថ្នាក់លេខ៥'
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
   ],
   'ក្រមការដើមខ្សែ(ខ.២.)': [
     'ថ្នាក់លេខ១',
@@ -1356,12 +1412,103 @@ const rankClassMapping = {
     'ថ្នាក់លេខ៨',
     'ថ្នាក់លេខ៩',
     'ថ្នាក់លេខ១០'
+  ],
+  'គ្រូបង្រៀនកម្រិតឧត្តម ដើមខ្សែពិសេស(ក.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'គ្រូបង្រៀនកម្រិតឧត្តម ដើមខ្សែ(ក.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'គ្រូបង្រៀនកម្រិតឧត្តម(ក.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'គ្រូបង្រៀនកម្រិតមូលដ្ឋាន ដើមខ្សែពិសេស(ខ.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'គ្រូបង្រៀនកម្រិតមូលដ្ឋាន ដើមខ្សែ(ខ.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'គ្រូបង្រៀនកម្រិតមូលដ្ឋាន(ខ.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'គ្រូបង្រៀនកម្រិតបឋម(គ)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦',
+    'ថ្នាក់លេខ៧',
+    'ថ្នាក់លេខ៨',
+    'ថ្នាក់លេខ៩',
+    'ថ្នាក់លេខ១០'
+  ],
+  'ឧត្តមមន្រ្តីការបរទេស(ក.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'វរៈមន្រ្តីការបរទេស(ក.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'អនុមន្រ្តីការបរទេស(ក.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'នាយក្រមការបរទេស(ខ.១.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤',
+    'ថ្នាក់លេខ៥',
+    'ថ្នាក់លេខ៦'
+  ],
+  'ក្រមការដើមខ្សែការបរទេស(ខ.២.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
+  ],
+  'ក្រមការការបរទេស(ខ.៣.)': [
+    'ថ្នាក់លេខ១',
+    'ថ្នាក់លេខ២',
+    'ថ្នាក់លេខ៣',
+    'ថ្នាក់លេខ៤'
   ]
 };
 
 // Dropdown options for document types
 const documentTypes = [
-  'ជ្រើសរើស',
   'ព្រះរាជក្រម',
   'ព្រះរាជក្រឹត្យ',
   'អនុក្រឹត្យ',
@@ -1413,6 +1560,29 @@ const computedFrameworks = computed(() => {
       'មន្រ្តីគ្រប់គ្រងរដ្ឋបាល',
       'មន្រ្តីក្រមការ',
       'លេខាធិការរដ្ឋបាល'
+    ];
+  }
+  
+  if (characteristicType === 'ក្រសួងមហាផ្ទៃ') {
+    return [
+      'មន្រ្តីរដ្ឋបាលជាន់ខ្ពស់',
+      'មន្រ្តីក្រមការ',
+      'លេខាធិការរដ្ឋបាល'
+    ];
+  }
+  
+  if (characteristicType === 'អប់រំ') {
+    return [
+      'ក្របខ័ណ្ឌគ្រូបង្រៀនកម្រិតឧត្តម',
+      'ក្របខ័ណ្ឌគ្រូបង្រៀនកម្រិតមូលដ្ឋាន',
+      'ក្របខ័ណ្ឌគ្រូបង្រៀនកម្រិតបឋម'
+    ];
+  }
+  
+  if (characteristicType === 'ការទូត') {
+    return [
+      'មន្រ្តីការទូតជាន់ខ្ពស់',
+      'មន្រ្តីក្រមការបរទេស'
     ];
   }
   
