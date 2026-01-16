@@ -328,10 +328,15 @@
     <!-- Create/Edit Modal -->
     <transition name="modal">
       <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-        <div class="modal-dialog" style="max-width: 900px;">
+        <div class="modal-dialog">
           <div class="modal-header">
-            <h3>{{ modalMode === 'create' ? 'Create Department' : 'Edit Department' }}</h3>
-            <button @click="closeModal" class="btn-close">&times;</button>
+            <h3>
+              <i class="fas fa-building"></i>
+              {{ modalMode === 'create' ? 'Create Department' : 'Edit Department' }}
+            </h3>
+            <button @click="closeModal" class="btn-close">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="saveDepartment">
@@ -510,10 +515,15 @@
     <!-- View Details Modal -->
     <transition name="modal">
       <div v-if="showDetailsModal" class="modal-overlay" @click.self="showDetailsModal = false">
-        <div class="modal-dialog" style="max-width: 800px;">
+        <div class="modal-dialog">
           <div class="modal-header">
-            <h3>Department Details</h3>
-            <button @click="showDetailsModal = false" class="btn-close">&times;</button>
+            <h3>
+              <i class="fas fa-info-circle"></i>
+              Department Details
+            </h3>
+            <button @click="showDetailsModal = false" class="btn-close">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
           <div class="modal-body" v-if="selectedDepartment">
             <div class="details-grid">
@@ -1330,7 +1340,7 @@ onMounted(() => {
   margin-bottom: 1rem;
 }
 
-/* Modal Styles */
+/* Modal Styles - Right Slide Panel (VS Code Style) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1339,17 +1349,43 @@ onMounted(() => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-end;
   z-index: 1000;
 }
 
 .modal-dialog {
   background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-height: 90vh;
+  width: 600px;
+  max-width: 90vw;
+  height: 100vh;
   overflow-y: auto;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.modal-overlay.modal-leave-active .modal-dialog {
+  animation: slideOutToRight 0.25s ease-in;
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .modal-header {
@@ -1358,31 +1394,103 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  flex-shrink: 0;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: #1a202c;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-header h3 i {
+  font-size: 1.25rem;
 }
 
 .btn-close {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
-  font-size: 2rem;
+  font-size: 1.25rem;
   cursor: pointer;
-  color: #a0aec0;
+  color: white;
   line-height: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.btn-close i {
+  font-size: 1rem;
+}
+
+.btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .modal-body {
   padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar for Modal (VS Code Style) */
+.modal-dialog::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-dialog::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.modal-dialog::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+.modal-dialog::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Vue Transition Classes for Modal */
+.modal-enter-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .modal-dialog {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.modal-leave-active .modal-dialog {
+  animation: slideOutToRight 0.25s ease-in;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1fr;
+  gap: 0;
 }
 
 .form-group {

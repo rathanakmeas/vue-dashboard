@@ -379,27 +379,31 @@
               <thead>
                 <tr>
                   <th>លេខលិខិតយោង</th>
-                  <th>ប្រភេទការលើកសរសើរ</th>
-                  <th>រូបភាពលើកសរសើរ</th>
                   <th>កាលបរិច្ឆេទ</th>
+                  <th>ប្រភេទលិខិត</th>
                   <th>ក្រសួង-ស្ថាប័ន</th>
-                  <th>ផ្សេងៗ</th>
+                  <th>ប្រភេទការលើកសរសើរ</th>
+                  <th>ប្រភេទថ្នាក់</th>
+                  <th>រូបភាពលើកសរសើរ</th>
+                  <th>កំណត់សម្គាល់</th>
                   <th>សកម្មភាព</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!employee.awards || employee.awards.length === 0">
-                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                  <td colspan="9" class="no-data">មិនមានទិន្នន័យ</td>
                 </tr>
                 <tr v-for="(item, i) in employee.awards" :key="i">
                   <td>{{ item.referenceLetterNo || '-' }}</td>
+                  <td>{{ formatDateKH(item.date) || '-' }}</td>
+                  <td>{{ item.documentType || '-' }}</td>
+                  <td>{{ item.ministryInstitution || '-' }}</td>
                   <td>{{ item.awardType || '-' }}</td>
+                  <td>{{ item.awardClass || '-' }}</td>
                   <td>
                     <img v-if="item.awardImage" :src="item.awardImage" alt="Award" class="table-image" />
                     <span v-else>-</span>
                   </td>
-                  <td>{{ formatDateKH(item.date) || '-' }}</td>
-                  <td>{{ item.ministryInstitution || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
                     <button class="action-btn" @click="editRecord('award', i)" title="កែសម្រួល">
@@ -891,24 +895,51 @@
               <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
             </div>
             <div class="form-field">
-              <label>ប្រភេទការលើកសរសើរ</label>
-              <input v-model="formData.awardType" type="text" placeholder="ប្រភេទការលើកសរសើរ" />
-            </div>
-            <div class="form-field">
               <label>កាលបរិច្ឆេទ</label>
               <input v-model="formData.date" type="date" />
             </div>
             <div class="form-field">
-              <label>ក្រសួង-ស្ថាប័ន</label>
-              <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
+              <label>ប្រភេទលិខិត</label>
+              <SearchableSelect 
+                v-model="formData.documentType" 
+                :options="documentTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
-            <div class="form-field full-width">
-              <label>រូបភាពលើកសរសើរ (URL)</label>
-              <input v-model="formData.awardImage" type="text" placeholder="URL រូបភាព" />
+            <div class="form-field">
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <SearchableSelect 
+                v-model="formData.ministryInstitution" 
+                :options="ministries" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទការលើកសរសើរ</label>
+              <SearchableSelect 
+                v-model="formData.awardType" 
+                :options="awardTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទថ្នាក់</label>
+              <SearchableSelect 
+                v-model="formData.awardClass" 
+                :options="awardClasses" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field full-width">
               <label>កំណត់សម្គាល់</label>
               <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
+            </div>
+            <div class="form-field full-width">
+              <label>ឯកសារ</label>
+              <input type="file" @change="handleFileUpload($event, 'awardImage')" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+              <small v-if="formData.awardImage" style="color: #059669; margin-top: 0.5rem; display: block;">
+                <i class="pi pi-check-circle"></i> {{ formData.awardImage }}
+              </small>
             </div>
           </div>
 
@@ -1810,6 +1841,41 @@ const documentTypes = [
   'លិខិតឧទ្ទេសនាម'
 ];
 
+// Award types dropdown options
+const awardTypes = [
+  'មេដាយជាតូបការ',
+  'មេដាយព្រះរាជាណាចក្រកម្ពុជា',
+  'មេដាយឯករាជ្យជាតិ',
+  'មេដាយសម្តេចព្រះមហាក្សត្រីយានីព្រះស៊ីសុវត្ថិមុនីវង្សកុសុមៈនារីរ័ត្ន',
+  'មេដាយរាជសម្បត្តិ',
+  'មេដាយរដ្ឋបាល',
+  'មេដាយអស្សឫទ្ធិ',
+  'មេដាយសេនាធិបតី',
+  'មេដាយការពារជាតិ',
+  'មេដាយសហមេត្រី',
+  'មេដាយសុវត្ថារា',
+  'មេដាយមុនីសារាភ័ណ្ឌ',
+  'មេដាយការងារ',
+  'មេដាយស្ថាបនាជាតិ',
+  'មេដាយខេមរាកីឡារិទ្ធ',
+  'មេដាយស្រីវឌ្ឍនា',
+  'ប័ណ្ណសរសើរ',
+  'ប្រកាសនីយបត្រជ័យលាភី'
+];
+
+// Award class types dropdown options
+const awardClasses = [
+  'មហាសេរីវឌ្ឍន៍',
+  'មហាសេនា',
+  'ធិបឌិន្ទ',
+  'សេនា',
+  'អស្សឫទ្ធិ',
+  'មាស',
+  'ប្រាក់',
+  'សំរឹទ្ធ',
+  'កូវីដ ១៩'
+];
+
 // Dropdown options for installation types
 const installationTypes = [
   'វេនជ្រើសរើស',
@@ -2120,6 +2186,21 @@ const closeDialog = () => {
   showDialog.value = false;
   formData.value = {};
   editIndex.value = -1;
+};
+
+const handleFileUpload = (event, fieldName) => {
+  const file = event.target.files[0];
+  if (file) {
+    // For now, store the filename. In production, upload to server
+    formData.value[fieldName] = file.name;
+    
+    // Optional: Create a preview or upload to server
+    // const reader = new FileReader();
+    // reader.onload = (e) => {
+    //   formData.value[fieldName] = e.target.result;
+    // };
+    // reader.readAsDataURL(file);
+  }
 };
 
 const saveRecord = async () => {
@@ -2722,7 +2803,7 @@ onMounted(() => {
   }
 }
 
-/* Dialog Styles */
+/* Dialog Styles - Right Slide Panel (VS Code Style) */
 .dialog-overlay {
   position: fixed;
   top: 0;
@@ -2731,21 +2812,35 @@ onMounted(() => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-end;
   z-index: 1000;
-  padding: 1rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .dialog-container {
   background: white;
-  border-radius: 0.5rem;
-  max-width: 800px;
-  width: 100%;
-  max-height: 90vh;
+  width: 700px;
+  max-width: 90vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .dialog-header {
@@ -2753,33 +2848,48 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .dialog-header h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #1f2937;
+  color: white;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .btn-close {
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   font-size: 1.25rem;
-  color: #6b7280;
+  color: white;
   cursor: pointer;
-  padding: 0.25rem;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.25rem;
+  border-radius: 6px;
   transition: all 0.2s;
+  padding: 0;
+}
+
+.btn-close i {
+  font-size: 1rem;
 }
 
 .btn-close:hover {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 
 .dialog-body {
@@ -2788,9 +2898,27 @@ onMounted(() => {
   flex: 1;
 }
 
+/* Custom Scrollbar for Dialog (VS Code Style) */
+.dialog-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
@@ -2884,8 +3012,13 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  background: #f9fafb;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .btn-cancel,
