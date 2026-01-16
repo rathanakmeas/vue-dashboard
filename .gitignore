@@ -34,3 +34,11 @@ backend/.env.local
 
 # Docker
 .docker/
+
+# PID files
+.pids/
+*.pid
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
