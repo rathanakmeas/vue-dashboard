@@ -616,8 +616,8 @@
     </div>
 
     <!-- Dialog for Adding/Editing Records -->
-    <div v-if="showDialog" class="dialog-overlay" @click="closeDialog">
-      <div class="dialog-container" @click.stop>
+    <div v-if="showDialog" class="dialog-overlay" @click.self="closeDialog">
+      <div class="dialog-container">
         <div class="dialog-header">
           <h3>{{ dialogTitle }}</h3>
           <button class="btn-close" @click="closeDialog">
@@ -634,31 +634,35 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទលិខិត</label>
-              <select v-model="formData.letterType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in letterTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.letterType" 
+                :options="letterTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ប្រភេទមន្ត្រី</label>
-              <select v-model="formData.employeeType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in employeeTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.employeeType" 
+                :options="employeeTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ស្ថានភាព</label>
-              <select v-model="formData.status">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in statusOptions" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.status" 
+                :options="statusOptions" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ក្រសួង-ស្ថាប័ន</label>
-              <select v-model="formData.ministry">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in ministries" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.ministry" 
+                :options="ministries" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>កាលបរិច្ឆេទចាប់ផ្តើម*</label>
@@ -710,24 +714,27 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទលិខិត</label>
-              <select v-model="formData.documentType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in documentTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.documentType" 
+                :options="documentTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ប្រភេទការតម្លើង</label>
-              <select v-model="formData.installationType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in installationTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.installationType" 
+                :options="installationTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ក្រសួង-ស្ថាប័ន</label>
-              <select v-model="formData.ministryInstitution">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in ministries" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.ministryInstitution" 
+                :options="ministries" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>អង្គភាពចំណុះ</label>
@@ -743,31 +750,35 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទលក្ខន្តិកៈ</label>
-              <select v-model="formData.characteristicType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in characteristicTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.characteristicType" 
+                :options="characteristicTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ក្របខ័ណ្ឌ</label>
-              <select v-model="formData.framework">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in computedFrameworks" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.framework" 
+                :options="computedFrameworks" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ឋានន្តរស័ក្តិ និងថ្នាក់</label>
-              <select v-model="formData.rankAndGrade">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in computedRankGradeOptions" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.rankAndGrade" 
+                :options="computedRankGradeOptions" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field" v-if="computedRankClassOptions.length > 0">
               <label>ថ្នាក់ (PayScale)</label>
-              <select v-model="formData.payScale">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in computedRankClassOptions" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.payScale" 
+                :options="computedRankClassOptions" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field full-width">
               <label>កំណត់សម្គាល់</label>
@@ -783,25 +794,27 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទលិខិត</label>
-              <select v-model="formData.documentType">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in documentTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.documentType" 
+                :options="documentTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ក្រសួង-ស្ថាប័ន</label>
-              <select v-model="formData.ministryInstitution">
-                <option value="">ជ្រើសរើស</option>
-                <option v-for="option in ministries" :key="option" :value="option">{{ option }}</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.ministryInstitution" 
+                :options="ministries" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ប្រភេទស្ថាប័ន</label>
-              <select v-model="formData.institutionType">
-                <option value="">ជ្រើសរើស</option>
-                <option value="ថ្នាក់កណ្តាល">ថ្នាក់កណ្តាល</option>
-                <option value="ថ្នាក់រាជធានី-ខេត្ត">ថ្នាក់រាជធានី-ខេត្ត</option>
-              </select>
+              <SearchableSelect 
+                v-model="formData.institutionType" 
+                :options="['ថ្នាក់កណ្តាល', 'ថ្នាក់រាជធានី-ខេត្ត']" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>មុខតំណែង</label>
@@ -809,57 +822,11 @@
             </div>
             <div class="form-field full-width">
               <label>អង្គភាពចំណុះ</label>
-              <select v-model="formData.department">
-                <option value="">ជ្រើសរើស</option>
-                <template v-if="formData.institutionType === 'ថ្នាក់កណ្តាល'">
-                  <option value="ទីប្រឹក្សា">ទីប្រឹក្សា</option>
-                  <option value="ជំនួយការ">ជំនួយការ</option>
-                  <option value="ខុទ្ទកាល័យរដ្ឋមន្រ្តី">ខុទ្ទកាល័យរដ្ឋមន្រ្តី</option>
-                  <option value="ក្រុមប្រឹក្សាជំនួយការ">ក្រុមប្រឹក្សាជំនួយការ</option>
-                  <option value="អគ្គាធិការដ្ឋាន">អគ្គាធិការដ្ឋាន</option>
-                  <option value="ទីភ្នាក់ងារបញ្ជាក់ចំណាយសេវាសុខាភិបាល">ទីភ្នាក់ងារបញ្ជាក់ចំណាយសេវាសុខាភិបាល</option>
-                  <option value="មជ្ឈមណ្ឌលជាតិ គាំពារមាតា និង ទារក">មជ្ឈមណ្ឌលជាតិ គាំពារមាតា និង ទារក</option>
-                  <option value="មជ្ឈមណ្ឌលជាតិ កំចាត់រោគរបេង និង ហង់សិន">មជ្ឈមណ្ឌលជាតិ កំចាត់រោគរបេង និង ហង់សិន</option>
-                  <option value="មជ្ឈមណ្ឌលជាតិ ផ្តល់ឈាម">មជ្ឈមណ្ឌលជាតិ ផ្តល់ឈាម</option>
-                  <option value="មជ្ឈមណ្ឌលជាតិ ប្រយុទ្ធនិងជំម្ងឺអេដស៏ សើស្បែក និង កាមរោគ">មជ្ឈមណ្ឌលជាតិ ប្រយុទ្ធនិងជំម្ងឺអេដស៏ សើស្បែក និង កាមរោគ</option>
-                  <option value="មជ្ឍមណ្ឌលជាតិ ប្រយុទ្ធនឹងជំងឺគ្រុនចាញ់ ប៉ារ៉ាស៊ីតសាស្ត្រ និងបាណកសាស្ត">មជ្ឍមណ្ឌលជាតិ ប្រយុទ្ធនឹងជំងឺគ្រុនចាញ់ ប៉ារ៉ាស៊ីតសាស្ត្រ និងបាណកសាស្ត</option>
-                  <option value="មជ្ឍមណ្ឌលជាតិលើកកំពស់សុខភាព">មជ្ឍមណ្ឌលជាតិលើកកំពស់សុខភាព</option>
-                  <option value="មជ្ឍមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របូរាណ">មជ្ឍមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របូរាណ</option>
-                  <option value="មន្ទីរពេទ្យ គន្ធបុប្ផា">មន្ទីរពេទ្យ គន្ធបុប្ផា</option>
-                  <option value="មជ្ឈមណ្ឌលជាតិពិសោធន៍សុខាភិបាល">មជ្ឈមណ្ឌលជាតិពិសោធន៍សុខាភិបាល</option>
-                  <option value="មន្ទីរពេទ្យកាលម៉ែត">មន្ទីរពេទ្យកាលម៉ែត</option>
-                  <option value="មន្ទីរពេទ្យមិត្តភាពខ្មែរ-សូវៀត">មន្ទីរពេទ្យមិត្តភាពខ្មែរ-សូវៀត</option>
-                  <option value="មន្ទីរពេទ្យព្រះអង្គឌួង">មន្ទីរពេទ្យព្រះអង្គឌួង</option>
-                  <option value="មន្ទីរពេទ្យមិត្តភាពកម្ពុជា-ចិន ព្រះកុសុមៈ">មន្ទីរពេទ្យមិត្តភាពកម្ពុជា-ចិន ព្រះកុសុមៈ</option>
-                  <option value="មន្ទីរពេទ្យកុមារជាតិ">មន្ទីរពេទ្យកុមារជាតិ</option>
-                  <option value="វិទ្យាស្ថានជាតិ សុខភាពសាធារណៈ">វិទ្យាស្ថានជាតិ សុខភាពសាធារណៈ</option>
-                  <option value="ឃ្លាំងឱសថកណ្តាល">ឃ្លាំងឱសថកណ្តាល</option>
-                  <option value="អគ្គលេខាធិការ">អគ្គលេខាធិការ</option>
-                  <option value="មន្ទីរពេទ្យជ័យវរ្ម័នទី៧">មន្ទីរពេទ្យជ័យវរ្ម័នទី៧</option>
-                  <option value="អគ្គនាយកដ្ឋាន រដ្ឋបាល-ហិរញ្ញវត្ថុ">អគ្គនាយកដ្ឋាន រដ្ឋបាល-ហិរញ្ញវត្ថុ</option>
-                  <option value="អគ្គនាយកដ្ឋាន បច្ចេកទេសសុខាភិបាល">អគ្គនាយកដ្ឋាន បច្ចេកទេសសុខាភិបាល</option>
-                  <option value="អាជ្ញាធរជាតិប្រយុទ្ធនឹងជំងឺអេដស៍">អាជ្ញាធរជាតិប្រយុទ្ធនឹងជំងឺអេដស៍</option>
-                  <option value="ខុទ្ទកាល័យ និងទីប្រឹក្សា">ខុទ្ទកាល័យ និងទីប្រឹក្សា</option>
-                  <option value="អគ្គលេខាធិការដ្ឋាន">អគ្គលេខាធិការដ្ឋាន</option>
-                  <option value="សាកលវិទ្យាល័យ វិទ្យាសាស្ត្រសុខាភិបាល">សាកលវិទ្យាល័យ វិទ្យាសាស្ត្រសុខាភិបាល</option>
-                  <option value="វិទ្យាស្ថាន ប៉ាស្ទ័រ">វិទ្យាស្ថាន ប៉ាស្ទ័រ</option>
-                  <option value="សាលាមធ្យមសិក្សាភូមិភាគ">សាលាមធ្យមសិក្សាភូមិភាគ</option>
-                  <option value="ថ្នាក់ដឹកនាំ">ថ្នាក់ដឹកនាំ</option>
-                  <option value="មន្ទីរពេទ្យព្រះសីហនុ មណ្ឌលនៃក្តីសង្ឃឹម">មន្ទីរពេទ្យព្រះសីហនុ មណ្ឌលនៃក្តីសង្ឃឹម</option>
-                  <option value="មន្ទីរពេទ្យជាតិ តេជោសន្តិភាព">មន្ទីរពេទ្យជាតិ តេជោសន្តិភាព</option>
-                  <option value="មន្ទីរពេទ្យ ហ្លួង ម៉ែ">មន្ទីរពេទ្យ ហ្លួង ម៉ែ</option>
-                </template>
-                <template v-if="formData.institutionType === 'ថ្នាក់រាជធានី-ខេត្ត'">
-                  <option value="មន្ទីរសុខាភិបាលខេត្ត">មន្ទីរសុខាភិបាលខេត្ត</option>
-                  <option value="ការិយាល័យ រដ្ឋបាល និងបុគ្គលិក">ការិយាល័យ រដ្ឋបាល និងបុគ្គលិក</option>
-                  <option value="ការិយាល័យ គណនេយ្យ និងហិរញ្ញវត្ថុ">ការិយាល័យ គណនេយ្យ និងហិរញ្ញវត្ថុ</option>
-                  <option value="ការិយាល័យ គ្រប់គ្រងឱសថ សុវត្ថិភាពចំណីអារហារ">ការិយាល័យ គ្រប់គ្រងឱសថ សុវត្ថិភាពចំណីអារហារ</option>
-                  <option value="ការិយាល័យ បច្ចេកទេស">ការិយាល័យ បច្ចេកទេស</option>
-                  <option value="មន្ទីរពេទ្យខេត្ត">មន្ទីរពេទ្យខេត្ត</option>
-                  <option value="មន្ទីរពេទ្យបង្អែកខេត្ត">មន្ទីរពេទ្យបង្អែកខេត្ត</option>
-                  <option value="ការិយាល័យ សុខាភិបាលស្រុកប្រតិបត្តិ">ការិយាល័យ សុខាភិបាលស្រុកប្រតិបត្តិ</option>
-                </template>
-              </select>
+              <SearchableSelect 
+                v-model="formData.department" 
+                :options="computedDepartmentOptions" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>កាលបរិច្ឆេទតែងតាំង <span class="required">*</span></label>
@@ -1102,6 +1069,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../api.js';
+import SearchableSelect from '../components/SearchableSelect.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -1855,6 +1823,60 @@ const installationTypes = [
   'តាំងស៊ប់'
 ];
 
+// Department options for central level
+const centralDepartments = [
+  'ទីប្រឹក្សា',
+  'ជំនួយការ',
+  'ខុទ្ទកាល័យរដ្ឋមន្រ្តី',
+  'ក្រុមប្រឹក្សាជំនួយការ',
+  'អគ្គាធិការដ្ឋាន',
+  'ទីភ្នាក់ងារបញ្ជាក់ចំណាយសេវាសុខាភិបាល',
+  'មជ្ឈមណ្ឌលជាតិ គាំពារមាតា និង ទារក',
+  'មជ្ឈមណ្ឌលជាតិ កំចាត់រោគរបេង និង ហង់សិន',
+  'មជ្ឈមណ្ឌលជាតិ ផ្តល់ឈាម',
+  'មជ្ឈមណ្ឌលជាតិ ប្រយុទ្ធនិងជំម្ងឺអេដស៏ សើស្បែក និង កាមរោគ',
+  'មជ្ឍមណ្ឌលជាតិ ប្រយុទ្ធនឹងជំងឺគ្រុនចាញ់ ប៉ារ៉ាស៊ីតសាស្ត្រ និងបាណកសាស្ត',
+  'មជ្ឍមណ្ឌលជាតិលើកកំពស់សុខភាព',
+  'មជ្ឍមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របូរាណ',
+  'មន្ទីរពេទ្យ គន្ធបុប្ផា',
+  'មជ្ឈមណ្ឌលជាតិពិសោធន៍សុខាភិបាល',
+  'មន្ទីរពេទ្យកាលម៉ែត',
+  'មន្ទីរពេទ្យមិត្តភាពខ្មែរ-សូវៀត',
+  'មន្ទីរពេទ្យព្រះអង្គឌួង',
+  'មន្ទីរពេទ្យមិត្តភាពកម្ពុជា-ចិន ព្រះកុសុមៈ',
+  'មន្ទីរពេទ្យកុមារជាតិ',
+  'វិទ្យាស្ថានជាតិ សុខភាពសាធារណៈ',
+  'ឃ្លាំងឱសថកណ្តាល',
+  'អគ្គលេខាធិការ',
+  'មន្ទីរពេទ្យជ័យវរ្ម័នទី៧',
+  'អគ្គនាយកដ្ឋាន រដ្ឋបាល-ហិរញ្ញវត្ថុ',
+  'អគ្គនាយកដ្ឋាន បច្ចេកទេសសុខាភិបាល',
+  'អាជ្ញាធរជាតិប្រយុទ្ធនឹងជំងឺអេដស៍',
+  'ខុទ្ទកាល័យ និងទីប្រឹក្សា',
+  'អគ្គលេខាធិការដ្ឋាន',
+  'សាកលវិទ្យាល័យ វិទ្យាសាស្ត្រសុខាភិបាល',
+  'វិទ្យាស្ថាន ប៉ាស្ទ័រ',
+  'សាលាមធ្យមសិក្សាភូមិភាគ',
+  'ថ្នាក់ដឹកនាំ',
+  'មន្ទីរពេទ្យព្រះសីហនុ មណ្ឌលនៃក្តីសង្ឃឹម',
+  'មន្ទីរពេទ្យជាតិ តេជោសន្តិភាព',
+  'មន្ទីរពេទ្យ ហ្លួង ម៉ែ'
+];
+
+// Department options for provincial level
+const provincialDepartments = [
+  'មន្ទីរសុខាភិបាលខេត្ត',
+  'ការិយាល័យ រដ្ឋបាល និងបុគ្គលិក',
+  'ការិយាល័យ គណនេយ្យ និងហិរញ្ញវត្ថុ',
+  'ការិយាល័យ គ្រប់គ្រងឱសថ សុវត្ថិភាពចំណីអារហារ',
+  'ការិយាល័យ បច្ចេកទេស',
+  'មន្ទីរពេទ្យខេត្ត',
+  'មន្ទីរពេទ្យបង្អែកខេត្ត',
+  'ការិយាល័យ សុខាភិបាលស្រុកប្រតិបត្តិ'
+];
+
+// Computed departments based on institution type
+
 // Computed frameworks based on selected characteristic type
 const computedFrameworks = computed(() => {
   const characteristicType = formData.value.characteristicType;
@@ -1946,6 +1968,17 @@ const computedRankGradeOptions = computed(() => {
 const computedRankClassOptions = computed(() => {
   const rankGrade = formData.value.rankAndGrade;
   return rankClassMapping[rankGrade] || [];
+});
+
+// Computed department options based on institution type
+const computedDepartmentOptions = computed(() => {
+  const institutionType = formData.value.institutionType;
+  if (institutionType === 'ថ្នាក់កណ្តាល') {
+    return centralDepartments;
+  } else if (institutionType === 'ថ្នាក់រាជធានី-ខេត្ត') {
+    return provincialDepartments;
+  }
+  return [];
 });
 
 
