@@ -4,7 +4,7 @@
  */
 
 import { ref, computed } from 'vue';
-import { getEmployeeById, updateEmployee as updateEmployeeApi } from '../api';
+import api from '../api';
 
 export function useEmployee(employeeId = null) {
   const employee = ref(null);
@@ -41,7 +41,7 @@ export function useEmployee(employeeId = null) {
     error.value = null;
 
     try {
-      const response = await getEmployeeById(id);
+      const response = await api.get(`/employees/${id}`);
       employee.value = response.data;
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch employee';
@@ -62,7 +62,7 @@ export function useEmployee(employeeId = null) {
     error.value = null;
 
     try {
-      const response = await updateEmployeeApi(id, updates);
+      const response = await api.put(`/employees/${id}`, updates);
       employee.value = response.data;
       return true;
     } catch (err) {

@@ -1005,9 +1005,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../api.js';
+import { useEmployee } from '../composables/useEmployee.js';
 import SearchableSelect from '../components/SearchableSelect.vue';
 import DatePicker from 'primevue/datepicker';
 import AwardForm from '../components/AwardForm.vue';
@@ -1038,8 +1039,9 @@ import {
 const route = useRoute();
 const router = useRouter();
 
-const employee = ref(null);
-const loading = ref(true);
+// Use employee composable for state management
+const { employee, loading, error, fetchEmployee, updateEmployee, fullName, fullNameLatin, displayGender } = useEmployee();
+
 const activeTab = ref(0);
 const showDialog = ref(false);
 const dialogType = ref('');
@@ -1302,17 +1304,7 @@ const computedDepartmentOptions = computed(() => {
 });
 
 
-const fetchEmployee = async () => {
-  try {
-    loading.value = true;
-    const response = await api.get(`/employees/${route.params.id}`);
-    employee.value = response.data;
-  } catch (error) {
-    console.error('Failed to fetch employee:', error);
-  } finally {
-    loading.value = false;
-  }
-};
+// fetchEmployee is now provided by useEmployee composable
 
 const formatDateKH = (date) => {
   if (!date) return '-';
@@ -1497,15 +1489,12 @@ const saveRecord = async () => {
       employee.value[fieldName].push({ ...formData.value });
     }
     
-    // Save to backend
-    await api.put(`/employees/${route.params.id}`, {
+    // Save to backend using composable
+    await updateEmployee({
       [fieldName]: employee.value[fieldName]
-    });
+    }, route.params.id);
     
     closeDialog();
-    
-    // Refresh employee data
-    await fetchEmployee();
   } catch (error) {
     console.error('Failed to save record:', error);
     alert('មិនអាចរក្សាទុកទិន្នន័យបានទេ: ' + (error.response?.data?.message || error.message));
@@ -1535,13 +1524,10 @@ const deleteRecord = async (type, index) => {
     if (employee.value[fieldName]) {
       employee.value[fieldName].splice(index, 1);
       
-      // Save to backend
-      await api.put(`/employees/${route.params.id}`, {
+      // Save to backend using composable
+      await updateEmployee({
         [fieldName]: employee.value[fieldName]
-      });
-      
-      // Refresh employee data
-      await fetchEmployee();
+      }, route.params.id);
     }
   } catch (error) {
     console.error('Failed to delete record:', error);
@@ -1555,8 +1541,18 @@ const saveInfo = () => {
 };
 
 onMounted(() => {
-  fetchEmployee();
+  fetchEmployee(route.params.id);
 });
+
+// Watch route changes to refetch employee data
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      fetchEmployee(newId);
+    }
+  }
+);
 </script>
 
 <style scoped>
