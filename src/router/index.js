@@ -1,39 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '../api'
 
-// Layout
+// Layout (eagerly loaded)
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 
-// Main Views
-import Dashboard from '../views/Dashboard.vue'
-import Folders from '../views/Folders.vue'
-import Files from '../views/Files.vue'
-import Activity from '../views/Activity.vue'
-import Recent from '../views/folder/Recent.vue'
-import Shared from '../views/folder/Shared.vue'
-import Settings from '../views/Settings.vue'
-import Departments from '../views/DepartmentsNew.vue'
-import Employees from '../views/Employees.vue'
-import EmployeeDetail from '../views/EmployeeDetail.vue'
-
-// Document Views
-import AllDocuments from '../views/documents/AllDocuments.vue'
-import Categories from '../views/documents/Categories.vue'
-import AuditTrail from '../views/documents/AuditTrail.vue'
-import Archived from '../views/documents/Archived.vue'
-
-// Department Views
-import DepartmentAnalytics from '../views/DepartmentAnalytics.vue'
-import OrgChart from '../views/OrgChart.vue'
-
-// Auth Views
+// Auth Views (eagerly loaded - needed immediately)
 import Login from '../views/Login.vue'
-import Register from '../views/auth/Register.vue'
-import Logout from '../views/auth/Logout.vue'
-import Users from '../views/auth/Users.vue'
-import Security from '../views/auth/Security.vue'
-import Privacy from '../views/auth/Privacy.vue'
-import Profile from '../views/auth/Profile.vue'
+
+// Main Views (lazy loaded)
+const Dashboard = () => import('../views/Dashboard.vue')
+const Folders = () => import('../views/Folders.vue')
+const Files = () => import('../views/Files.vue')
+const Activity = () => import('../views/Activity.vue')
+const Recent = () => import('../views/folder/Recent.vue')
+const Shared = () => import('../views/folder/Shared.vue')
+const Settings = () => import('../views/Settings.vue')
+const Departments = () => import('../views/DepartmentsNew.vue')
+const Employees = () => import('../views/Employees.vue')
+const EmployeeDetail = () => import('../views/EmployeeDetail.vue')
+
+// Document Views (lazy loaded)
+const AllDocuments = () => import('../views/documents/AllDocuments.vue')
+const Categories = () => import('../views/documents/Categories.vue')
+const AuditTrail = () => import('../views/documents/AuditTrail.vue')
+const Archived = () => import('../views/documents/Archived.vue')
+
+// Department Views (lazy loaded)
+const DepartmentAnalytics = () => import('../views/DepartmentAnalytics.vue')
+const OrgChart = () => import('../views/OrgChart.vue')
+
+// Auth Views (lazy loaded)
+const Register = () => import('../views/auth/Register.vue')
+const Logout = () => import('../views/auth/Logout.vue')
+const Users = () => import('../views/auth/Users.vue')
+const Security = () => import('../views/auth/Security.vue')
+const Privacy = () => import('../views/auth/Privacy.vue')
+const Profile = () => import('../views/auth/Profile.vue')
 
 const isAuthenticated = () => !!getToken()
 
