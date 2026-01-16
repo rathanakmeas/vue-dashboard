@@ -1,17 +1,22 @@
 <template>
-  <div class="employee-detail-page">
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb">
-      <router-link to="/" class="breadcrumb-link">ទំព័រដើម</router-link>
-      <span class="breadcrumb-sep">»</span>
-      <router-link to="/employees" class="breadcrumb-link active">គ្រប់គ្រងបុគ្គលិក មន្រ្តីរាជការ</router-link>
-    </nav>
+  <ErrorBoundary
+    fallback-title="មិនអាចផ្ទុកព័ត៌មានបុគ្គលិកបានទេ"
+    fallback-message="មានបញ្ហាក្នុងការផ្ទុកព័ត៌មានបុគ្គលិក។ សូមព្យាយាមម្តងទៀត។"
+    :on-retry="() => fetchEmployee(route.params.id)"
+  >
+    <div class="employee-detail-page">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <router-link to="/" class="breadcrumb-link">ទំព័រដើម</router-link>
+        <span class="breadcrumb-sep">»</span>
+        <router-link to="/employees" class="breadcrumb-link active">គ្រប់គ្រងបុគ្គលិក មន្រ្តីរាជការ</router-link>
+      </nav>
 
-    <div v-if="loading" class="loading-container">
-      <LoadingSkeleton variant="detail" :rows="6" />
-    </div>
+      <div v-if="loading" class="loading-container">
+        <LoadingSkeleton variant="detail" :rows="6" />
+      </div>
 
-    <div v-else-if="employee" class="employee-detail">
+      <div v-else-if="employee" class="employee-detail">
       <!-- Top Section: Photo + Info Card -->
       <div class="top-section">
         <!-- Left: Photo Card -->
@@ -1000,7 +1005,8 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
+  </ErrorBoundary>
 </template>
 
 <script setup>
@@ -1014,6 +1020,7 @@ import AwardForm from '../components/AwardForm.vue';
 import DisciplinaryForm from '../components/DisciplinaryForm.vue';
 import DocumentForm from '../components/DocumentForm.vue';
 import LoadingSkeleton from '../components/LoadingSkeleton.vue';
+import ErrorBoundary from '../components/ErrorBoundary.vue';
 
 // Import constants
 import {
