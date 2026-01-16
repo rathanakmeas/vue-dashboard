@@ -883,109 +883,18 @@
           </div>
 
           <!-- Award Form -->
-          <div v-if="dialogType === 'award'" class="form-grid">
-            <div class="form-field">
-              <label>លេខលិខិតយោង</label>
-              <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
-            </div>
-            <div class="form-field">
-              <label>កាលបរិច្ឆេទ</label>
-              <input v-model="formData.date" type="date" />
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទលិខិត</label>
-              <SearchableSelect 
-                v-model="formData.documentType" 
-                :options="documentTypes" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field">
-              <label>ក្រសួង-ស្ថាប័ន</label>
-              <SearchableSelect 
-                v-model="formData.ministryInstitution" 
-                :options="ministries" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទការលើកសរសើរ</label>
-              <SearchableSelect 
-                v-model="formData.awardType" 
-                :options="awardTypes" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទថ្នាក់</label>
-              <SearchableSelect 
-                v-model="formData.awardClass" 
-                :options="awardClasses" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field full-width">
-              <label>កំណត់សម្គាល់</label>
-              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
-            </div>
-            <div class="form-field full-width">
-              <label>ឯកសារ</label>
-              <input type="file" @change="handleFileUpload($event, 'awardImage')" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-              <small v-if="formData.awardImage" style="color: #059669; margin-top: 0.5rem; display: block;">
-                <i class="pi pi-check-circle"></i> {{ formData.awardImage }}
-              </small>
-            </div>
-          </div>
+          <AwardForm 
+            v-if="dialogType === 'award'"
+            v-model="formData"
+            ref="awardFormRef"
+          />
 
           <!-- Disciplinary Action Form -->
-          <div v-if="dialogType === 'disciplinary'" class="form-grid">
-            <div class="form-field">
-              <label>លេខលិខិតយោង</label>
-              <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
-            </div>
-            <div class="form-field">
-              <label>កាលបរិច្ឆេទ</label>
-              <input v-model="formData.date" type="date" />
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទលិខិត</label>
-              <SearchableSelect 
-                v-model="formData.documentType" 
-                :options="documentTypes" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field">
-              <label>ក្រសួង-ស្ថាប័ន</label>
-              <SearchableSelect 
-                v-model="formData.ministryInstitution" 
-                :options="ministries" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទការដាក់ពិន័យ <span class="required">*</span></label>
-              <select v-model="formData.actionType">
-                <option value="" disabled>ជ្រើសរើស</option>
-                <option v-for="option in disciplinaryTypes" :key="option" :value="option">{{ option }}</option>
-              </select>
-            </div>
-            <div class="form-field full-width">
-              <label>រូបភាពនៃការដាក់ពិន័យ (URL)</label>
-              <input v-model="formData.actionImage" type="text" placeholder="URL រូបភាព" />
-            </div>
-            <div class="form-field full-width">
-              <label>កំណត់សម្គាល់</label>
-              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
-            </div>
-            <div class="form-field full-width">
-              <label>ឯកសារ</label>
-              <input type="file" @change="handleFileUpload($event, 'disciplinaryAttachment')" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-              <small v-if="formData.disciplinaryAttachment" style="color: #059669; margin-top: 0.5rem; display: block;">
-                <i class="pi pi-check-circle"></i> {{ formData.disciplinaryAttachment }}
-              </small>
-            </div>
-          </div>
+          <DisciplinaryForm
+            v-if="dialogType === 'disciplinary'"
+            v-model="formData"
+            ref="disciplinaryFormRef"
+          />
 
           <!-- Union Info Form -->
           <div v-if="dialogType === 'union'" class="form-grid">
@@ -1048,58 +957,11 @@
           </div>
 
           <!-- Related Document Form -->
-          <div v-if="dialogType === 'document'" class="form-grid">
-            <div class="form-field">
-              <label>លេខកូដឯកសារ</label>
-              <input v-model="formData.documentCode" type="text" placeholder="លេខកូដឯកសារ" />
-            </div>
-            <div class="form-field">
-              <label>ឈ្មោះឯកសារ</label>
-              <input v-model="formData.documentName" type="text" placeholder="ឈ្មោះឯកសារ" />
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទឯកសារ</label>
-              <select v-model="formData.documentType">
-                <option value="" disabled>ជ្រើសរើស</option>
-                <option v-for="option in documentCategories" :key="option" :value="option">{{ option }}</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>ប្រភេទលិខិត<span style="color: red;">*</span></label>
-              <SearchableSelect 
-                v-model="formData.letterType" 
-                :options="letterTypes" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
-            </div>
-            <div class="form-field">
-              <label>លេខឯកសារ</label>
-              <input v-model="formData.documentNo" type="text" placeholder="លេខឯកសារ" />
-            </div>
-            <div class="form-field">
-              <label>កាលបរិច្ឆេទ</label>
-              <input v-model="formData.date" type="date" />
-            </div>
-            <div class="form-field full-width">
-              <label>កំណត់សម្គាល់</label>
-              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
-            </div>
-            <div class="form-field">
-              <label>ចេញឯកសារដោយ</label>
-              <input v-model="formData.issuedBy" type="text" placeholder="ចេញឯកសារដោយ" />
-            </div>
-            <div class="form-field">
-              <label>កាលបរិច្ឆេទចេញឯកសារ</label>
-              <input v-model="formData.issueDate" type="date" />
-            </div>
-            <div class="form-field full-width">
-              <label>ជ្រើសរើសឯកសារ<span style="color: red;">*</span></label>
-              <input type="file" @change="handleFileUpload($event, 'documentFile')" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-              <small v-if="formData.documentFile" style="color: #059669; margin-top: 0.5rem; display: block;">
-                <i class="pi pi-check-circle"></i> {{ formData.documentFile }}
-              </small>
-            </div>
-          </div>
+          <DocumentForm
+            v-if="dialogType === 'document'"
+            v-model="formData"
+            ref="documentFormRef"
+          />
         </div>
 
         <div class="dialog-footer">
@@ -1148,6 +1010,9 @@ import { useRoute, useRouter } from 'vue-router';
 import api from '../api.js';
 import SearchableSelect from '../components/SearchableSelect.vue';
 import DatePicker from 'primevue/datepicker';
+import AwardForm from '../components/AwardForm.vue';
+import DisciplinaryForm from '../components/DisciplinaryForm.vue';
+import DocumentForm from '../components/DocumentForm.vue';
 
 // Import constants
 import {
@@ -1184,6 +1049,11 @@ const editIndex = ref(-1);
 const showInstallationDialog = ref(false);
 const installationDate = ref('');
 const calendarVisible = ref(false);
+
+// Form component refs for validation
+const awardFormRef = ref(null);
+const disciplinaryFormRef = ref(null);
+const documentFormRef = ref(null);
 
 const tabs = [
   { label: 'ស្ថានភាពមន្ត្រី', icon: 'pi pi-check-circle' },
@@ -1589,6 +1459,18 @@ const handleFileUpload = (event, fieldName) => {
 
 const saveRecord = async () => {
   try {
+    // Validate form if it's award, disciplinary, or document
+    if (dialogType.value === 'award' && awardFormRef.value) {
+      const isValid = await awardFormRef.value.validate();
+      if (!isValid) return;
+    } else if (dialogType.value === 'disciplinary' && disciplinaryFormRef.value) {
+      const isValid = await disciplinaryFormRef.value.validate();
+      if (!isValid) return;
+    } else if (dialogType.value === 'document' && documentFormRef.value) {
+      const isValid = await documentFormRef.value.validate();
+      if (!isValid) return;
+    }
+
     const fieldMap = {
       civilStatus: 'civilStatuses',
       rankGrade: 'rankGrades',
