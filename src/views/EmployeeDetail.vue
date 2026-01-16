@@ -666,10 +666,13 @@
             </div>
             <div class="form-field">
               <label>បច្ចុប្បន្ន</label>
-              <button class="btn-toggle" :class="{ active: formData.isCurrent }" @click="formData.isCurrent = !formData.isCurrent">
-                <i :class="formData.isCurrent ? 'pi pi-check' : 'pi pi-times'"></i>
-                {{ formData.isCurrent ? 'បាទ' : 'ទេ' }}
-              </button>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <label class="switch">
+                  <input type="checkbox" v-model="formData.isCurrent" />
+                  <span class="slider round"></span>
+                </label>
+                <span>{{ formData.isCurrent ? 'បើក' : 'បិទ' }}</span>
+              </div>
             </div>
             <div class="form-field">
               <label>កាលបរិច្ឆេទបញ្ចប់</label>
@@ -693,10 +696,13 @@
             </div>
             <div class="form-field">
               <label>បច្ចុប្បន្ន</label>
-              <button class="btn-toggle" :class="{ active: formData.isCurrent }" @click="formData.isCurrent = !formData.isCurrent">
-                <i :class="formData.isCurrent ? 'pi pi-check' : 'pi pi-times'"></i>
-                {{ formData.isCurrent ? 'បាទ' : 'ទេ' }}
-              </button>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <label class="switch">
+                  <input type="checkbox" v-model="formData.isCurrent" />
+                  <span class="slider round"></span>
+                </label>
+                <span>{{ formData.isCurrent ? 'បើក' : 'បិទ' }}</span>
+              </div>
             </div>
             <div class="form-field">
               <label>កាលបរិច្ឆេទបញ្ចប់</label>
