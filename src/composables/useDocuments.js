@@ -4,7 +4,8 @@
  */
 
 import { ref } from 'vue';
-import { getDocuments, addDocument, updateDocument, deleteDocument } from '../api';
+import api from '../api';
+import { handleApiError, getErrorMessage } from '../utils/errorHandler';
 
 export function useDocuments(employeeId = null) {
   const documents = ref([]);
@@ -22,11 +23,11 @@ export function useDocuments(employeeId = null) {
     error.value = null;
 
     try {
-      const response = await getDocuments(id);
+      const response = await api.get(`/employees/${id}/documents`);
       documents.value = response.data || [];
     } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to fetch documents';
-      console.error('Error fetching documents:', err);
+      error.value = getErrorMessage(err);
+      handleApiError(err, 'មិនអាចទាញយកឯកសារបានទេ', { showAlert: false });
       documents.value = [];
     } finally {
       loading.value = false;
@@ -44,14 +45,14 @@ export function useDocuments(employeeId = null) {
     error.value = null;
 
     try {
-      const response = await addDocument(id, documentData);
+      const response = await api.post(`/employees/${id}/documents`, documentData);
       if (response.data) {
         documents.value.push(response.data);
       }
       return true;
     } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to add document';
-      console.error('Error adding document:', err);
+      error.value = getErrorMessage(err);
+      handleApiError(err, 'មិនអាចបន្ថែមឯកសារបានទេ', { showAlert: false });
       return false;
     } finally {
       loading.value = false;
@@ -69,7 +70,7 @@ export function useDocuments(employeeId = null) {
     error.value = null;
 
     try {
-      const response = await updateDocument(id, documentId, updates);
+      const response = await api.put(`/employees/${id}/documents/${documentId}`, updates);
       if (response.data) {
         const index = documents.value.findIndex(doc => doc._id === documentId);
         if (index !== -1) {
@@ -78,8 +79,8 @@ export function useDocuments(employeeId = null) {
       }
       return true;
     } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to update document';
-      console.error('Error updating document:', err);
+      error.value = getErrorMessage(err);
+      handleApiError(err, 'មិនអាចកែប្រែឯកសារបានទេ', { showAlert: false });
       return false;
     } finally {
       loading.value = false;
@@ -97,12 +98,12 @@ export function useDocuments(employeeId = null) {
     error.value = null;
 
     try {
-      await deleteDocument(id, documentId);
+      await api.delete(`/employees/${id}/documents/${documentId}`);
       documents.value = documents.value.filter(doc => doc._id !== documentId);
       return true;
     } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to delete document';
-      console.error('Error deleting document:', err);
+      error.value = getErrorMessage(err);
+      handleApiError(err, 'មិនអាចលុបឯកសារបានទេ', { showAlert: false });
       return false;
     } finally {
       loading.value = false;

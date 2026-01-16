@@ -5,6 +5,7 @@
 
 import { ref, computed } from 'vue';
 import api from '../api';
+import { handleApiError, getErrorMessage } from '../utils/errorHandler';
 
 export function useEmployee(employeeId = null) {
   const employee = ref(null);
@@ -44,8 +45,8 @@ export function useEmployee(employeeId = null) {
       const response = await api.get(`/employees/${id}`);
       employee.value = response.data;
     } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to fetch employee';
-      console.error('Error fetching employee:', err);
+      error.value = getErrorMessage(err);
+      handleApiError(err, 'មិនអាចទាញយកទិន្នន័យបុគ្គលិកបានទេ', { showAlert: false });
     } finally {
       loading.value = false;
     }
@@ -66,8 +67,8 @@ export function useEmployee(employeeId = null) {
       employee.value = response.data;
       return true;
     } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to update employee';
-      console.error('Error updating employee:', err);
+      error.value = getErrorMessage(err);
+      handleApiError(err, 'មិនអាចកែប្រែទិន្នន័យបុគ្គលិកបានទេ', { showAlert: false });
       return false;
     } finally {
       loading.value = false;
