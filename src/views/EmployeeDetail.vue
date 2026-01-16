@@ -432,27 +432,31 @@
               <thead>
                 <tr>
                   <th>លេខលិខិតយោង</th>
-                  <th>ប្រភេទការដាក់ពិន័យ</th>
-                  <th>រូបភាពការដាក់ពិន័យ</th>
                   <th>កាលបរិច្ឆេទ</th>
+                  <th>ប្រភេទលិខិត</th>
                   <th>ក្រសួង-ស្ថាប័ន</th>
-                  <th>ផ្សេងៗ</th>
+                  <th>ប្រភេទការដាក់ពិន័យ</th>
+                  <th>រូបភាព</th>
+                  <th>ឯកសារ</th>
+                  <th>កំណត់សម្គាល់</th>
                   <th>សកម្មភាព</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!employee.disciplinaryActions || employee.disciplinaryActions.length === 0">
-                  <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
+                  <td colspan="9" class="no-data">មិនមានទិន្នន័យ</td>
                 </tr>
                 <tr v-for="(item, i) in employee.disciplinaryActions" :key="i">
                   <td>{{ item.referenceLetterNo || '-' }}</td>
+                  <td>{{ formatDateKH(item.date) || '-' }}</td>
+                  <td>{{ item.documentType || '-' }}</td>
+                  <td>{{ item.ministryInstitution || '-' }}</td>
                   <td>{{ item.actionType || '-' }}</td>
                   <td>
                     <img v-if="item.actionImage" :src="item.actionImage" alt="Disciplinary" class="table-image" />
                     <span v-else>-</span>
                   </td>
-                  <td>{{ formatDateKH(item.date) || '-' }}</td>
-                  <td>{{ item.ministryInstitution || '-' }}</td>
+                  <td>{{ item.disciplinaryAttachment || '-' }}</td>
                   <td>{{ item.remarks || '-' }}</td>
                   <td>
                     <button class="action-btn" @click="editRecord('disciplinary', i)" title="កែសម្រួល">
@@ -572,12 +576,12 @@
             <table>
               <thead>
                 <tr>
+                  <th>ល.រ</th>
+                  <th>លេខកូដឯកសារ</th>
+                  <th>ប្រភេទលិខិត</th>
+                  <th>លេខលិខិតយោង</th>
                   <th>ឈ្មោះឯកសារ</th>
                   <th>ប្រភេទឯកសារ</th>
-                  <th>លេខឯកសារ</th>
-                  <th>កាលបរិច្ឆេទ</th>
-                  <th>ឯកសារភ្ជាប់</th>
-                  <th>ផ្សេងៗ</th>
                   <th>សកម្មភាព</th>
                 </tr>
               </thead>
@@ -586,17 +590,12 @@
                   <td colspan="7" class="no-data">មិនមានទិន្នន័យ</td>
                 </tr>
                 <tr v-for="(item, i) in employee.relatedDocuments" :key="i">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ item.documentCode || '-' }}</td>
+                  <td>{{ item.letterType || '-' }}</td>
+                  <td>{{ item.documentNo || '-' }}</td>
                   <td>{{ item.documentName || '-' }}</td>
                   <td>{{ item.documentType || '-' }}</td>
-                  <td>{{ item.documentNo || '-' }}</td>
-                  <td>{{ formatDateKH(item.date) || '-' }}</td>
-                  <td>
-                    <a v-if="item.attachment" :href="item.attachment" target="_blank" class="file-link">
-                      <i class="pi pi-file-pdf"></i> មើល
-                    </a>
-                    <span v-else>-</span>
-                  </td>
-                  <td>{{ item.remarks || '-' }}</td>
                   <td>
                     <button class="action-btn" @click="editRecord('document', i)" title="កែសម្រួល">
                       <i class="pi pi-pencil"></i>
@@ -620,8 +619,8 @@
     </div>
 
     <!-- Dialog for Adding/Editing Records -->
-    <div v-if="showDialog" class="dialog-overlay" @click.self="closeDialog">
-      <div class="dialog-container">
+    <div v-if="showDialog" class="dialog-overlay" :class="{ 'centered-overlay': dialogType === 'document' }" @click.self="closeDialog">
+      <div class="dialog-container" :class="{ 'blur-content': calendarVisible, 'centered-dialog': dialogType === 'document' }">
         <div class="dialog-header">
           <h3>{{ dialogTitle }}</h3>
           <button class="btn-close" @click="closeDialog">
@@ -726,11 +725,10 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទការតម្លើង</label>
-              <SearchableSelect 
-                v-model="formData.installationType" 
-                :options="installationTypes" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
+              <select v-model="formData.installationType">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in installationTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field">
               <label>ក្រសួង-ស្ថាប័ន</label>
@@ -754,35 +752,31 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទលក្ខន្តិកៈ</label>
-              <SearchableSelect 
-                v-model="formData.characteristicType" 
-                :options="characteristicTypes" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
+              <select v-model="formData.characteristicType">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in characteristicTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field">
               <label>ក្របខ័ណ្ឌ</label>
-              <SearchableSelect 
-                v-model="formData.framework" 
-                :options="computedFrameworks" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
+              <select v-model="formData.framework">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in computedFrameworks" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field">
               <label>ឋានន្តរស័ក្តិ និងថ្នាក់</label>
-              <SearchableSelect 
-                v-model="formData.rankAndGrade" 
-                :options="computedRankGradeOptions" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
+              <select v-model="formData.rankAndGrade">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in computedRankGradeOptions" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field" v-if="computedRankClassOptions.length > 0">
               <label>ថ្នាក់ (PayScale)</label>
-              <SearchableSelect 
-                v-model="formData.payScale" 
-                :options="computedRankClassOptions" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
+              <select v-model="formData.payScale">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in computedRankClassOptions" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field full-width">
               <label>កំណត់សម្គាល់</label>
@@ -814,11 +808,11 @@
             </div>
             <div class="form-field">
               <label>ប្រភេទស្ថាប័ន</label>
-              <SearchableSelect 
-                v-model="formData.institutionType" 
-                :options="['ថ្នាក់កណ្តាល', 'ថ្នាក់រាជធានី-ខេត្ត']" 
-                placeholder="ជ្រើសរើសឬស្វែងរក..."
-              />
+              <select v-model="formData.institutionType">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option value="ថ្នាក់កណ្តាល">ថ្នាក់កណ្តាល</option>
+                <option value="ថ្នាក់រាជធានី-ខេត្ត">ថ្នាក់រាជធានី-ខេត្ត</option>
+              </select>
             </div>
             <div class="form-field">
               <label>មុខតំណែង</label>
@@ -950,24 +944,46 @@
               <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
             </div>
             <div class="form-field">
-              <label>ប្រភេទការដាក់ពិន័យ</label>
-              <input v-model="formData.actionType" type="text" placeholder="ប្រភេទការដាក់ពិន័យ" />
-            </div>
-            <div class="form-field">
               <label>កាលបរិច្ឆេទ</label>
               <input v-model="formData.date" type="date" />
             </div>
             <div class="form-field">
+              <label>ប្រភេទលិខិត</label>
+              <SearchableSelect 
+                v-model="formData.documentType" 
+                :options="documentTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
+            </div>
+            <div class="form-field">
               <label>ក្រសួង-ស្ថាប័ន</label>
-              <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
+              <SearchableSelect 
+                v-model="formData.ministryInstitution" 
+                :options="ministries" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទការដាក់ពិន័យ <span class="required">*</span></label>
+              <select v-model="formData.actionType">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in disciplinaryTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
             </div>
             <div class="form-field full-width">
-              <label>រូបភាពការដាក់ពិន័យ (URL)</label>
+              <label>រូបភាពនៃការដាក់ពិន័យ (URL)</label>
               <input v-model="formData.actionImage" type="text" placeholder="URL រូបភាព" />
             </div>
             <div class="form-field full-width">
               <label>កំណត់សម្គាល់</label>
               <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
+            </div>
+            <div class="form-field full-width">
+              <label>ឯកសារ</label>
+              <input type="file" @change="handleFileUpload($event, 'disciplinaryAttachment')" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+              <small v-if="formData.disciplinaryAttachment" style="color: #059669; margin-top: 0.5rem; display: block;">
+                <i class="pi pi-check-circle"></i> {{ formData.disciplinaryAttachment }}
+              </small>
             </div>
           </div>
 
@@ -1002,8 +1018,12 @@
           <!-- Cultural Level Form -->
           <div v-if="dialogType === 'cultural'" class="form-grid">
             <div class="form-field">
-              <label>កម្រិតវប្បធម៌</label>
-              <input v-model="formData.level" type="text" placeholder="កម្រិតវប្បធម៌" />
+              <label>កម្រិតវប្បធម៌<span style="color: red;">*</span></label>
+              <SearchableSelect 
+                v-model="formData.level" 
+                :options="culturalLevels" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>ឆ្នាំបញ្ចប់</label>
@@ -1030,12 +1050,27 @@
           <!-- Related Document Form -->
           <div v-if="dialogType === 'document'" class="form-grid">
             <div class="form-field">
+              <label>លេខកូដឯកសារ</label>
+              <input v-model="formData.documentCode" type="text" placeholder="លេខកូដឯកសារ" />
+            </div>
+            <div class="form-field">
               <label>ឈ្មោះឯកសារ</label>
               <input v-model="formData.documentName" type="text" placeholder="ឈ្មោះឯកសារ" />
             </div>
             <div class="form-field">
               <label>ប្រភេទឯកសារ</label>
-              <input v-model="formData.documentType" type="text" placeholder="ប្រភេទឯកសារ" />
+              <select v-model="formData.documentType">
+                <option value="" disabled>ជ្រើសរើស</option>
+                <option v-for="option in documentCategories" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទលិខិត<span style="color: red;">*</span></label>
+              <SearchableSelect 
+                v-model="formData.letterType" 
+                :options="letterTypes" 
+                placeholder="ជ្រើសរើសឬស្វែងរក..."
+              />
             </div>
             <div class="form-field">
               <label>លេខឯកសារ</label>
@@ -1046,12 +1081,23 @@
               <input v-model="formData.date" type="date" />
             </div>
             <div class="form-field full-width">
-              <label>ឯកសារភ្ជាប់ (URL)</label>
-              <input v-model="formData.attachment" type="text" placeholder="URL ឯកសារ" />
-            </div>
-            <div class="form-field full-width">
               <label>កំណត់សម្គាល់</label>
               <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
+            </div>
+            <div class="form-field">
+              <label>ចេញឯកសារដោយ</label>
+              <input v-model="formData.issuedBy" type="text" placeholder="ចេញឯកសារដោយ" />
+            </div>
+            <div class="form-field">
+              <label>កាលបរិច្ឆេទចេញឯកសារ</label>
+              <input v-model="formData.issueDate" type="date" />
+            </div>
+            <div class="form-field full-width">
+              <label>ជ្រើសរើសឯកសារ<span style="color: red;">*</span></label>
+              <input type="file" @change="handleFileUpload($event, 'documentFile')" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+              <small v-if="formData.documentFile" style="color: #059669; margin-top: 0.5rem; display: block;">
+                <i class="pi pi-check-circle"></i> {{ formData.documentFile }}
+              </small>
             </div>
           </div>
         </div>
@@ -1101,6 +1147,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../api.js';
 import SearchableSelect from '../components/SearchableSelect.vue';
+import DatePicker from 'primevue/datepicker';
 
 const route = useRoute();
 const router = useRouter();
@@ -1115,6 +1162,7 @@ const formData = ref({});
 const editIndex = ref(-1);
 const showInstallationDialog = ref(false);
 const installationDate = ref('');
+const calendarVisible = ref(false);
 
 const tabs = [
   { label: 'ស្ថានភាពមន្ត្រី', icon: 'pi pi-check-circle' },
@@ -1126,6 +1174,26 @@ const tabs = [
   { label: 'ព័ត៌មានសហព័ទ្ធ', icon: 'pi pi-users' },
   { label: 'កម្រិតវប្បធម៌', icon: 'pi pi-book' },
   { label: 'ឯកសារពាក់ព័ន្ធ', icon: 'pi pi-file' }
+];
+
+// Document categories for document tab
+const documentCategories = [
+  'ឯកសារមន្ត្រីរាជការ',
+  'ឯកសារទូទៅ',
+  'ផ្សេងៗ'
+];
+
+// Cultural/Education levels
+const culturalLevels = [
+  'បឋមសិក្សា',
+  'មធ្យមសិក្សាបឋមភូមិ',
+  'មធ្យមសិក្សាទុតិយភូមិ',
+  'បរិញ្ញាបត្ររង',
+  'បរិញ្ញាបត្រ',
+  'បរិញ្ញាបត្រជាន់ខ្ពស់',
+  'អនុបណ្ឌិត',
+  'បណ្ឌិត',
+  'ផ្សេងៗ'
 ];
 
 // Dropdown options for civil status tab
@@ -1876,6 +1944,19 @@ const awardClasses = [
   'កូវីដ ១៩'
 ];
 
+// Disciplinary types dropdown options
+const disciplinaryTypes = [
+  'ស្តីបន្ទោស',
+  'ស្តីបន្ទោសដោយមានចំណារក្នុងសំណុំលិខិតផ្ទាល់ខ្លួន',
+  'ផ្លាស់ដោយបង្ខំតាមវិធានការខាងវិន័យ',
+  'លុបឈ្មោះចេញពីតារាងឡើងឋានន្តរស័ក្តិឬថ្នាក់',
+  'ស្តីបន្ទោសជារូបមន្តបណ្តាលឲ្យលុបចេញពីតារាងឡើងឋានន្តរស័ក្តិឬថ្នាក់',
+  'ដាក់ឲ្យនៅទំនេរគ្មានបៀវត្សមិនឲ្យលើសពីមួយឆ្នាំ',
+  'បន្ថយឋានន្តរស័ក្តិមួយថ្នាក់ ឬច្រើនថ្នាក់',
+  'ដាក់ឲ្យចូលនិវត្តន៍មុនកំណត់ ឬបញ្ឈប់ពីការងារដោយបង្ខំ',
+  'បណ្តេញចេញពីមុខតំណែងរាជការ'
+];
+
 // Dropdown options for installation types
 const installationTypes = [
   'វេនជ្រើសរើស',
@@ -2424,8 +2505,8 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'Siemreap', cursive;
-  font-size: 1.25rem;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 14pt;
   font-weight: 600;
   margin-bottom: 1.5rem;
   color: #1f2937;
@@ -2436,7 +2517,7 @@ onMounted(() => {
 
 .section-title i {
   color: #6366f1;
-  font-size: 1.1rem;
+  font-size: 14pt;
 }
 
 .info-list {
@@ -2463,15 +2544,15 @@ onMounted(() => {
 }
 
 .info-label {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
   color: #6b7280;
 }
 
 .info-value {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
-  color: #1f2937;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
+  color: #2563eb;
   font-weight: 500;
 }
 
@@ -2498,8 +2579,8 @@ onMounted(() => {
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 10pt;
   font-weight: 500;
   color: #6b7280;
   transition: all 0.2s;
@@ -2564,16 +2645,16 @@ onMounted(() => {
 }
 
 .field label {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
   font-weight: 500;
   color: #374151;
 }
 
 .field input,
 .field select {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
   padding: 0.625rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
@@ -2656,8 +2737,8 @@ onMounted(() => {
 .data-table table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
 }
 
 .data-table thead {
@@ -2665,8 +2746,8 @@ onMounted(() => {
 }
 
 .data-table th {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
   padding: 0.75rem;
   text-align: left;
   font-weight: 600;
@@ -2675,8 +2756,8 @@ onMounted(() => {
 }
 
 .data-table td {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
   padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
   color: #1f2937;
@@ -2740,8 +2821,8 @@ onMounted(() => {
 }
 
 .file-link {
-  font-family: 'Siemreap', cursive;
-  font-size: 12px;
+  font-family: Tahoma, 'Siemreap', cursive;
+  font-size: 11pt;
   color: #2563eb;
   text-decoration: none;
   display: inline-flex;
@@ -2810,12 +2891,18 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: stretch;
   justify-content: flex-end;
   z-index: 1000;
   animation: fadeIn 0.25s ease-out;
+}
+
+/* Centered overlay for document modal */
+.dialog-overlay.centered-overlay {
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes fadeIn {
@@ -2825,13 +2912,52 @@ onMounted(() => {
 
 .dialog-container {
   background: white;
-  width: 700px;
+  width: 60vw;
   max-width: 90vw;
+  min-width: 600px;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-  animation: slideInFromRight 0.3s ease-out;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+  animation: slideInFromRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px 0 0 16px;
+  overflow: hidden;
+}
+
+/* Centered dialog for document modal */
+.dialog-container.centered-dialog {
+  width: 850px;
+  max-width: 90vw;
+  height: auto;
+  max-height: 90vh;
+  border-radius: 16px;
+  overflow: hidden;
+  animation: slideInFromCenter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-container.centered-dialog .dialog-header {
+  border-radius: 16px 16px 0 0;
+}
+
+.dialog-container.centered-dialog .dialog-body {
+  border-radius: 0 0 16px 16px;
+}
+
+@keyframes slideInFromCenter {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Hide modal content completely when calendar is visible */
+.dialog-container.blur-content .dialog-body {
+  visibility: hidden;
 }
 
 @keyframes slideInFromRight {
@@ -2847,9 +2973,9 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 2px solid #e5e7eb;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
   flex-shrink: 0;
   position: sticky;
@@ -2859,43 +2985,45 @@ onMounted(() => {
 
 .dialog-header h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: white;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
 .btn-close {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   font-size: 1.25rem;
   color: white;
   cursor: pointer;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  transition: all 0.2s;
+  transition: all 0.15s;
   padding: 0;
 }
 
 .btn-close i {
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .btn-close:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
   transform: scale(1.05);
 }
 
 .dialog-body {
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   overflow-y: auto;
   flex: 1;
+  background: #fafafa;
 }
 
 /* Custom Scrollbar for Dialog (VS Code Style) */
@@ -2918,14 +3046,18 @@ onMounted(() => {
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  background: white;
+  padding: 0.875rem;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
 }
 
 .form-field.full-width {
@@ -2933,9 +3065,10 @@ onMounted(() => {
 }
 
 .form-field label {
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
 }
 
 .form-field input,
@@ -2964,6 +3097,281 @@ onMounted(() => {
   color: #9ca3af;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* PrimeVue DatePicker Styling */
+.form-field :deep(.p-datepicker-input-icon-container) {
+  width: 100%;
+}
+
+.form-field :deep(.p-datepicker-input-icon-container .p-inputtext),
+.form-field :deep(.p-datepicker .p-inputtext) {
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: 'Khmer OS Siemreap', 'Segoe UI', sans-serif;
+  width: 100%;
+}
+
+.form-field :deep(.p-datepicker-input-icon-container .p-inputtext:focus),
+.form-field :deep(.p-datepicker .p-inputtext:focus) {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-field :deep(.p-datepicker) {
+  font-family: 'Khmer OS Siemreap', 'Segoe UI', sans-serif !important;
+  background: #ffffff !important;
+  border: 3px solid #6366f1 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+  z-index: 1100 !important;
+  padding: 12px !important;
+  position: relative !important;
+  isolation: isolate !important;
+  max-width: 380px !important;
+  width: auto !important;
+}
+
+/* Add solid white base layer */
+.form-field :deep(.p-datepicker)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  z-index: -1;
+}
+
+/* Add white wrapper to datepicker */
+.form-field :deep(.p-datepicker),
+.form-field :deep(.p-datepicker-panel) {
+  background: #ffffff !important;
+}
+
+/* Calendar header styling */
+.form-field :deep(.p-datepicker .p-datepicker-header) {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  color: white;
+  border-radius: 13px 13px 0 0;
+  padding: 1.25rem;
+  margin: 0;
+  position: relative;
+  z-index: 20;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-title) {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-prev),
+.form-field :deep(.p-datepicker .p-datepicker-next) {
+  color: white !important;
+  width: 2rem;
+  height: 2rem;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-prev:hover),
+.form-field :deep(.p-datepicker .p-datepicker-next:hover) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+/* Calendar table container */
+.form-field :deep(.p-datepicker .p-datepicker-calendar-container) {
+  padding: 1.5rem;
+  background: #ffffff !important;
+  position: relative;
+  z-index: 10;
+  margin: 0;
+}
+
+/* Make entire calendar area white with padding */
+.form-field :deep(.p-datepicker .p-datepicker-group-container) {
+  background: #ffffff !important;
+  padding: 8px;
+  margin: -8px;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-group) {
+  background: #ffffff !important;
+}
+
+/* Ensure all calendar internals are white */
+.form-field :deep(.p-datepicker *) {
+  box-sizing: border-box;
+}
+
+/* Day headers (អា.ចន្ទ ចន្ទ អង្គារ...) */
+.form-field :deep(.p-datepicker table th) {
+  color: #6366f1;
+  font-weight: 700;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+  background: #f9fafb !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Calendar table */
+.form-field :deep(.p-datepicker table) {
+  background: #ffffff !important;
+  position: relative;
+  z-index: 1;
+}
+
+.form-field :deep(.p-datepicker table tbody),
+.form-field :deep(.p-datepicker table tr) {
+  background: #ffffff !important;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-group-container),
+.form-field :deep(.p-datepicker .p-datepicker-group) {
+  background: #ffffff !important;
+}
+
+/* Day cells */
+.form-field :deep(.p-datepicker table td) {
+  padding: 0.2rem;
+  text-align: center;
+  background: white !important;
+  position: relative;
+  z-index: 1;
+}
+
+.form-field :deep(.p-datepicker table td > span) {
+  font-family: 'Khmer OS Siemreap', 'Segoe UI', sans-serif !important;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  margin: 0 auto;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 10;
+  opacity: 1 !important;
+}
+
+/* Hover effect on days */
+.form-field :deep(.p-datepicker table td > span:hover) {
+  background: #e0e7ff !important;
+  color: #4f46e5 !important;
+  transform: scale(1.08);
+  border-color: #c7d2fe !important;
+  cursor: pointer;
+}
+
+/* Selected day */
+.form-field :deep(.p-datepicker table td > span.p-highlight) {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  color: white !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+  border-color: transparent !important;
+}
+
+/* Today's date */
+.form-field :deep(.p-datepicker table td.p-datepicker-today > span) {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border: 2px solid #fbbf24 !important;
+  font-weight: 700;
+}
+
+/* Today's date when hovered */
+.form-field :deep(.p-datepicker table td.p-datepicker-today > span:hover) {
+  background: #fde68a !important;
+  color: #78350f !important;
+  transform: scale(1.08);
+}
+
+/* Other month days */
+.form-field :deep(.p-datepicker table td > span.p-disabled) {
+  color: #d1d5db !important;
+  background: #ffffff !important;
+  cursor: not-allowed !important;
+  border-color: #f3f4f6 !important;
+  opacity: 0.6 !important;
+}
+
+/* Button bar (ថ្ងៃនេះ / សម្អាត) */
+.form-field :deep(.p-datepicker .p-datepicker-buttonbar) {
+  padding: 1rem 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  background: #ffffff !important;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  position: relative;
+  z-index: 20;
+  border-radius: 0 0 13px 13px;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-buttonbar button) {
+  font-family: 'Khmer OS Siemreap', 'Segoe UI', sans-serif !important;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-buttonbar .p-button-text) {
+  background: #4f46e5 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.form-field :deep(.p-datepicker .p-datepicker-buttonbar .p-button-text:hover) {
+  background: #4338ca !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* DatePicker backdrop overlay - dark overlay behind calendar */
+:deep(.p-datepicker-mask) {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 1099 !important;
+}
+
+/* DatePicker panel container wrapper - solid white background */
+:deep(.p-datepicker-panel) {
+  z-index: 1100 !important;
+  position: fixed !important;
+  background: #ffffff !important;
+  border: 2px solid #6366f1 !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  max-width: 380px !important;
+  width: auto !important;
+  overflow: hidden;
+}
+
+:deep(.p-datepicker) {
+  z-index: 1100 !important;
+  background: #ffffff !important;
+}
+
+/* Ensure no text overlap in calendar */
+.form-field :deep(.p-datepicker *) {
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .datetime-input {
@@ -3013,12 +3421,13 @@ onMounted(() => {
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  border-top: 2px solid #e5e7eb;
-  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  background: white;
   flex-shrink: 0;
   position: sticky;
   bottom: 0;
   z-index: 10;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .btn-cancel,
