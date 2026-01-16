@@ -1,21 +1,26 @@
 import axios from 'axios';
+import { useAuthStore } from './stores/auth';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+// Legacy token management (keeping for backward compatibility during migration)
 let token = localStorage.getItem('token');
 
 export const setToken = (newToken) => {
   token = newToken;
-  localStorage.setItem('token', newToken);
+  const authStore = useAuthStore();
+  authStore.setToken(newToken);
 };
 
 export const getToken = () => {
-  return token || localStorage.getItem('token');
+  const authStore = useAuthStore();
+  return authStore.token || token || localStorage.getItem('token');
 };
 
 export const clearToken = () => {
   token = null;
-  localStorage.removeItem('token');
+  const authStore = useAuthStore();
+  authStore.logout();
 };
 
 const getHeaders = (isFormData = false) => {
@@ -41,10 +46,11 @@ const api = axios.create({
   }
 });
 
-// Add token to requests
+// Add token to requests using Pinia store
 api.interceptors.request.use(
   (config) => {
-    const authToken = getToken();
+    const authStore = useAuthStore();
+    const authToken = authStore.token;
     if (authToken) {
       config.headers.Authorization = `Bearer ${authToken}`;
     }
