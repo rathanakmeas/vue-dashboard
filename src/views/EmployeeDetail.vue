@@ -772,32 +772,114 @@
           <!-- Position Form -->
           <div v-if="dialogType === 'position'" class="form-grid">
             <div class="form-field">
-              <label>លេខលិខិត</label>
-              <input v-model="formData.letterNo" type="text" placeholder="លេខលិខិត" />
+              <label>លេខលិខិតយោង</label>
+              <input v-model="formData.referenceLetterNo" type="text" placeholder="លេខលិខិតយោង" />
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទលិខិត</label>
+              <select v-model="formData.documentType">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in documentTypes" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ក្រសួង-ស្ថាប័ន</label>
+              <select v-model="formData.ministryInstitution">
+                <option value="">ជ្រើសរើស</option>
+                <option v-for="option in ministries" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>ប្រភេទស្ថាប័ន</label>
+              <select v-model="formData.institutionType">
+                <option value="">ជ្រើសរើស</option>
+                <option value="ថ្នាក់កណ្តាល">ថ្នាក់កណ្តាល</option>
+                <option value="ថ្នាក់រាជធានី-ខេត្ត">ថ្នាក់រាជធានី-ខេត្ត</option>
+              </select>
             </div>
             <div class="form-field">
               <label>មុខតំណែង</label>
               <input v-model="formData.position" type="text" placeholder="មុខតំណែង" />
             </div>
-            <div class="form-field">
-              <label>ឋានៈស្មើ</label>
-              <input v-model="formData.equivalentRank" type="text" placeholder="ឋានៈស្មើ" />
+            <div class="form-field full-width">
+              <label>អង្គភាពចំណុះ</label>
+              <select v-model="formData.department">
+                <option value="">ជ្រើសរើស</option>
+                <template v-if="formData.institutionType === 'ថ្នាក់កណ្តាល'">
+                  <option value="ទីប្រឹក្សា">ទីប្រឹក្សា</option>
+                  <option value="ជំនួយការ">ជំនួយការ</option>
+                  <option value="ខុទ្ទកាល័យរដ្ឋមន្រ្តី">ខុទ្ទកាល័យរដ្ឋមន្រ្តី</option>
+                  <option value="ក្រុមប្រឹក្សាជំនួយការ">ក្រុមប្រឹក្សាជំនួយការ</option>
+                  <option value="អគ្គាធិការដ្ឋាន">អគ្គាធិការដ្ឋាន</option>
+                  <option value="ទីភ្នាក់ងារបញ្ជាក់ចំណាយសេវាសុខាភិបាល">ទីភ្នាក់ងារបញ្ជាក់ចំណាយសេវាសុខាភិបាល</option>
+                  <option value="មជ្ឈមណ្ឌលជាតិ គាំពារមាតា និង ទារក">មជ្ឈមណ្ឌលជាតិ គាំពារមាតា និង ទារក</option>
+                  <option value="មជ្ឈមណ្ឌលជាតិ កំចាត់រោគរបេង និង ហង់សិន">មជ្ឈមណ្ឌលជាតិ កំចាត់រោគរបេង និង ហង់សិន</option>
+                  <option value="មជ្ឈមណ្ឌលជាតិ ផ្តល់ឈាម">មជ្ឈមណ្ឌលជាតិ ផ្តល់ឈាម</option>
+                  <option value="មជ្ឈមណ្ឌលជាតិ ប្រយុទ្ធនិងជំម្ងឺអេដស៏ សើស្បែក និង កាមរោគ">មជ្ឈមណ្ឌលជាតិ ប្រយុទ្ធនិងជំម្ងឺអេដស៏ សើស្បែក និង កាមរោគ</option>
+                  <option value="មជ្ឍមណ្ឌលជាតិ ប្រយុទ្ធនឹងជំងឺគ្រុនចាញ់ ប៉ារ៉ាស៊ីតសាស្ត្រ និងបាណកសាស្ត">មជ្ឍមណ្ឌលជាតិ ប្រយុទ្ធនឹងជំងឺគ្រុនចាញ់ ប៉ារ៉ាស៊ីតសាស្ត្រ និងបាណកសាស្ត</option>
+                  <option value="មជ្ឍមណ្ឌលជាតិលើកកំពស់សុខភាព">មជ្ឍមណ្ឌលជាតិលើកកំពស់សុខភាព</option>
+                  <option value="មជ្ឍមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របូរាណ">មជ្ឍមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របូរាណ</option>
+                  <option value="មន្ទីរពេទ្យ គន្ធបុប្ផា">មន្ទីរពេទ្យ គន្ធបុប្ផា</option>
+                  <option value="មជ្ឈមណ្ឌលជាតិពិសោធន៍សុខាភិបាល">មជ្ឈមណ្ឌលជាតិពិសោធន៍សុខាភិបាល</option>
+                  <option value="មន្ទីរពេទ្យកាលម៉ែត">មន្ទីរពេទ្យកាលម៉ែត</option>
+                  <option value="មន្ទីរពេទ្យមិត្តភាពខ្មែរ-សូវៀត">មន្ទីរពេទ្យមិត្តភាពខ្មែរ-សូវៀត</option>
+                  <option value="មន្ទីរពេទ្យព្រះអង្គឌួង">មន្ទីរពេទ្យព្រះអង្គឌួង</option>
+                  <option value="មន្ទីរពេទ្យមិត្តភាពកម្ពុជា-ចិន ព្រះកុសុមៈ">មន្ទីរពេទ្យមិត្តភាពកម្ពុជា-ចិន ព្រះកុសុមៈ</option>
+                  <option value="មន្ទីរពេទ្យកុមារជាតិ">មន្ទីរពេទ្យកុមារជាតិ</option>
+                  <option value="វិទ្យាស្ថានជាតិ សុខភាពសាធារណៈ">វិទ្យាស្ថានជាតិ សុខភាពសាធារណៈ</option>
+                  <option value="ឃ្លាំងឱសថកណ្តាល">ឃ្លាំងឱសថកណ្តាល</option>
+                  <option value="អគ្គលេខាធិការ">អគ្គលេខាធិការ</option>
+                  <option value="មន្ទីរពេទ្យជ័យវរ្ម័នទី៧">មន្ទីរពេទ្យជ័យវរ្ម័នទី៧</option>
+                  <option value="អគ្គនាយកដ្ឋាន រដ្ឋបាល-ហិរញ្ញវត្ថុ">អគ្គនាយកដ្ឋាន រដ្ឋបាល-ហិរញ្ញវត្ថុ</option>
+                  <option value="អគ្គនាយកដ្ឋាន បច្ចេកទេសសុខាភិបាល">អគ្គនាយកដ្ឋាន បច្ចេកទេសសុខាភិបាល</option>
+                  <option value="អាជ្ញាធរជាតិប្រយុទ្ធនឹងជំងឺអេដស៍">អាជ្ញាធរជាតិប្រយុទ្ធនឹងជំងឺអេដស៍</option>
+                  <option value="ខុទ្ទកាល័យ និងទីប្រឹក្សា">ខុទ្ទកាល័យ និងទីប្រឹក្សា</option>
+                  <option value="អគ្គលេខាធិការដ្ឋាន">អគ្គលេខាធិការដ្ឋាន</option>
+                  <option value="សាកលវិទ្យាល័យ វិទ្យាសាស្ត្រសុខាភិបាល">សាកលវិទ្យាល័យ វិទ្យាសាស្ត្រសុខាភិបាល</option>
+                  <option value="វិទ្យាស្ថាន ប៉ាស្ទ័រ">វិទ្យាស្ថាន ប៉ាស្ទ័រ</option>
+                  <option value="សាលាមធ្យមសិក្សាភូមិភាគ">សាលាមធ្យមសិក្សាភូមិភាគ</option>
+                  <option value="ថ្នាក់ដឹកនាំ">ថ្នាក់ដឹកនាំ</option>
+                  <option value="មន្ទីរពេទ្យព្រះសីហនុ មណ្ឌលនៃក្តីសង្ឃឹម">មន្ទីរពេទ្យព្រះសីហនុ មណ្ឌលនៃក្តីសង្ឃឹម</option>
+                  <option value="មន្ទីរពេទ្យជាតិ តេជោសន្តិភាព">មន្ទីរពេទ្យជាតិ តេជោសន្តិភាព</option>
+                  <option value="មន្ទីរពេទ្យ ហ្លួង ម៉ែ">មន្ទីរពេទ្យ ហ្លួង ម៉ែ</option>
+                </template>
+                <template v-if="formData.institutionType === 'ថ្នាក់រាជធានី-ខេត្ត'">
+                  <option value="មន្ទីរសុខាភិបាលខេត្ត">មន្ទីរសុខាភិបាលខេត្ត</option>
+                  <option value="ការិយាល័យ រដ្ឋបាល និងបុគ្គលិក">ការិយាល័យ រដ្ឋបាល និងបុគ្គលិក</option>
+                  <option value="ការិយាល័យ គណនេយ្យ និងហិរញ្ញវត្ថុ">ការិយាល័យ គណនេយ្យ និងហិរញ្ញវត្ថុ</option>
+                  <option value="ការិយាល័យ គ្រប់គ្រងឱសថ សុវត្ថិភាពចំណីអារហារ">ការិយាល័យ គ្រប់គ្រងឱសថ សុវត្ថិភាពចំណីអារហារ</option>
+                  <option value="ការិយាល័យ បច្ចេកទេស">ការិយាល័យ បច្ចេកទេស</option>
+                  <option value="មន្ទីរពេទ្យខេត្ត">មន្ទីរពេទ្យខេត្ត</option>
+                  <option value="មន្ទីរពេទ្យបង្អែកខេត្ត">មន្ទីរពេទ្យបង្អែកខេត្ត</option>
+                  <option value="ការិយាល័យ សុខាភិបាលស្រុកប្រតិបត្តិ">ការិយាល័យ សុខាភិបាលស្រុកប្រតិបត្តិ</option>
+                </template>
+              </select>
             </div>
             <div class="form-field">
-              <label>ថ្ងៃចុះហត្ថលេខា</label>
-              <input v-model="formData.signatureDate" type="date" />
+              <label>កាលបរិច្ឆេទតែងតាំង <span class="required">*</span></label>
+              <input v-model="formData.appointmentDate" type="date" required />
             </div>
             <div class="form-field">
-              <label>ថ្ងៃបញ្ចប់</label>
-              <input v-model="formData.endDate" type="date" />
+              <label>បច្ចុប្បន្ន</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <label class="switch">
+                  <input type="checkbox" v-model="formData.isCurrent" />
+                  <span class="slider round"></span>
+                </label>
+                <span>{{ formData.isCurrent ? 'បើក' : 'បិទ' }}</span>
+              </div>
             </div>
             <div class="form-field">
-              <label>ក្រសួង-ស្ថាប័ន</label>
-              <input v-model="formData.ministryInstitution" type="text" placeholder="ក្រសួង-ស្ថាប័ន" />
+              <label>កាលបរិច្ឆេទបញ្ចប់</label>
+              <input v-model="formData.endDate" type="date" :disabled="formData.isCurrent" />
+            </div>
+            <div class="form-field">
+              <label>ជំនាញ/បច្ចេកទេស</label>
+              <input v-model="formData.skillTechnical" type="text" placeholder="ជំនាញ/បច្ចេកទេស" />
             </div>
             <div class="form-field full-width">
-              <label>កំណត់សម្គាល់</label>
-              <textarea v-model="formData.remarks" placeholder="កំណត់សម្គាល់" rows="3"></textarea>
+              <label>កន្លែងបម្រើការងារដែលមិនក្នុងប្រព័ន្ធ</label>
+              <textarea v-model="formData.outsideSystemWorkplace" placeholder="កន្លែងបម្រើការងារដែលមិនក្នុងប្រព័ន្ធ" rows="3"></textarea>
             </div>
           </div>
 
@@ -2797,6 +2879,58 @@ onMounted(() => {
 
 .btn-save:hover {
   background: #4f46e5;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #6366f1;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 
 @media (max-width: 640px) {
