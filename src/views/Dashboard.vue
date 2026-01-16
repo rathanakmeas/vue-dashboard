@@ -8,22 +8,27 @@
 
         <!-- Stats Cards Grid -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <h3>📁 Total Folders</h3>
-                <p>{{ statistics.totalFolders }}</p>
-            </div>
-            <div class="stat-card">
-                <h3>🔒 Owned</h3>
-                <p>{{ statistics.ownedFolders }}</p>
-            </div>
-            <div class="stat-card">
-                <h3>🔗 Shared</h3>
-                <p>{{ statistics.sharedFolders }}</p>
-            </div>
-            <div class="stat-card">
-                <h3>📄 Total Files</h3>
-                <p>{{ statistics.totalFiles }}</p>
-            </div>
+            <template v-if="loading">
+                <LoadingSkeleton variant="card" v-for="n in 4" :key="n" />
+            </template>
+            <template v-else>
+                <div class="stat-card">
+                    <h3>📁 Total Folders</h3>
+                    <p>{{ statistics.totalFolders }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🔒 Owned</h3>
+                    <p>{{ statistics.ownedFolders }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🔗 Shared</h3>
+                    <p>{{ statistics.sharedFolders }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📄 Total Files</h3>
+                    <p>{{ statistics.totalFiles }}</p>
+                </div>
+            </template>
         </div>
 
         <!-- Activity Stats -->
@@ -40,7 +45,7 @@
         <!-- Top Folders -->
         <section class="dashboard-section card">
             <h3>📁 Top Folders by Files</h3>
-            <div v-if="loading" class="loading">Loading...</div>
+            <LoadingSkeleton v-if="loading" variant="list" :rows="5" />
             <div v-else-if="topFolders.length === 0" class="no-data">No folders yet</div>
             <div v-else class="top-folders">
                 <div v-for="folder in topFolders" :key="folder._id" class="folder-stat">
@@ -71,6 +76,7 @@
 
 <script setup>
     import { ref, onMounted } from 'vue'
+    import LoadingSkeleton from '../components/LoadingSkeleton.vue'
 
     const today = new Date().toLocaleDateString(undefined, {
         weekday: 'long',

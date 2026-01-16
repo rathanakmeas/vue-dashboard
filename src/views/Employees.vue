@@ -18,7 +18,9 @@
 
     <!-- Employee Table -->
     <div class="table-container">
-      <table class="simple-table">
+      <LoadingSkeleton v-if="loading" variant="table" :rows="8" />
+      
+      <table v-else class="simple-table">
         <thead>
           <tr>
             <th>រូបភាព</th>
@@ -1831,9 +1833,11 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../api';
 import SearchableSelect from '../components/SearchableSelect.vue';
+import LoadingSkeleton from '../components/LoadingSkeleton.vue';
 
 const router = useRouter();
 const employees = ref([]);
+const loading = ref(true);
 const dialogVisible = ref(false);
 const deleteDialogVisible = ref(false);
 const selectedEmployee = ref(null);
@@ -2194,6 +2198,7 @@ const progressPercentage = computed(() => {
 
 const loadEmployees = async () => {
   try {
+    loading.value = true;
     const response = await api.get('/employees');
     // Backend returns { employees: [...], total, page, ... }
     employees.value = response.data.employees || response.data;
@@ -2204,6 +2209,8 @@ const loadEmployees = async () => {
     }
   } catch (error) {
     console.error('Error loading employees:', error);
+  } finally {
+    loading.value = false;
   }
 };
 

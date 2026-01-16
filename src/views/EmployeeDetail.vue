@@ -7,9 +7,8 @@
       <router-link to="/employees" class="breadcrumb-link active">គ្រប់គ្រងបុគ្គលិក មន្រ្តីរាជការ</router-link>
     </nav>
 
-    <div v-if="loading" class="loading-state">
-      <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: #6366f1;"></i>
-      <p>កំពុងផ្ទុក...</p>
+    <div v-if="loading" class="loading-container">
+      <LoadingSkeleton variant="detail" :rows="6" />
     </div>
 
     <div v-else-if="employee" class="employee-detail">
@@ -1014,6 +1013,7 @@ import DatePicker from 'primevue/datepicker';
 import AwardForm from '../components/AwardForm.vue';
 import DisciplinaryForm from '../components/DisciplinaryForm.vue';
 import DocumentForm from '../components/DocumentForm.vue';
+import LoadingSkeleton from '../components/LoadingSkeleton.vue';
 
 // Import constants
 import {
