@@ -20,9 +20,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '../api';
+import api, { setToken } from '../api';
+import { useAuthStore } from '../stores/auth';
 
 const router = useRouter();
+const authStore = useAuthStore();
 const credentials = ref({
   email: '',
   password: ''
@@ -31,8 +33,15 @@ const credentials = ref({
 const handleLogin = async () => {
   try {
     const response = await api.post('/auth/login', credentials.value);
-    localStorage.setItem('token', response.data.token);
-    router.push('/');
+    
+    if (response.data && response.data.token) {
+      // Update both localStorage AND auth store
+      setToken(response.data.token);
+      authStore.setUser(response.data.user);
+      
+      // Navigate to dashboard
+      await router.push('/');
+    }
   } catch (error) {
     alert('ម៉ាក់ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ');
   }

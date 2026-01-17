@@ -42,6 +42,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    console.log('=== LOGIN ATTEMPT START ===');
     console.log('Login attempt - Body:', JSON.stringify(req.body), 'Email:', req.body?.email, 'Password:', req.body?.password ? '[provided]' : '[missing]');
     const { email, password } = req.body;
 
@@ -50,24 +51,35 @@ export const login = async (req, res) => {
       console.log('VALIDATION FAILED - Email:', email, 'Password:', password ? '[provided]' : '[missing]');
       return res.status(400).json({ message: 'Email and password required' });
     }
+    console.log('✓ Validation passed');
 
     // Check if user exists
     const user = await User.findOne({ email });
+    console.log('✓ User query completed. Found:', !!user);
     if (!user) {
+      console.log('✗ User not found');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Compare password
+    console.log('Comparing password...');
     const isMatch = await user.comparePassword(password);
+    console.log('✓ Password comparison completed. Match:', isMatch);
     if (!isMatch) {
+      console.log('✗ Password mismatch');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    console.log('Generating token...');
     const token = generateToken(user._id);
+    console.log('✓ Token generated');
     
     // Log login activity
+    console.log('Logging activity...');
     await logActivity(user._id, 'LOGIN', 'USER', user._id, { email });
+    console.log('✓ Activity logged');
 
+    console.log('=== LOGIN SUCCESSFUL - Sending response ===');
     res.json({
       message: 'Login successful',
       token,
@@ -80,6 +92,8 @@ export const login = async (req, res) => {
       }
     });
   } catch (error) {
+    console.log('✗✗✗ LOGIN ERROR ✗✗✗', error.message);
+    console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
