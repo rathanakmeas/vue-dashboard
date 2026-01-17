@@ -1,5 +1,5 @@
 <template>
-  <div class="geography-input-wrapper">
+  <div class="geography-input-wrapper" :class="{ 'full-width': fullWidth }">
     <!-- Toggle Checkbox -->
     <div class="geography-toggle">
       <input 
@@ -86,6 +86,10 @@ const props = defineProps({
   id: {
     type: String,
     required: true
+  },
+  fullWidth: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -137,6 +141,10 @@ const updateManualText = (field, value) => {
   width: 100%;
 }
 
+.geography-input-wrapper.full-width {
+  grid-column: 1 / -1;
+}
+
 .geography-toggle {
   display: flex;
   align-items: center;
@@ -161,6 +169,8 @@ const updateManualText = (field, value) => {
   font-size: 0.95rem;
   color: #333;
   font-weight: 500;
+  font-family: 'Noto Serif Khmer', serif;
+  font-size: 12px;
 }
 
 .geography-toggle label:hover {
@@ -191,23 +201,25 @@ const updateManualText = (field, value) => {
 }
 
 .manual-input-mode label {
-  font-size: 0.9rem;
-  color: #666;
-  font-weight: 500;
+  font-family: 'Siemreap', sans-serif;
+  font-weight: 600;
+  color: #475569;
+  font-size: 12px;
 }
 
 .manual-input-mode input {
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  font-family: inherit;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: 'Siemreap', sans-serif;
+  font-size: 12px;
+  transition: all 0.2s;
 }
 
 .manual-input-mode input:focus {
   outline: none;
-  border-color: #2196F3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 @media (max-width: 1024px) {
