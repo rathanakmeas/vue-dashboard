@@ -41,8 +41,6 @@
             :placeholder="labels.district || 'ស្រុក/ខណ្ឌ'"
           />
         </div>
-      </div>
-      <div class="form-row">
         <div class="form-group">
           <label>{{ labels.commune || 'ឃុំ/សង្កាត់' }}</label>
           <input 
@@ -52,7 +50,9 @@
             :placeholder="labels.commune || 'ឃុំ/សង្កាត់'"
           />
         </div>
-        <div v-if="includeVillage" class="form-group">
+      </div>
+      <div v-if="includeVillage" class="form-row">
+        <div class="form-group">
           <label>{{ labels.village || 'ភូមិ' }}</label>
           <input 
             type="text" 
