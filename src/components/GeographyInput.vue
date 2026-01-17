@@ -192,12 +192,18 @@ const updateManualText = (field, value) => {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
+  width: 100%;
+}
+
+.manual-input-mode .form-row:last-child {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .manual-input-mode .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .manual-input-mode label {
