@@ -319,9 +319,10 @@
                 <h4>ទីកន្លែងកំណើត</h4>
               </div>
             <div class="form-row">
-              <GeographySelector 
+              <GeographyInput 
                 v-model="formData.birthPlace"
                 :include-village="true"
+                id="birthPlace"
               />
             </div>
             <div class="form-row">
@@ -343,9 +344,10 @@
                 <h4>អាសយដ្ឋាន</h4>
               </div>
             <div class="form-row">
-              <GeographySelector 
+              <GeographyInput 
                 v-model="formData.currentAddress"
                 :include-village="true"
+                id="currentAddress"
               />
             </div>
             <div class="form-row">
@@ -421,9 +423,10 @@
               </div>
             </div>
             <div class="form-row">
-              <GeographySelector 
+              <GeographyInput 
                 v-model="formData.emergencyAddress"
                 :include-village="true"
+                id="emergencyAddress"
               />
             </div>
             <div class="form-row">
@@ -742,9 +745,10 @@
                 <div class="subsection-title">ទីកន្លែងកំណើតម្តាយ</div>
 
                 <div class="form-row">
-                  <GeographySelector 
+                  <GeographyInput 
                     v-model="formData.motherBirthPlace"
                     :include-village="true"
+                    id="motherBirthPlace"
                   />
                 </div>
 
@@ -926,9 +930,10 @@
                   <h4>ទីកន្លែងកំណើតសហព័ទ្ធ</h4>
                 </div>
 
-                <GeographySelector 
+                <GeographyInput 
                   v-model="formData.spouseBirthPlace"
                   :include-village="true"
+                  id="spouseBirthPlace"
                 />
 
                 <div class="form-row">
@@ -950,9 +955,10 @@
                   <h4>អាសយដ្ឋានសហព័ទ្ធ</h4>
                 </div>
 
-                <GeographySelector 
+                <GeographyInput 
                   v-model="formData.spouseAddress"
                   :include-village="true"
+                  id="spouseAddress"
                 />
 
                 <div class="form-row">
@@ -1755,7 +1761,7 @@ import { useRouter } from 'vue-router';
 import api from '../api';
 import SearchableSelect from '../components/SearchableSelect.vue';
 import LoadingSkeleton from '../components/LoadingSkeleton.vue';
-import GeographySelector from '../components/GeographySelector.vue';
+import GeographyInput from '../components/GeographyInput.vue';
 
 const router = useRouter();
 const employees = ref([]);
