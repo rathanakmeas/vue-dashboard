@@ -8,7 +8,7 @@
         v-model="isManualInput"
         class="toggle-checkbox"
       />
-      <label :for="`manual-${id}`">វាយបញ្ចូលទីកន្លែងកំណើត</label>
+      <label :for="`manual-${id}`">វាយបញ្ចូល (Manual)</label>
     </div>
 
     <!-- Geography Selector Mode -->
@@ -89,7 +89,7 @@ const props = defineProps({
   },
   fullWidth: {
     type: Boolean,
-    default: true
+    default: false
   }
 });
 
