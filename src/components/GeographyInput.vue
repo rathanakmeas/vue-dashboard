@@ -8,7 +8,7 @@
         v-model="isManualInput"
         class="toggle-checkbox"
       />
-      <label :for="`manual-${id}`">វាយបញ្ចូលទីកន្លែងកំណើត (ម៉ាន់យូអាល់)</label>
+      <label :for="`manual-${id}`">វាយបញ្ចូលទីកន្លែងកំណើត</label>
     </div>
 
     <!-- Geography Selector Mode -->
@@ -180,7 +180,7 @@ const updateManualText = (field, value) => {
 
 .manual-input-mode .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
 }
 
@@ -208,6 +208,12 @@ const updateManualText = (field, value) => {
   outline: none;
   border-color: #2196F3;
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+@media (max-width: 1024px) {
+  .manual-input-mode .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 768px) {
