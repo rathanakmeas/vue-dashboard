@@ -11,6 +11,7 @@ import activityRoutes from './routes/activity.js';
 import dashboardRoutes from './routes/dashboard.js';
 import departmentRoutes from './routes/departments.js';
 import employeeRoutes from './routes/employees.js';
+import geographyRoutes from './routes/geography.js';
 import User from './models/User.js';
 import Folder from './models/Folder.js';
 import { authenticateToken } from './middleware/auth.js';
@@ -113,6 +114,7 @@ app.use('/api/files', fileRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/employees', employeeRoutes);
+app.use('/api/geography', geographyRoutes);
 app.use('/api', dashboardRoutes);
 
 // Root route

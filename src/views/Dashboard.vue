@@ -77,6 +77,7 @@
 <script setup>
     import { ref, onMounted } from 'vue'
     import LoadingSkeleton from '../components/LoadingSkeleton.vue'
+    import api from '../api.js'
 
     const today = new Date().toLocaleDateString(undefined, {
         weekday: 'long',
@@ -120,10 +121,8 @@
     const loadDashboard = async () => {
         loading.value = true
         try {
-            const response = await fetch('/api/dashboard', {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            })
-            const data = await response.json()
+            const response = await api.get('/dashboard')
+            const data = response.data
             statistics.value = data.statistics
             activityStats.value = data.activityStats
             topFolders.value = data.topFolders

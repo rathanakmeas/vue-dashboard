@@ -319,24 +319,12 @@
                 <h4>ទីកន្លែងកំណើត</h4>
               </div>
             <div class="form-row">
-              <div class="form-group">
-                <label>រាជធានី/ខេត្ត</label>
-                <input v-model="formData.birthProvince" type="text" placeholder="រាជធានី/ខេត្ត" />
-              </div>
-              <div class="form-group">
-                <label>ស្រុក/ខណ្ឌ</label>
-                <input v-model="formData.birthDistrict" type="text" placeholder="ស្រុក/ខណ្ឌ" />
-              </div>
-              <div class="form-group">
-                <label>ឃុំ/សង្កាត់</label>
-                <input v-model="formData.birthCommune" type="text" placeholder="ឃុំ/សង្កាត់" />
-              </div>
+              <GeographySelector 
+                v-model="formData.birthPlace"
+                :include-village="true"
+              />
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label>ភូមិ</label>
-                <input v-model="formData.birthVillage" type="text" placeholder="ភូមិ" />
-              </div>
               <div class="form-group">
                 <label>ផ្ទះលេខ</label>
                 <input v-model="formData.birthHouseNumber" type="text" placeholder="ផ្ទះលេខ" />
@@ -355,24 +343,12 @@
                 <h4>អាសយដ្ឋាន</h4>
               </div>
             <div class="form-row">
-              <div class="form-group">
-                <label>រាជធានី/ខេត្ត</label>
-                <input v-model="formData.addressProvince" type="text" placeholder="រាជធានី/ខេត្ត" />
-              </div>
-              <div class="form-group">
-                <label>ស្រុក/ខណ្ឌ</label>
-                <input v-model="formData.addressDistrict" type="text" placeholder="ស្រុក/ខណ្ឌ" />
-              </div>
-              <div class="form-group">
-                <label>ឃុំ/សង្កាត់</label>
-                <input v-model="formData.addressCommune" type="text" placeholder="ឃុំ/សង្កាត់" />
-              </div>
+              <GeographySelector 
+                v-model="formData.currentAddress"
+                :include-village="true"
+              />
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label>ភូមិ</label>
-                <input v-model="formData.addressVillage" type="text" placeholder="ភូមិ" />
-              </div>
               <div class="form-group">
                 <label>ផ្ទះលេខ</label>
                 <input v-model="formData.addressHouseNumber" type="text" placeholder="ផ្ទះលេខ" />
@@ -443,24 +419,12 @@
                   <option value="other">ផ្សេងៗ</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>រាជធានី/ខេត្ត</label>
-                <input v-model="formData.emergencyProvince" type="text" placeholder="រាជធានី/ខេត្ត" />
-              </div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label>ស្រុក/ខណ្ឌ</label>
-                <input v-model="formData.emergencyDistrict" type="text" placeholder="ស្រុក/ខណ្ឌ" />
-              </div>
-              <div class="form-group">
-                <label>ឃុំ/សង្កាត់</label>
-                <input v-model="formData.emergencyCommune" type="text" placeholder="ឃុំ/សង្កាត់" />
-              </div>
-              <div class="form-group">
-                <label>ភូមិ</label>
-                <input v-model="formData.emergencyVillage" type="text" placeholder="ភូមិ" />
-              </div>
+              <GeographySelector 
+                v-model="formData.emergencyAddress"
+                :include-village="true"
+              />
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -778,25 +742,13 @@
                 <div class="subsection-title">ទីកន្លែងកំណើតម្តាយ</div>
 
                 <div class="form-row">
-                  <div class="form-group">
-                    <label>រាជធានី/ខេត្ត</label>
-                    <input v-model="formData.motherBirthProvince" type="text" placeholder="រាជធានី/ខេត្ត" />
-                  </div>
-                  <div class="form-group">
-                    <label>ស្រុក/ខណ្ឌ</label>
-                    <input v-model="formData.motherBirthDistrict" type="text" placeholder="ស្រុក/ខណ្ឌ" />
-                  </div>
-                  <div class="form-group">
-                    <label>ឃុំ/សង្កាត់</label>
-                    <input v-model="formData.motherBirthCommune" type="text" placeholder="ឃុំ/សង្កាត់" />
-                  </div>
+                  <GeographySelector 
+                    v-model="formData.motherBirthPlace"
+                    :include-village="true"
+                  />
                 </div>
 
                 <div class="form-row">
-                  <div class="form-group">
-                    <label>ភូមិ</label>
-                    <input v-model="formData.motherBirthVillage" type="text" placeholder="ភូមិ" />
-                  </div>
                   <div class="form-group">
                     <label>ផ្ទះលេខ</label>
                     <input v-model="formData.motherBirthHouseNumber" type="text" placeholder="ផ្ទះលេខ" />
@@ -805,9 +757,6 @@
                     <label>ផ្លូវលេខ</label>
                     <input v-model="formData.motherBirthStreetNumber" type="text" placeholder="ផ្លូវលេខ" />
                   </div>
-                </div>
-
-                <div class="form-row">
                   <div class="form-group">
                     <label>លេខទូរស័ព្ទ</label>
                     <input v-model="formData.motherPhone" type="tel" placeholder="+855 12 345 678" />
@@ -977,26 +926,12 @@
                   <h4>ទីកន្លែងកំណើតសហព័ទ្ធ</h4>
                 </div>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>រាជធានី/ខេត្ត</label>
-                    <input v-model="formData.spouseBirthProvince" type="text" placeholder="រាជធានី/ខេត្ត" />
-                  </div>
-                  <div class="form-group">
-                    <label>ស្រុក/ខណ្ឌ</label>
-                    <input v-model="formData.spouseBirthDistrict" type="text" placeholder="ស្រុក/ខណ្ឌ" />
-                  </div>
-                  <div class="form-group">
-                    <label>ឃុំ/សង្កាត់</label>
-                    <input v-model="formData.spouseBirthCommune" type="text" placeholder="ឃុំ/សង្កាត់" />
-                  </div>
-                </div>
+                <GeographySelector 
+                  v-model="formData.spouseBirthPlace"
+                  :include-village="true"
+                />
 
                 <div class="form-row">
-                  <div class="form-group">
-                    <label>ភូមិ</label>
-                    <input v-model="formData.spouseBirthVillage" type="text" placeholder="ភូមិ" />
-                  </div>
                   <div class="form-group">
                     <label>ផ្ទះលេខ</label>
                     <input v-model="formData.spouseBirthHouseNumber" type="text" placeholder="ផ្ទះលេខ" />
@@ -1015,26 +950,12 @@
                   <h4>អាសយដ្ឋានសហព័ទ្ធ</h4>
                 </div>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>រាជធានី/ខេត្ត</label>
-                    <input v-model="formData.spouseAddressProvince" type="text" placeholder="រាជធានី/ខេត្ត" />
-                  </div>
-                  <div class="form-group">
-                    <label>ស្រុក/ខណ្ឌ</label>
-                    <input v-model="formData.spouseAddressDistrict" type="text" placeholder="ស្រុក/ខណ្ឌ" />
-                  </div>
-                  <div class="form-group">
-                    <label>ឃុំ/សង្កាត់</label>
-                    <input v-model="formData.spouseAddressCommune" type="text" placeholder="ឃុំ/សង្កាត់" />
-                  </div>
-                </div>
+                <GeographySelector 
+                  v-model="formData.spouseAddress"
+                  :include-village="true"
+                />
 
                 <div class="form-row">
-                  <div class="form-group">
-                    <label>ភូមិ</label>
-                    <input v-model="formData.spouseAddressVillage" type="text" placeholder="ភូមិ" />
-                  </div>
                   <div class="form-group">
                     <label>ផ្ទះលេខ</label>
                     <input v-model="formData.spouseAddressHouseNumber" type="text" placeholder="ផ្ទះលេខ" />
@@ -1834,6 +1755,7 @@ import { useRouter } from 'vue-router';
 import api from '../api';
 import SearchableSelect from '../components/SearchableSelect.vue';
 import LoadingSkeleton from '../components/LoadingSkeleton.vue';
+import GeographySelector from '../components/GeographySelector.vue';
 
 const router = useRouter();
 const employees = ref([]);
@@ -1913,17 +1835,21 @@ const formData = ref({
   physicalAttributes: '',
   photo: null,
   // Birth Place
-  birthProvince: '',
-  birthDistrict: '',
-  birthCommune: '',
-  birthVillage: '',
+  birthPlace: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
   birthHouseNumber: '',
   birthStreetNumber: '',
   // Current Address
-  addressProvince: '',
-  addressDistrict: '',
-  addressCommune: '',
-  addressVillage: '',
+  currentAddress: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
   addressHouseNumber: '',
   addressStreetNumber: '',
   // Emergency Contact
@@ -1932,10 +1858,12 @@ const formData = ref({
   emergencyGender: '',
   emergencyRelationship: '',
   emergencyOccupation: '',
-  emergencyProvince: '',
-  emergencyDistrict: '',
-  emergencyCommune: '',
-  emergencyVillage: '',
+  emergencyAddress: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
   emergencyHouseNumber: '',
   emergencyStreetNumber: '',
   emergencyPhone: '',
@@ -1950,10 +1878,15 @@ const formData = ref({
   fatherEthnicity: '',
   fatherNationality: '',
   fatherOccupation: '',
-  fatherBirthProvince: '',
-  fatherBirthDistrict: '',
-  fatherBirthCommune: '',
-  fatherBirthVillage: '',
+  fatherBirthPlace: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
+  fatherBirthHouseNumber: '',
+  fatherBirthStreetNumber: '',
+  fatherPhone: '',
   // Mother Information
   motherName: '',
   motherLatinName: '',
@@ -1964,10 +1897,15 @@ const formData = ref({
   motherEthnicity: '',
   motherNationality: '',
   motherOccupation: '',
-  motherBirthProvince: '',
-  motherBirthDistrict: '',
-  motherBirthCommune: '',
-  motherBirthVillage: '',
+  motherBirthPlace: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
+  motherBirthHouseNumber: '',
+  motherBirthStreetNumber: '',
+  motherPhone: '',
   // Spouse Information
   spouseWorksHere: false,
   marriageCertificateNo: '',
@@ -1982,16 +1920,20 @@ const formData = ref({
   spouseWorkplace: '',
   spouseEthnicity: '',
   spouseNationality: '',
-  spouseBirthProvince: '',
-  spouseBirthDistrict: '',
-  spouseBirthCommune: '',
-  spouseBirthVillage: '',
+  spouseBirthPlace: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
   spouseBirthHouseNumber: '',
   spouseBirthStreetNumber: '',
-  spouseAddressProvince: '',
-  spouseAddressDistrict: '',
-  spouseAddressCommune: '',
-  spouseAddressVillage: '',
+  spouseAddress: {
+    province: '',
+    district: '',
+    commune: '',
+    village: ''
+  },
   spouseAddressHouseNumber: '',
   spouseAddressStreetNumber: '',
   spousePhone: '',
@@ -2049,30 +1991,9 @@ const formData = ref({
   civilServantNotes: ''
 });
 
-// Position options for searchable dropdown
-const positionOptions = [
-  'អនុរដ្ឋលេខាធិការ',
-  'អគ្គនាយក',
-  'អគ្គនាយករង',
-  'អគ្គប្រធាន',
-  'អគ្គប្រធានរង',
-  'នាយក',
-  'នាយករង',
-  'ប្រធាន',
-  'ប្រធានរង',
-  'ប្រធានការិយាល័យ',
-  'អនុប្រធានការិយាល័យ',
-  'ប្រធានផ្នែក',
-  'អនុប្រធានផ្នែក',
-  'ប្រធានកុម្មង',
-  'អនុប្រធានកុម្មង',
-  'អ្នកឯកទេស',
-  'អ្នកជំនាញ',
-  'អនុប្រធានក្រុម',
-  'មន្រ្តីបច្ចេកទេស',
-  'មន្រ្តីរដ្ឋបាល',
-  'ផ្សេងៗ'
-];
+// Position options for searchable dropdown - imported from constants
+import { POSITION_OPTIONS } from '../constants/dropdown-options';
+const positionOptions = POSITION_OPTIONS;
 
 // Department options for searchable dropdown
 const departmentOptions = [

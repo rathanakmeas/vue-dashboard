@@ -6,8 +6,10 @@ import File from './models/File.js';
 import Activity from './models/Activity.js';
 import Department from './models/Department.js';
 import Employee from './models/Employee.js';
+import Geography from './models/Geography.js';
 import DEPARTMENTS from './config/departments.js';
 import connectDB from './config/db.js';
+import { syncGeographyData } from './utils/syncGeography.js';
 
 dotenv.config();
 
@@ -23,6 +25,7 @@ const seedData = async () => {
     await Activity.deleteMany({});
     await Department.deleteMany({});
     await Employee.deleteMany({});
+    await Geography.deleteMany({});
     console.log('Cleared existing data');
 
     // Create demo users
@@ -396,7 +399,17 @@ const seedData = async () => {
       }
     ]);
     console.log('Created activities');
+// Seed geography data from MEF API
+    console.log('\n📍 Syncing Cambodia geography data from MEF API...');
+    try {
+      await syncGeographyData();
+      console.log('✅ Geography data synced successfully!');
+    } catch (error) {
+      console.error('⚠️  Warning: Geography sync failed:', error.message);
+      console.log('   You can sync geography data later by running: npm run init-geography');
+    }
 
+    
     console.log('\n✅ Database seeded successfully!');
     console.log('\nDemo Users:');
     console.log('  Email: admin@example.com | Password: password123');
