@@ -26,8 +26,8 @@ echo Waiting for services to be ready...
 timeout /t 10 /nobreak >nul
 
 echo.
-echo Seeding database with sample data...
-docker exec vue-dashboard-backend node seeder.js
+echo Initializing database with sample data and geography...
+docker exec vue-dashboard-backend npm run seed
 
 echo.
 echo ====================================
@@ -35,11 +35,17 @@ echo ✓ All services started successfully!
 echo ====================================
 echo.
 echo Frontend: http://localhost:5173
-echo Backend:  http://localhost:5000
+echo Backend:  http://localhost:5001
 echo.
 echo Login credentials:
 echo   Email:    admin@example.com
 echo   Password: password123
+echo.
+echo Features:
+echo   - 728 Position titles
+echo   - Cambodia geography selector (25 provinces)
+echo   - Document management
+echo   - Employee management
 echo.
 echo Press any key to open the application in your browser...
 pause >nul
@@ -47,5 +53,6 @@ pause >nul
 start http://localhost:5173
 
 echo.
-echo To stop all services, run: docker-compose down
+echo To stop all services: docker-compose down
+echo To view logs: docker-compose logs -f
 echo.

@@ -24,20 +24,35 @@ echo "Waiting for services to be ready..."
 sleep 10
 
 echo ""
-echo "Seeding database with sample data..."
-docker exec vue-dashboard-backend node seeder.js
+echo "Checking database status..."
+GEO_COUNT=$(curl -s http://localhost:5001/api/geography/status 2>/dev/null | grep -o '"total_records":[0-9]*' | grep -o '[0-9]*')
+
+if [ -z "$GEO_COUNT" ] || [ "$GEO_COUNT" -lt 14000 ]; then
+    echo "Initializing database with sample data and geography..."
+    docker exec vue-dashboard-backend npm run seed
+else
+    echo "Database already initialized ($GEO_COUNT geography records found)"
+fi
 
 echo ""
 echo "===================================="
 echo "✓ All services started successfully!"
 echo "===================================="
 echo ""
-echo "Frontend: http://localhost:5173"
-echo "Backend:  http://localhost:5000"
+echo "🌐 Frontend: http://localhost:5173"
+echo "⚙️  Backend:  http://localhost:5001"
+echo "📍 Geography: $GEO_COUNT records (25 provinces)"
 echo ""
-echo "Login credentials:"
+echo "🔐 Login credentials:"
 echo "  Email:    admin@example.com"
 echo "  Password: password123"
 echo ""
-echo "To stop all services, run: docker-compose down"
+echo "📚 Features:"
+echo "  • 728 Position titles"
+echo "  • Cambodia geography selector (25 provinces)"
+echo "  • Document management"
+echo "  • Employee management"
+echo ""
+echo "To stop: docker-compose down"
+echo "To view logs: docker-compose logs -f"
 echo ""

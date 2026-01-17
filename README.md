@@ -12,13 +12,25 @@ A comprehensive HRIS (Human Resources Information System) with employee manageme
 
 ## ✨ Features
 
+## ✨ Features
+
 ### 👥 Employee Management
 - Complete employee lifecycle (CRUD operations)
 - Profile management with photo upload
 - Personal information in both Khmer and Latin scripts
-- Contact details and addresses
+- **728 official position titles** with salary grades
+- **Cambodia geography selector** - cascading province/district/commune/village dropdowns
+- Contact details and addresses (7 geography sections)
 - Employment records (ID, position, salary, dates)
 - Department assignment and transfer management
+
+### 🗺️ Geography Integration
+- **MEF Cambodia 2025 Official Data** - 14,528 administrative divisions
+- **25 Provinces** (រាជធានី/ខេត្ត) with bilingual names (Khmer/English)
+- Cascading dropdown selectors for all address fields
+- 30-day browser cache for optimal performance
+- Offline-ready after initial data load
+- Real-time data sync from MEF API
 
 ### 🏛️ Department Management
 - Multi-level department hierarchy with tree view
@@ -86,15 +98,42 @@ A comprehensive HRIS (Human Resources Information System) with employee manageme
    - Backend API: http://localhost:5001
    - MongoDB: localhost:27017
 
-4. **Default credentials:**
+4. **Access the application:**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:5001
+
+5. **Default credentials:**
    ```
    Email: admin@example.com
-   Password: admin123
+   Password: password123
    ```
+
+### Quick Start Scripts
+
+**macOS/Linux:**
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+**Windows:**
+```cmd
+start.bat
+```
+
+The startup script will:
+- ✅ Check if Docker is running
+- ✅ Build and start all containers
+- ✅ Initialize database with sample data
+- ✅ Sync Cambodia geography data (14,528 records)
+- ✅ Seed 728 position titles
+- ✅ Open browser to http://localhost:5173
 
 ### Manual Setup (Without Docker)
 
 See [Setup Guide](docs/SETUP.md) for detailed manual installation instructions.
+
+**Note:** Docker setup is recommended as it includes automatic geography data synchronization.
 
 ## 📚 Documentation
 
@@ -102,6 +141,7 @@ See [Setup Guide](docs/SETUP.md) for detailed manual installation instructions.
 |----------|-------------|
 | [Setup Guide](docs/SETUP.md) | Complete development environment setup |
 | [API Documentation](docs/API.md) | REST API endpoints and usage |
+| [Geography Selector](docs/GEOGRAPHY_SELECTOR.md) | Cambodia geography integration guide |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment instructions |
 | [Changelog](docs/CHANGELOG.md) | Version history and migration guides |
 | [Architecture](ARCHITECTURE.md) | System architecture and design |
@@ -120,11 +160,15 @@ See [Setup Guide](docs/SETUP.md) for detailed manual installation instructions.
 ### Backend
 - **Node.js** (18+) - JavaScript runtime
 - **Express.js** (4.21.2) - Web framework
-- **MongoDB** (7.0) - NoSQL database
-- **Mongoose** (8.9.5) - ODM for MongoDB
+- **MongoDB** (7.0) - NoSQL database with aggregation
+- **Mongoose** (8.9.5) - ODM for MongoDB with indexes
 - **JWT** - Authentication tokens
 - **Multer** (1.4.5) - File upload handling
 - **Bcrypt** - Password hashing
+- **node-fetch** (3.3.0) - HTTP client for MEF API
+
+### External APIs
+- **MEF Cambodia Open Data** - Official geography data (25 provinces, 197 districts, 1,646 communes, 14,528 villages)
 
 ### DevOps
 - **Docker** - Containerization
